@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const pool = require('../config/pgPool');
 
 // Protect routes
 const protect = async (req, res, next) => {
@@ -16,9 +16,17 @@ const protect = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Get user from the token
-      req.user = await User.findById(decoded.id).select('-password');
+      // Get user from PostgreSQL (exclude password)
+      const { rows } = await pool.query(
+        'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
+        [decoded.id]
+      );
 
+      if (rows.length === 0) {
+        return res.status(401).json({ message: 'Not authorized, user not found' });
+      }
+
+      req.user = rows[0];
       next();
     } catch (error) {
       console.error(error);
@@ -33,7 +41,7 @@ const protect = async (req, res, next) => {
 
 // Admin authentication middleware
 const admin = (req, res, next) => {
-  if (req.user && req.user.role === 'ADMIN') {
+  if (req.user && req.user.role === 'admin') {
     next();
   } else {
     res.status(403).json({ message: 'Not authorized as an admin' });

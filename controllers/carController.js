@@ -65,7 +65,7 @@ const updateCar = async (req, res) => {
     }
 
     // Make sure user is car owner or admin
-    if (car.seller.toString() !== req.user.id && req.user.role !== 'ADMIN') {
+    if (car.seller.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to update this car' });
     }
 
@@ -92,7 +92,7 @@ const deleteCar = async (req, res) => {
     }
 
     // Make sure user is car owner or admin
-    if (car.seller.toString() !== req.user.id && req.user.role !== 'ADMIN') {
+    if (car.seller.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to delete this car' });
     }
 

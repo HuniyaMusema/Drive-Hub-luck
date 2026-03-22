@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const pool = require('../config/pgPool');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -20,31 +21,38 @@ const registerUser = async (req, res) => {
 
   try {
     // Check if user exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
+    const { rows: existing } = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (existing.length > 0) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create user
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role: 'USER', // Default role
-    });
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    if (user) {
-      res.status(201).json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid user data' });
-    }
+    // Create user
+    const { rows } = await pool.query(
+      `INSERT INTO users (name, email, password, role)
+       VALUES ($1, $2, $3, 'user')
+       RETURNING id, name, email, role, created_at`,
+      [name, email, hashedPassword]
+    );
+
+    const user = rows[0];
+
+    res.status(201).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user.id),
+    });
   } catch (error) {
+    console.error('[registerUser]', error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -56,21 +64,31 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check for user email
-    const user = await User.findOne({ email }).select('+password');
+    const { rows } = await pool.query(
+      'SELECT id, name, email, password, role FROM users WHERE email = $1',
+      [email]
+    );
 
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials' });
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
+
+    const user = rows[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user.id),
+    });
   } catch (error) {
+    console.error('[loginUser]', error.message);
     res.status(500).json({ message: error.message });
   }
 };
