@@ -81,6 +81,38 @@ function AdminSidebar() {
   );
 }
 
+function RoleSwitcher() {
+  const { user, setUser } = useAuth();
+  const roles: { label: string; value: UserRole }[] = [
+    { label: "Admin", value: "admin" },
+    { label: "Lottery Staff", value: "lottery_staff" },
+  ];
+
+  const switchRole = (role: UserRole) => {
+    if (user) {
+      setUser({ ...user, role, name: role === "admin" ? "Admin User" : "Lottery Staff" });
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1 text-xs">
+          Role: {user?.role === "lottery_staff" ? "Lottery Staff" : "Admin"}
+          <ChevronDown className="h-3 w-3" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {roles.map((r) => (
+          <DropdownMenuItem key={r.value} onClick={() => switchRole(r.value)} className={user?.role === r.value ? "bg-accent" : ""}>
+            {r.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
