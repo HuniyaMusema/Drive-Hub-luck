@@ -89,11 +89,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center border-b px-4 bg-background">
-            <SidebarTrigger className="mr-4" />
-            <span className="text-sm font-medium text-muted-foreground">
-              {user?.role === "lottery_staff" ? "Lottery Staff Panel" : "Admin Panel"}
-            </span>
+          <header className="h-14 flex items-center justify-between border-b px-4 bg-background">
+            <div className="flex items-center">
+              <SidebarTrigger className="mr-4" />
+              <span className="text-sm font-medium text-muted-foreground">
+                {user?.role === "lottery_staff" ? "Lottery Staff Panel" : "Admin Panel"}
+              </span>
+            </div>
+            <RoleSwitcher />
           </header>
           <main className="flex-1 p-6 lg:p-8 bg-background overflow-auto">
             {children}
