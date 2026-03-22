@@ -2,7 +2,9 @@ import { Link } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices } from "lucide-react";
+import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
 
 interface NavItem {
@@ -79,6 +81,38 @@ function AdminSidebar() {
   );
 }
 
+function RoleSwitcher() {
+  const { user, setUser } = useAuth();
+  const roles: { label: string; value: UserRole }[] = [
+    { label: "Admin", value: "admin" },
+    { label: "Lottery Staff", value: "lottery_staff" },
+  ];
+
+  const switchRole = (role: UserRole) => {
+    if (user) {
+      setUser({ ...user, role, name: role === "admin" ? "Admin User" : "Lottery Staff" });
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1 text-xs">
+          Role: {user?.role === "lottery_staff" ? "Lottery Staff" : "Admin"}
+          <ChevronDown className="h-3 w-3" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {roles.map((r) => (
+          <DropdownMenuItem key={r.value} onClick={() => switchRole(r.value)} className={user?.role === r.value ? "bg-accent" : ""}>
+            {r.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
@@ -87,11 +121,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center border-b px-4 bg-background">
-            <SidebarTrigger className="mr-4" />
-            <span className="text-sm font-medium text-muted-foreground">
-              {user?.role === "lottery_staff" ? "Lottery Staff Panel" : "Admin Panel"}
-            </span>
+          <header className="h-14 flex items-center justify-between border-b px-4 bg-background">
+            <div className="flex items-center">
+              <SidebarTrigger className="mr-4" />
+              <span className="text-sm font-medium text-muted-foreground">
+                {user?.role === "lottery_staff" ? "Lottery Staff Panel" : "Admin Panel"}
+              </span>
+            </div>
+            <RoleSwitcher />
           </header>
           <main className="flex-1 p-6 lg:p-8 bg-background overflow-auto">
             {children}
