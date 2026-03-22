@@ -1,20 +1,34 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices } from "lucide-react";
+import type { UserRole } from "@/types/auth";
 
-const navItems = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Cars", url: "/admin/cars", icon: Car },
-  { title: "Rentals", url: "/admin/rentals", icon: CalendarCheck },
-  { title: "Lottery", url: "/admin/lottery", icon: Ticket },
-  { title: "Payments", url: "/admin/payments", icon: CreditCard },
-  { title: "Users", url: "/admin/users", icon: Users },
+interface NavItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: UserRole[];
+}
+
+const navItems: NavItem[] = [
+  { title: "Dashboard", url: "/admin", icon: LayoutDashboard, roles: ["admin"] },
+  { title: "Cars", url: "/admin/cars", icon: Car, roles: ["admin"] },
+  { title: "Rentals", url: "/admin/rentals", icon: CalendarCheck, roles: ["admin"] },
+  { title: "Lottery", url: "/admin/lottery", icon: Ticket, roles: ["admin"] },
+  { title: "Payments", url: "/admin/payments", icon: CreditCard, roles: ["admin"] },
+  { title: "Users", url: "/admin/users", icon: Users, roles: ["admin"] },
+  { title: "Lottery Payments", url: "/admin/lottery-payments", icon: CreditCard, roles: ["admin", "lottery_staff"] },
+  { title: "Generate Numbers", url: "/admin/generate-lottery", icon: Dices, roles: ["admin", "lottery_staff"] },
 ];
 
 function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const { user } = useAuth();
+
+  const visibleItems = navItems.filter((item) => user && item.roles.includes(user.role));
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
@@ -24,10 +38,12 @@ function AdminSidebar() {
           {!collapsed && <span className="font-bold text-sidebar-foreground font-display">DriveHub</span>}
         </div>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/40">Management</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sidebar-foreground/40">
+            {user?.role === "lottery_staff" ? "Lottery" : "Management"}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {visibleItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-primary font-medium">
@@ -41,6 +57,12 @@ function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <div className="mt-auto p-4">
+          {!collapsed && user && (
+            <div className="mb-3 px-2">
+              <p className="text-xs text-sidebar-foreground/50 uppercase tracking-wider">{user.role.replace("_", " ")}</p>
+              <p className="text-sm text-sidebar-foreground truncate">{user.name}</p>
+            </div>
+          )}
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
@@ -58,6 +80,8 @@ function AdminSidebar() {
 }
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -65,7 +89,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col">
           <header className="h-14 flex items-center border-b px-4 bg-background">
             <SidebarTrigger className="mr-4" />
-            <span className="text-sm font-medium text-muted-foreground">Admin Panel</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              {user?.role === "lottery_staff" ? "Lottery Staff Panel" : "Admin Panel"}
+            </span>
           </header>
           <main className="flex-1 p-6 lg:p-8 bg-background overflow-auto">
             {children}
