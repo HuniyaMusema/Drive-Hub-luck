@@ -2,7 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ENUM TYPES
-CREATE TYPE user_role AS ENUM ('user', 'admin');
+CREATE TYPE user_role AS ENUM ('user', 'admin', 'lottery_staff');
 CREATE TYPE car_type AS ENUM ('sale', 'rental');
 CREATE TYPE lottery_status AS ENUM ('active', 'closed');
 CREATE TYPE lottery_number_status AS ENUM ('available', 'pending', 'confirmed');
@@ -65,6 +65,7 @@ CREATE TABLE lottery_numbers (
     status lottery_number_status NOT NULL DEFAULT 'available',
     user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     lottery_id UUID NOT NULL REFERENCES lottery_settings(id) ON DELETE CASCADE,
+    generated_by UUID REFERENCES users(id) ON DELETE SET NULL,
     expires_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -82,8 +83,19 @@ CREATE TABLE payments (
     status payment_status NOT NULL DEFAULT 'pending',
     reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
     reviewed_at TIMESTAMP WITH TIME ZONE,
+    rejection_reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 6. Audit Logs Table
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    action_type VARCHAR(100) NOT NULL,
+    performed_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    target_id UUID,
+    details JSONB,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- TRIGGERS
