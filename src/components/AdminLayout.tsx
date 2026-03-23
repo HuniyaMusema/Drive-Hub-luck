@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown, UserCheck } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
@@ -23,6 +23,7 @@ const navItems: NavItem[] = [
   { title: "Users", url: "/admin/users", icon: Users, roles: ["admin"] },
   { title: "Lottery Payments", url: "/admin/lottery-payments", icon: CreditCard, roles: ["admin", "lottery_staff"] },
   { title: "Generate Numbers", url: "/admin/generate-lottery", icon: Dices, roles: ["admin", "lottery_staff"] },
+  { title: "Participants", url: "/admin/lottery-participants", icon: UserCheck, roles: ["admin", "lottery_staff"] },
 ];
 
 function AdminSidebar() {

@@ -16,6 +16,7 @@ import Lottery from "./pages/lottery/Lottery";
 import LotterySelect from "./pages/lottery/LotterySelect";
 import LotteryPayments from "./pages/lottery/LotteryPayments";
 import GenerateLotteryNumbers from "./pages/lottery/GenerateLotteryNumbers";
+import LotteryParticipants from "./pages/lottery/LotteryParticipants";
 import Payment from "./pages/Payment";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
@@ -63,6 +64,7 @@ const App = () => (
             {/* Admin + Lottery Staff */}
             <Route path="/admin/lottery-payments" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><LotteryPayments /></ProtectedRoute>} />
             <Route path="/admin/generate-lottery" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><GenerateLotteryNumbers /></ProtectedRoute>} />
+            <Route path="/admin/lottery-participants" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><LotteryParticipants /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
