@@ -15,7 +15,9 @@ app.use('/api/cars', require('./routes/carRoutes'));
 app.use('/api/lottery', require('./routes/lotteryRoutes'));
 
 // Admin routes (PostgreSQL-backed)
-app.use('/api/admin/lottery', require('./routes/adminLotteryRoutes'));
+app.use('/api/admin/cars',      require('./routes/adminCarRoutes'));
+app.use('/api/admin/lottery',   require('./routes/adminLotteryRoutes'));
+app.use('/api/admin/payments',  require('./routes/adminPaymentRoutes'));
 
 // Basic route for testing
 app.get('/', (req, res) => {
