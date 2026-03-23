@@ -10,7 +10,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Car className="h-7 w-7" />
-              <span className="text-xl font-bold font-display">DriveHub</span>
+              <span className="text-xl font-bold font-display">Gech (ጌች)</span>
             </Link>
             <p className="text-sm text-primary-foreground/70 leading-relaxed max-w-xs">
               Your trusted partner for car sales, rentals, and exciting lottery draws. Premium vehicles, transparent pricing.
@@ -69,14 +69,14 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2.5 text-sm text-primary-foreground/70">
                 <Mail className="h-4 w-4 shrink-0" />
-                <span>hello@drivehub.com</span>
+                <span>hello@gech.com</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/40">
-          © {new Date().getFullYear()} DriveHub. All rights reserved.
+          © {new Date().getFullYear()} Gech (ጌች). All rights reserved.
         </div>
       </div>
     </footer>

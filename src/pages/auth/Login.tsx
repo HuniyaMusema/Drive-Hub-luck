@@ -11,13 +11,13 @@ import type { User } from "@/types/auth";
 import { useToast } from "@/hooks/use-toast";
 
 const DEMO_ACCOUNTS: Record<string, { password: string; user: User }> = {
-  "admin@drivehub.com": {
+  "admin@gech.com": {
     password: "admin123",
-    user: { id: "1", name: "Admin User", email: "admin@drivehub.com", role: "admin" },
+    user: { id: "1", name: "Admin User", email: "admin@gech.com", role: "admin" },
   },
-  "staff@drivehub.com": {
+  "staff@gech.com": {
     password: "staff123",
-    user: { id: "2", name: "Lottery Staff", email: "staff@drivehub.com", role: "lottery_staff" },
+    user: { id: "2", name: "Lottery Staff", email: "staff@gech.com", role: "lottery_staff" },
   },
 };
 
@@ -37,7 +37,7 @@ export default function Login() {
       toast({ title: `Welcome, ${account.user.name}!`, description: `Logged in as ${account.user.role.replace("_", " ")}` });
       navigate(account.user.role === "admin" ? "/admin" : "/admin/lottery-payments");
     } else {
-      toast({ title: "Invalid credentials", description: "Try admin@drivehub.com / admin123 or staff@drivehub.com / staff123", variant: "destructive" });
+      toast({ title: "Invalid credentials", description: "Try admin@gech.com / admin123 or staff@gech.com / staff123", variant: "destructive" });
     }
   };
 
@@ -52,13 +52,13 @@ export default function Login() {
                 <Car className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl font-bold text-card-foreground">Welcome Back</h1>
-              <p className="text-sm text-muted-foreground mt-1">Sign in to your DriveHub account</p>
+              <p className="text-sm text-muted-foreground mt-1">Sign in to your Gech (ጌች) account</p>
             </div>
 
             <div className="mb-6 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground space-y-1">
               <p className="font-semibold text-foreground text-sm mb-1">Demo Accounts</p>
-              <p><span className="font-medium">Admin:</span> admin@drivehub.com / admin123</p>
-              <p><span className="font-medium">Lottery Staff:</span> staff@drivehub.com / staff123</p>
+              <p><span className="font-medium">Admin:</span> admin@gech.com / admin123</p>
+              <p><span className="font-medium">Lottery Staff:</span> staff@gech.com / staff123</p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>

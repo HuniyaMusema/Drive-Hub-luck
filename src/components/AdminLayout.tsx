@@ -37,7 +37,7 @@ function AdminSidebar() {
       <SidebarContent className="bg-sidebar">
         <div className="p-4 flex items-center gap-2">
           <Car className="h-6 w-6 text-sidebar-primary shrink-0" />
-          {!collapsed && <span className="font-bold text-sidebar-foreground font-display">DriveHub</span>}
+          {!collapsed && <span className="font-bold text-sidebar-foreground font-display">Gech (ጌች)</span>}
         </div>
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/40">

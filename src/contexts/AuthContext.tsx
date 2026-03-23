@@ -7,7 +7,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const defaultUser: User = {
   id: "1",
   name: "Admin User",
-  email: "admin@drivehub.com",
+  email: "admin@gech.com",
   role: "admin",
 };
 

@@ -28,7 +28,7 @@ export default function Register() {
                 <Car className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl font-bold text-card-foreground">Create Account</h1>
-              <p className="text-sm text-muted-foreground mt-1">Join DriveHub to buy, rent, or win</p>
+              <p className="text-sm text-muted-foreground mt-1">Join Gech (ጌች) to buy, rent, or win</p>
             </div>
 
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
