@@ -19,7 +19,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
         <Link to="/" className="flex items-center gap-2 text-primary-foreground">
           <Car className="h-7 w-7" />
-          <span className="text-xl font-bold font-display tracking-tight">DriveHub</span>
+          <span className="text-xl font-bold font-display tracking-tight">Gech (ጌች)</span>
         </Link>
 
         {/* Desktop nav */}

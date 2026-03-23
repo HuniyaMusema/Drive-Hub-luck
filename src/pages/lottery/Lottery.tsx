@@ -13,7 +13,7 @@ export default function Lottery() {
       <div className="container mx-auto px-4 lg:px-8">
         {/* Hero */}
         <div className="text-center mb-16 animate-fade-in-up">
-          <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">DriveHub Lottery</p>
+          <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">Gech (ጌች) Lottery</p>
           <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight mb-4">
             Pick a Number, Win a Ride
           </h1>
@@ -108,7 +108,7 @@ export default function Lottery() {
             <li>• Numbers are reserved upon payment approval — not upon selection.</li>
             <li>• The draw date is announced once all tickets are sold or the deadline arrives.</li>
             <li>• Winners must claim their prize within 30 days of the draw.</li>
-            <li>• All decisions by DriveHub administration are final.</li>
+            <li>• All decisions by Gech (ጌች) administration are final.</li>
           </ul>
         </div>
       </div>
