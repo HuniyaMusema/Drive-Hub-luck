@@ -48,4 +48,22 @@ const admin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin };
+// Lottery Staff authentication middleware
+const isLotteryStaff = (req, res, next) => {
+  if (req.user && req.user.role === 'lottery_staff') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized as lottery staff' });
+  }
+};
+
+// Admin or Lottery Staff authentication middleware
+const isAdminOrLotteryStaff = (req, res, next) => {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'lottery_staff')) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized: Admin or Lottery Staff role required' });
+  }
+};
+
+module.exports = { protect, admin, isLotteryStaff, isAdminOrLotteryStaff };
