@@ -16,6 +16,7 @@ import Lottery from "./pages/lottery/Lottery";
 import LotterySelect from "./pages/lottery/LotterySelect";
 import LotteryPayments from "./pages/lottery/LotteryPayments";
 import GenerateLotteryNumbers from "./pages/lottery/GenerateLotteryNumbers";
+import LotteryParticipants from "./pages/lottery/LotteryParticipants";
 import Payment from "./pages/Payment";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
