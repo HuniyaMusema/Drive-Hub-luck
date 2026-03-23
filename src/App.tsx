@@ -64,6 +64,7 @@ const App = () => (
             {/* Admin + Lottery Staff */}
             <Route path="/admin/lottery-payments" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><LotteryPayments /></ProtectedRoute>} />
             <Route path="/admin/generate-lottery" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><GenerateLotteryNumbers /></ProtectedRoute>} />
+            <Route path="/admin/lottery-participants" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><LotteryParticipants /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
