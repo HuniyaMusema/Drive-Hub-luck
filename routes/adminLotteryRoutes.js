@@ -7,26 +7,25 @@ const {
   startLottery,
   stopLottery,
   getAllLotteries,
+  getLotteryPayments,
+  verifyPayment,
+  rejectPayment,
+  getLotteryNumbers,
 } = require('../controllers/adminLotteryController');
 
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, isAdminOrLotteryStaff } = require('../middleware/authMiddleware');
 
-// All routes require authentication AND admin role
-router.use(protect, admin);
+// ── Admin-Only Routes ────────────────────────────────────────────────────────
+router.post('/', protect, admin, createLottery);
+router.put('/:id/start', protect, admin, startLottery);
+router.put('/:id/stop', protect, admin, stopLottery);
 
-// POST   /api/admin/lottery          → create new lottery
-router.post('/', createLottery);
-
-// GET    /api/admin/lottery          → list all lotteries (history)
-router.get('/', getAllLotteries);
-
-// GET    /api/admin/lottery/current  → get the active lottery
-router.get('/current', getCurrentLottery);
-
-// PUT    /api/admin/lottery/:id/start → activate a lottery
-router.put('/:id/start', startLottery);
-
-// PUT    /api/admin/lottery/:id/stop  → close a lottery
-router.put('/:id/stop', stopLottery);
+// ── Admin-or-Lottery-Staff Routes ───────────────────────────────────────────
+router.get('/', protect, isAdminOrLotteryStaff, getAllLotteries);
+router.get('/current', protect, isAdminOrLotteryStaff, getCurrentLottery);
+router.get('/payments', protect, isAdminOrLotteryStaff, getLotteryPayments);
+router.get('/numbers', protect, isAdminOrLotteryStaff, getLotteryNumbers);
+router.post('/payments/:id/verify', protect, isAdminOrLotteryStaff, verifyPayment);
+router.post('/payments/:id/reject', protect, isAdminOrLotteryStaff, rejectPayment);
 
 module.exports = router;

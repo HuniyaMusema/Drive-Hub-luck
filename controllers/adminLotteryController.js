@@ -16,6 +16,17 @@ const fetchActiveLottery = async (client) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Helper: create an audit log entry
+// ─────────────────────────────────────────────────────────────────────────────
+const createAuditLog = async (client, action_type, performed_by, target_id, details) => {
+  await client.query(
+    `INSERT INTO audit_logs (action_type, performed_by, target_id, details)
+     VALUES ($1, $2, $3, $4)`,
+    [action_type, performed_by, target_id, details ? JSON.stringify(details) : null]
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Create a new lottery + bulk-generate lottery numbers
 // @route   POST /api/admin/lottery
 // @access  Private / Admin
@@ -85,17 +96,19 @@ const createLottery = async (req, res) => {
       let   paramIdx = 1;
 
       for (let num = start; num <= end; num++) {
-        values.push(`($${paramIdx}, $${paramIdx + 1}, 'available')`);
-        params.push(lottery.id, num);
-        paramIdx += 2;
+        values.push(`($${paramIdx}, $${paramIdx + 1}, 'available', $${paramIdx + 2})`);
+        params.push(lottery.id, num, req.user.id);
+        paramIdx += 3;
       }
 
       await client.query(
-        `INSERT INTO lottery_numbers (lottery_id, number, status)
+        `INSERT INTO lottery_numbers (lottery_id, number, status, generated_by)
          VALUES ${values.join(', ')}`,
         params
       );
     }
+
+    await createAuditLog(client, 'LOTTERY_CREATED', req.user.id, lottery.id, { start, end });
 
     await client.query('COMMIT');
 
@@ -283,10 +296,145 @@ const getAllLotteries = async (req, res) => {
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// @desc    Get all lottery payments
+// @route   GET /api/admin/lottery/payments
+// @access  Private / Admin / LotteryStaff
+// ─────────────────────────────────────────────────────────────────────────────
+const getLotteryPayments = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT p.*, u.name as user_name, u.email as user_email, ln.number as ticket_number
+       FROM payments p
+       JOIN users u ON p.user_id = u.id
+       JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+       ORDER BY p.created_at DESC`
+    );
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.error('[getLotteryPayments]', error.message);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// @desc    Verify (approve) a lottery payment
+// @route   POST /api/admin/lottery/payments/:id/verify
+// @access  Private / Admin / LotteryStaff
+// ─────────────────────────────────────────────────────────────────────────────
+const verifyPayment = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const { rows } = await client.query('SELECT * FROM payments WHERE id = $1', [id]);
+    if (rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'Payment not found' });
+    }
+
+    if (rows[0].status !== 'pending') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ message: `Payment is already ${rows[0].status}` });
+    }
+
+    const { rows: updated } = await client.query(
+      `UPDATE payments 
+       SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), updated_at = NOW()
+       WHERE id = $2 
+       RETURNING *`,
+      [req.user.id, id]
+    );
+
+    await createAuditLog(client, 'PAYMENT_VERIFIED', req.user.id, id, { status: 'approved' });
+
+    await client.query('COMMIT');
+    return res.status(200).json(updated[0]);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('[verifyPayment]', error.message);
+    return res.status(500).json({ message: error.message });
+  } finally {
+    client.release();
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// @desc    Reject a lottery payment
+// @route   POST /api/admin/lottery/payments/:id/reject
+// @access  Private / Admin / LotteryStaff
+// ─────────────────────────────────────────────────────────────────────────────
+const rejectPayment = async (req, res) => {
+  const { id } = req.params;
+  const { rejection_reason } = req.body;
+
+  if (!rejection_reason) {
+    return res.status(400).json({ message: 'Rejection reason is required' });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const { rows } = await client.query('SELECT * FROM payments WHERE id = $1', [id]);
+    if (rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'Payment not found' });
+    }
+
+    const { rows: updated } = await client.query(
+      `UPDATE payments 
+       SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), rejection_reason = $2, updated_at = NOW()
+       WHERE id = $3 
+       RETURNING *`,
+      [req.user.id, rejection_reason, id]
+    );
+
+    await createAuditLog(client, 'PAYMENT_REJECTED', req.user.id, id, { reason: rejection_reason });
+
+    await client.query('COMMIT');
+    return res.status(200).json(updated[0]);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('[rejectPayment]', error.message);
+    return res.status(500).json({ message: error.message });
+  } finally {
+    client.release();
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// @desc    Get lottery numbers history
+// @route   GET /api/admin/lottery/numbers
+// @access  Private / Admin / LotteryStaff
+// ─────────────────────────────────────────────────────────────────────────────
+const getLotteryNumbers = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT ln.*, u.name as generated_by_name, us.name as assigned_to_name
+       FROM lottery_numbers ln
+       LEFT JOIN users u ON ln.generated_by = u.id
+       LEFT JOIN users us ON ln.user_id = us.id
+       ORDER BY ln.created_at DESC`
+    );
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.error('[getLotteryNumbers]', error.message);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createLottery,
   getCurrentLottery,
   startLottery,
   stopLottery,
   getAllLotteries,
+  getLotteryPayments,
+  verifyPayment,
+  rejectPayment,
+  getLotteryNumbers,
 };
