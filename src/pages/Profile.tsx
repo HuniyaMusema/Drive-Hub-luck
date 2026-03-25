@@ -1,12 +1,27 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Mail, Phone, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Profile() {
   const [editing, setEditing] = useState(false);
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    setUser(null);
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+    navigate("/");
+  };
 
   return (
     <PageShell>
@@ -19,7 +34,7 @@ export default function Profile() {
               <User className="h-7 w-7 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold text-card-foreground text-lg">Marcus Rivera</h2>
+              <h2 className="font-semibold text-card-foreground text-lg">{user?.name || "User"}</h2>
               <p className="text-sm text-muted-foreground">Member since Jan 2026</p>
             </div>
           </div>
@@ -28,18 +43,18 @@ export default function Profile() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="first">First Name</Label>
-                <Input id="first" defaultValue="Marcus" disabled={!editing} />
+                <Input id="first" defaultValue={user?.name?.split(' ')[0] || "User"} disabled={!editing} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="last">Last Name</Label>
-                <Input id="last" defaultValue="Rivera" disabled={!editing} />
+                <Input id="last" defaultValue={user?.name?.split(' ')[1] || ""} disabled={!editing} />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="email" defaultValue="marcus@email.com" disabled={!editing} className="pl-10" />
+                <Input id="email" defaultValue={user?.email || "user@email.com"} disabled={!editing} className="pl-10" />
               </div>
             </div>
             <div className="space-y-2">
@@ -93,7 +108,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <Button variant="outline" className="text-destructive hover:text-destructive">
+        <Button variant="outline" className="text-destructive hover:text-destructive" onClick={handleLogout}>
           <LogOut className="h-4 w-4 mr-2" /> Log Out
         </Button>
       </div>

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -5,10 +6,9 @@ import { ArrowRight, Car, Key, Ticket, Shield, Clock, Star } from "lucide-react"
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CarCard } from "@/components/CarCard";
+import { carsData } from "@/data/cars";
 import heroBg from "@/assets/hero-bg.jpg";
-import car1 from "@/assets/car-1.jpg";
-import car2 from "@/assets/car-2.jpg";
-import car3 from "@/assets/car-3.jpg";
 
 function HeroSection() {
   const { t } = useLanguage();
@@ -65,12 +65,10 @@ function HeroSection() {
 function FeaturedSection() {
   const { ref, isVisible } = useScrollReveal();
   const { t } = useLanguage();
-
-  const featuredCars = [
-    { id: 1, name: "Horizon LX 450", price: "$42,800", type: t("sale"), year: 2025, image: car1 },
-    { id: 2, name: "Prestige Sedan S", price: "$85/day", type: t("rental"), year: 2024, image: car2 },
-    { id: 3, name: "Apex GT Coupe", price: "$67,500", type: t("sale"), year: 2025, image: car3 },
-  ];
+  
+  const featuredCars = useMemo(() => {
+    return carsData.filter(car => [1, 2, 3].includes(car.id));
+  }, []);
 
   return (
     <section ref={ref} className="py-24 lg:py-32 bg-background">
@@ -89,30 +87,7 @@ function FeaturedSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredCars.map((car, i) => (
-              <div
-                key={car.id}
-                className={`group rounded-xl overflow-hidden bg-card shadow-sm hover:shadow-xl transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-                style={{ transitionDelay: `${(i + 1) * 100}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
-              >
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
-                  <span className="absolute top-3 left-3 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-full">
-                    {car.type}
-                  </span>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-1">
-                    <h3 className="font-semibold text-card-foreground">{car.name}</h3>
-                    <span className="text-sm text-muted-foreground">{car.year}</span>
-                  </div>
-                  <p className="text-xl font-bold text-primary tabular-nums">{car.price}</p>
-                  <Link to={`/cars/${car.id}`}>
-                    <Button variant="outline" size="sm" className="w-full mt-4">
-                      {t("viewDetails")}
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+              <CarCard key={car.id} car={car} view="grid" isVisible={isVisible} delay={(i + 1) * 100} />
             ))}
           </div>
         </div>

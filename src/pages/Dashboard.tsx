@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
-import { Car, Key, Ticket, CreditCard, User, ArrowRight } from "lucide-react";
+import { Car, Key, Ticket, CreditCard, User, ArrowRight, Heart } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -18,6 +18,7 @@ export default function Dashboard() {
   const quickLinks = [
     { icon: Car, label: t("browseCarsForSale"), to: "/cars/sale" },
     { icon: Key, label: t("rentACar"), to: "/cars/rent" },
+    { icon: Heart, label: t("savedCars"), to: "/saved-cars" },
     { icon: Ticket, label: t("enterLotteryAction"), to: "/lottery" },
     { icon: CreditCard, label: t("payment"), to: "/payment" },
     { icon: User, label: t("myProfile"), to: "/profile" },

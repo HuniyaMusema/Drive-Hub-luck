@@ -2,13 +2,33 @@ import { useParams, Link } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { carsData } from "@/data/cars";
-import { ArrowLeft, Fuel, Gauge, Settings2, Users, Calendar, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Fuel, Gauge, Settings2, Users, Calendar, CheckCircle2, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSavedCars } from "@/contexts/SavedCarsContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function CarDetail() {
   const { id } = useParams();
   const car = carsData.find((c) => c.id === Number(id));
   const { t } = useLanguage();
+  const { isSaved, toggleSave } = useSavedCars();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const saved = car ? isSaved(car.id) : false;
+
+  const handleToggleSave = () => {
+    if (!car) return;
+    if (!user) {
+      toast({
+        title: t("signInToSave"),
+        description: t("loginPromptDesc") || "Sign in to your account to bookmark your favorite vehicles.",
+      });
+      return;
+    }
+    toggleSave(car.id);
+  };
 
   if (!car) {
     return (
@@ -70,18 +90,25 @@ export default function CarDetail() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {car.type === "sale" ? (
-                <Button size="xl" disabled={!car.available} className="flex-1 min-w-[160px]">
-                  <CheckCircle2 className="h-5 w-5 mr-1" /> {car.available ? t("contactToBuy") : t("noLongerAvailable")}
-                </Button>
+              {car.available ? (
+                <Link to="/contact" className="flex-1 min-w-[160px]">
+                  <Button size="xl" className="w-full">
+                    <CheckCircle2 className="h-5 w-5 mr-1" /> {car.type === "sale" ? t("contactToBuy") : t("bookRental")}
+                  </Button>
+                </Link>
               ) : (
-                <Button size="xl" disabled={!car.available} className="flex-1 min-w-[160px]">
-                  <CheckCircle2 className="h-5 w-5 mr-1" /> {car.available ? t("bookRental") : t("currentlyRented")}
+                <Button size="xl" disabled className="flex-1 min-w-[160px]">
+                  <CheckCircle2 className="h-5 w-5 mr-1" /> {car.type === "sale" ? t("noLongerAvailable") : t("currentlyRented")}
                 </Button>
               )}
-              <Link to="/payment">
-                <Button variant="outline" size="xl">{t("paymentInfo")}</Button>
-              </Link>
+              <Button
+                variant={saved ? "default" : "outline"}
+                size="xl"
+                onClick={handleToggleSave}
+                className={`w-14 px-0 shrink-0 ${saved ? "bg-primary text-primary-foreground" : ""}`}
+              >
+                <Heart className={`h-5 w-5 ${saved ? "fill-current" : ""}`} />
+              </Button>
             </div>
           </div>
         </div>

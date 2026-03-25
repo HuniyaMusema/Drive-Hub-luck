@@ -43,7 +43,7 @@ export default function Contact() {
 
               {/* Telegram */}
               <a
-                href="https://t.me/GechAutomotive"
+                href="https://t.me/gech49"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-start gap-4 bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group"
@@ -53,7 +53,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-card-foreground mb-1">{t("telegramLabel")}</h3>
-                  <p className="text-accent font-medium">@GechAutomotive</p>
+                  <p className="text-accent font-medium">@gech49</p>
                   <p className="text-xs text-muted-foreground mt-1">{t("telegramTap")}</p>
                 </div>
               </a>
@@ -99,7 +99,7 @@ export default function Contact() {
             <div className="rounded-xl overflow-hidden shadow-sm bg-card h-[480px] lg:h-auto min-h-[400px]">
               <iframe
                 title="Gech Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.5!2d38.7578!3d9.0192!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMDEnMDkuMSJOIDM4wrA0NSwyNy4xIkU!5e0!3m2!1sen!2set!4v1"
+                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3941.148077914366!2d38.7046111!3d8.958499999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOMKwNTcnMzAuNiJOIDM4wrA0MicxNi42IkU!5e0!3m2!1sam!2set!4v1774456777329!5m2!1sam!2set"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

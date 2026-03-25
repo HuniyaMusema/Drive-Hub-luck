@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Car, Menu, X, Globe } from "lucide-react";
+import { Car, Menu, X, Globe, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
+import { useSavedCars } from "@/contexts/SavedCarsContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,6 +24,8 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
+  const { savedCarsCount } = useSavedCars();
+  const { user } = useAuth();
 
   const currentLang = languages.find((l) => l.code === language);
 
@@ -80,12 +84,29 @@ export function Header() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <Link to="/auth/login">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6">
-              {t("login")}
-            </Button>
+          
+          <Link to="/saved-cars" className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <Heart className={`h-5 w-5 ${savedCarsCount > 0 ? "text-primary fill-primary/20" : ""}`} />
+            {savedCarsCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                {savedCarsCount}
+              </span>
+            )}
           </Link>
+
+          {user ? (
+            <Link to="/dashboard">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6">
+                {t("dashboard")}
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/auth/login">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6">
+                {t("login")}
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -115,6 +136,40 @@ export function Header() {
                 {t(link.key)}
               </Link>
             ))}
+            
+            {user && (
+              <Link
+                to="/saved-cars"
+                className={`flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                  isActive("/saved-cars")
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <Heart className="h-4 w-4" />
+                {t("savedCars")}
+                {savedCarsCount > 0 && (
+                  <span className="ml-auto bg-primary text-primary-foreground text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                    {savedCarsCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            {!user ? (
+              <Link to="/auth/login" onClick={() => setMobileOpen(false)}>
+                <Button className="w-full bg-primary text-primary-foreground rounded-full mt-2">
+                  {t("login")}
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                <Button className="w-full bg-primary text-primary-foreground rounded-full mt-2">
+                  {t("dashboard")}
+                </Button>
+              </Link>
+            )}
 
             {/* Language selector mobile */}
             <div className="flex gap-2 pt-3 border-t border-border mt-2">

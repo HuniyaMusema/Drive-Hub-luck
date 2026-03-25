@@ -215,9 +215,12 @@ const translations: Record<Language, Record<string, string>> = {
     telegramTap: "Opens Telegram app",
     emailLabel: "Email",
     addressLabel: "Address",
-    addressValue: "Bole Sub City, Addis Ababa, Ethiopia",
+    addressValue: "Jemo3 beside Taf gas station",
     hoursLabel: "Business Hours",
     hoursValue: "Mon–Sat: 8:00 AM – 6:00 PM",
+    savedCars: "Saved Cars",
+    noSavedCars: "You haven't saved any cars yet.",
+    signInToSave: "Please sign in to save cars.",
   },
   am: {
     // Nav
@@ -419,9 +422,12 @@ const translations: Record<Language, Record<string, string>> = {
     telegramTap: "የቴሌግራም መተግበሪያ ይከፈታል",
     emailLabel: "ኢሜይል",
     addressLabel: "አድራሻ",
-    addressValue: "ቦሌ ክፍለ ከተማ፣ አዲስ አበባ፣ ኢትዮጵያ",
+    addressValue: "ጀሞ3 ጣፍ ነዳጅ መሸጫ አጠገብ",
     hoursLabel: "የስራ ሰዓት",
     hoursValue: "ሰኞ–ቅዳሜ: 8:00 ጠ. – 6:00 ከሰ.",
+    savedCars: "የተቀመጡ መኪናዎች",
+    noSavedCars: "እስካሁን ምንም የተቀመጡ መኪናዎች የሉም።",
+    signInToSave: "መኪናዎችን ለማስቀመጥ እባክዎ ይግቡ።",
   },
   om: {
     // Nav
@@ -623,9 +629,12 @@ const translations: Record<Language, Record<string, string>> = {
     telegramTap: "Apiliikeeshinii Teleegiraamii bana",
     emailLabel: "Imeelii",
     addressLabel: "Teessoo",
-    addressValue: "Kutaa Magaalaa Boolee, Finfinnee, Itoophiyaa",
+    addressValue: "Jemo3 buufata boba'aa Taf bukkee",
     hoursLabel: "Saʼaatii Hojii",
     hoursValue: "Wiixata–Sanbata: 8:00 WD – 6:00 WB",
+    savedCars: "Konkolaataa Olka'ame",
+    noSavedCars: "Hamma yoonaatti konkolaataa olkaa'ame hin qabdu.",
+    signInToSave: "Konkolaataa olkaasuuf maaloo seenaa.",
   },
 };
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { carsData, brands } from "@/data/cars";
 import { Search, Grid3X3, List, SlidersHorizontal } from "lucide-react";
+import { CarCard } from "@/components/CarCard";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -84,57 +85,13 @@ export default function CarsForSale() {
           ) : view === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {cars.map((car, i) => (
-                <Link
-                  to={`/cars/${car.id}`}
-                  key={car.id}
-                  className={`group rounded-xl overflow-hidden bg-card shadow-sm hover:shadow-xl transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-                  style={{ transitionDelay: `${i * 80}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
-                    {!car.available && (
-                      <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
-                        <span className="bg-destructive text-destructive-foreground text-xs font-bold px-3 py-1 rounded-full">{t("sold")}</span>
-                      </div>
-                    )}
-                    {car.available && (
-                      <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">{t("available")}</span>
-                    )}
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-start justify-between mb-1">
-                      <h3 className="font-semibold text-card-foreground">{car.name}</h3>
-                      <span className="text-sm text-muted-foreground">{car.year}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">{car.mileage} · {car.fuel} · {car.transmission}</p>
-                    <p className="text-xl font-bold text-primary tabular-nums">{car.priceLabel}</p>
-                  </div>
-                </Link>
+                <CarCard key={car.id} car={car} view="grid" isVisible={isVisible} delay={i * 80} />
               ))}
             </div>
           ) : (
             <div className="space-y-4">
               {cars.map((car, i) => (
-                <Link
-                  to={`/cars/${car.id}`}
-                  key={car.id}
-                  className={`group flex flex-col sm:flex-row rounded-xl overflow-hidden bg-card shadow-sm hover:shadow-lg transition-all duration-500 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-6"}`}
-                  style={{ transitionDelay: `${i * 80}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
-                >
-                  <div className="relative sm:w-64 aspect-[4/3] sm:aspect-auto overflow-hidden shrink-0">
-                    <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
-                    {!car.available && (
-                      <span className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-xs font-bold px-3 py-1 rounded-full">{t("sold")}</span>
-                    )}
-                  </div>
-                  <div className="p-5 flex flex-col justify-between flex-1">
-                    <div>
-                      <h3 className="font-semibold text-card-foreground text-lg">{car.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{car.year} · {car.mileage} · {car.fuel} · {car.transmission}</p>
-                    </div>
-                    <p className="text-xl font-bold text-primary tabular-nums mt-3">{car.priceLabel}</p>
-                  </div>
-                </Link>
+                <CarCard key={car.id} car={car} view="list" isVisible={isVisible} delay={i * 80} />
               ))}
             </div>
           )}

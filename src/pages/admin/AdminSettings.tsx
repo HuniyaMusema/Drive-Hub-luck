@@ -46,8 +46,6 @@ interface LotterySettings {
 interface OperationalSettings {
   platformEnabled: boolean;
   lotteryModuleEnabled: boolean;
-  carSalesEnabled: boolean;
-  rentalsEnabled: boolean;
   maintenanceMessage: string;
 }
 
@@ -97,8 +95,6 @@ const defaultLottery: LotterySettings = {
 const defaultOperational: OperationalSettings = {
   platformEnabled: true,
   lotteryModuleEnabled: true,
-  carSalesEnabled: true,
-  rentalsEnabled: true,
   maintenanceMessage: "",
 };
 
@@ -148,6 +144,7 @@ export default function AdminSettings() {
   const save = (key: string, data: unknown, label: string) => {
     persist(key, data);
     toast({ title: "Settings saved", description: `${label} settings updated successfully.` });
+    window.dispatchEvent(new CustomEvent("settings-updated", { detail: key }));
   };
 
   const filteredLogs = logFilter === "all" ? demoLogs : demoLogs.filter((l) => l.type === logFilter);
@@ -392,18 +389,6 @@ export default function AdminSettings() {
                   <p className="text-sm font-medium text-card-foreground">Lottery Module</p>
                 </div>
                 <Switch checked={operational.lotteryModuleEnabled} onCheckedChange={(v) => setOperational({ ...operational, lotteryModuleEnabled: v })} />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-card-foreground">Car Sales Module</p>
-                </div>
-                <Switch checked={operational.carSalesEnabled} onCheckedChange={(v) => setOperational({ ...operational, carSalesEnabled: v })} />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-card-foreground">Rentals Module</p>
-                </div>
-                <Switch checked={operational.rentalsEnabled} onCheckedChange={(v) => setOperational({ ...operational, rentalsEnabled: v })} />
               </div>
               <div className="space-y-2">
                 <Label>Maintenance Mode Message</Label>

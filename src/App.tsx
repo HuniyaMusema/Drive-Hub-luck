@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 import Index from "./pages/Index";
@@ -25,19 +26,20 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCars from "./pages/admin/AdminCars";
 import AdminRentals from "./pages/admin/AdminRentals";
 import AdminLottery from "./pages/admin/AdminLottery";
-import AdminPayments from "./pages/admin/AdminPayments";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Contact from "./pages/Contact";
+import SavedCars from "./pages/SavedCars";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-    <AuthProvider>
-      <TooltipProvider>
+      <LanguageProvider>
+      <AuthProvider>
+      <SavedCarsProvider>
+        <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
@@ -53,17 +55,17 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/lottery/select" element={<LotterySelect />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/saved-cars" element={<SavedCars />} />
 
             {/* User */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
 
             {/* Admin only */}
-            <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/cars" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCars /></ProtectedRoute>} />
             <Route path="/admin/rentals" element={<ProtectedRoute allowedRoles={["admin"]}><AdminRentals /></ProtectedRoute>} />
             <Route path="/admin/lottery" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLottery /></ProtectedRoute>} />
-            <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPayments /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsers /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />
 
@@ -76,9 +78,10 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-    </AuthProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
+      </SavedCarsProvider>
+      </AuthProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
 );
 
 export default App;

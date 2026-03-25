@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { carsData } from "@/data/cars";
 import { Search, Calendar, Fuel } from "lucide-react";
+import { CarCard } from "@/components/CarCard";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -35,34 +36,7 @@ export default function CarsForRent() {
 
         <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cars.map((car, i) => (
-            <div
-              key={car.id}
-              className={`group rounded-xl overflow-hidden bg-card shadow-sm hover:shadow-xl transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-              style={{ transitionDelay: `${i * 100}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
-            >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
-                <span className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${car.available ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                  {car.available ? t("available") : t("rented")}
-                </span>
-              </div>
-              <div className="p-5">
-                <h3 className="font-semibold text-card-foreground mb-2">{car.name}</h3>
-                <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-3">
-                  <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {car.year}</span>
-                  <span className="flex items-center gap-1"><Fuel className="h-3.5 w-3.5" /> {car.fuel}</span>
-                  <span>{car.seats} {t("seats")}</span>
-                </div>
-                <div className="flex items-end justify-between">
-                  <p className="text-xl font-bold text-primary tabular-nums">{car.priceLabel}</p>
-                  <Link to={`/cars/${car.id}`}>
-                    <Button size="sm" disabled={!car.available}>
-                      {car.available ? t("rentNow") : t("unavailable")}
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <CarCard key={car.id} car={car} view="grid" isVisible={isVisible} delay={i * 100} />
           ))}
         </div>
       </div>
