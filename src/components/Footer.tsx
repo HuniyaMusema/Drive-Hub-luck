@@ -12,7 +12,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Car className="h-7 w-7" />
-              <span className="text-xl font-bold font-display">Gech (ጌች)</span>
+              <span className="text-xl font-bold font-display">Gech ጌች</span>
             </Link>
             <p className="text-sm text-primary-foreground/70 leading-relaxed max-w-xs">
               {t("footerDesc")}
@@ -75,7 +75,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/40">
-          © {new Date().getFullYear()} Gech (ጌች). {t("allRightsReserved")}
+          © {new Date().getFullYear()} Gech ጌች. {t("allRightsReserved")}
         </div>
       </div>
     </footer>

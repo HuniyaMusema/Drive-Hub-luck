@@ -236,7 +236,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Hero
     heroTagline: "ጌች የመኪና አገልግሎት",
-    heroTitle: "ህልมዎን ይንዱ፣ ዛሬ ይጀምሩ",
+    heroTitle: "ህልምዎን ይንዱ፣ ዛሬ ይጀምሩ",
     heroDesc: "ፕሪሚየም ተሽከርካሪዎችን ይግዙ ወይም ይከራዩ፣ በአስደሳች የመኪና ሎተሪያችንም ዕድልዎን ይሞክሩ።",
     browseCars: "መኪናዎችን ይመልከቱ",
     enterLottery: "ሎተሪ ይግቡ",
