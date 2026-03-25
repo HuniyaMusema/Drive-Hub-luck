@@ -27,6 +27,8 @@ import AdminRentals from "./pages/admin/AdminRentals";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminSettings from "./pages/admin/AdminSettings";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
