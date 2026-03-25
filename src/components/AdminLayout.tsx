@@ -24,6 +24,7 @@ const navItems: NavItem[] = [
   { title: "Lottery Payments", url: "/admin/lottery-payments", icon: CreditCard, roles: ["admin", "lottery_staff"] },
   { title: "Generate Numbers", url: "/admin/generate-lottery", icon: Dices, roles: ["admin", "lottery_staff"] },
   { title: "Participants", url: "/admin/lottery-participants", icon: UserCheck, roles: ["admin", "lottery_staff"] },
+  { title: "Settings", url: "/admin/settings", icon: Settings, roles: ["admin"] },
 ];
 
 function AdminSidebar() {
