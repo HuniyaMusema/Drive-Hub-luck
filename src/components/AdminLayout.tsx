@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown, UserCheck } from "lucide-react";
+import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown, UserCheck, Settings } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
