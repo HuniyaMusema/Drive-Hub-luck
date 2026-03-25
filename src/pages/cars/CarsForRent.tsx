@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { carsData } from "@/data/cars";
 import { Search, Calendar, Fuel } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function CarsForRent() {
   const [search, setSearch] = useState("");
+  const { t } = useLanguage();
 
   const cars = useMemo(() => {
     return carsData
@@ -22,13 +24,13 @@ export default function CarsForRent() {
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8">
         <div className="mb-8">
-          <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-2">Rentals</p>
-          <h1 className="text-3xl lg:text-4xl font-bold text-foreground">Cars for Rent</h1>
+          <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-2">{t("rentalsLabel")}</p>
+          <h1 className="text-3xl lg:text-4xl font-bold text-foreground">{t("carsForRent")}</h1>
         </div>
 
         <div className="relative max-w-md mb-8">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search rentals..." className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input placeholder={t("searchRentals")} className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
 
         <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -41,7 +43,7 @@ export default function CarsForRent() {
               <div className="relative aspect-[4/3] overflow-hidden">
                 <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
                 <span className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${car.available ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"}`}>
-                  {car.available ? "Available" : "Rented"}
+                  {car.available ? t("available") : t("rented")}
                 </span>
               </div>
               <div className="p-5">
@@ -49,13 +51,13 @@ export default function CarsForRent() {
                 <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-3">
                   <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {car.year}</span>
                   <span className="flex items-center gap-1"><Fuel className="h-3.5 w-3.5" /> {car.fuel}</span>
-                  <span>{car.seats} seats</span>
+                  <span>{car.seats} {t("seats")}</span>
                 </div>
                 <div className="flex items-end justify-between">
                   <p className="text-xl font-bold text-primary tabular-nums">{car.priceLabel}</p>
                   <Link to={`/cars/${car.id}`}>
                     <Button size="sm" disabled={!car.available}>
-                      {car.available ? "Rent Now" : "Unavailable"}
+                      {car.available ? t("rentNow") : t("unavailable")}
                     </Button>
                   </Link>
                 </div>

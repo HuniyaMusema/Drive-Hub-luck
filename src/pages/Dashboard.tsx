@@ -3,33 +3,34 @@ import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { Car, Key, Ticket, CreditCard, User, ArrowRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-
-const stats = [
-  { icon: Key, label: "Active Rentals", value: "1", color: "bg-primary/10 text-primary" },
-  { icon: Ticket, label: "Lottery Entries", value: "3", color: "bg-accent/10 text-accent" },
-  { icon: CreditCard, label: "Pending Payments", value: "1", color: "bg-amber-50 text-amber-600" },
-];
-
-const quickLinks = [
-  { icon: Car, label: "Browse Cars for Sale", to: "/cars/sale" },
-  { icon: Key, label: "Rent a Car", to: "/cars/rent" },
-  { icon: Ticket, label: "Enter Lottery", to: "/lottery" },
-  { icon: CreditCard, label: "Payment", to: "/payment" },
-  { icon: User, label: "My Profile", to: "/profile" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
   const { ref, isVisible } = useScrollReveal(0.1);
+  const { t } = useLanguage();
+
+  const stats = [
+    { icon: Key, label: t("activeRentals"), value: "1", color: "bg-primary/10 text-primary" },
+    { icon: Ticket, label: t("lotteryEntries"), value: "3", color: "bg-accent/10 text-accent" },
+    { icon: CreditCard, label: t("pendingPayments"), value: "1", color: "bg-amber-50 text-amber-600" },
+  ];
+
+  const quickLinks = [
+    { icon: Car, label: t("browseCarsForSale"), to: "/cars/sale" },
+    { icon: Key, label: t("rentACar"), to: "/cars/rent" },
+    { icon: Ticket, label: t("enterLotteryAction"), to: "/lottery" },
+    { icon: CreditCard, label: t("payment"), to: "/payment" },
+    { icon: User, label: t("myProfile"), to: "/profile" },
+  ];
 
   return (
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8">
         <div className="mb-8 animate-fade-in-up">
-          <h1 className="text-3xl font-bold text-foreground mb-1">Welcome back, Marcus</h1>
-          <p className="text-muted-foreground">Here's a summary of your activity.</p>
+          <h1 className="text-3xl font-bold text-foreground mb-1">{t("welcomeBack")}, Marcus</h1>
+          <p className="text-muted-foreground">{t("activitySummary")}</p>
         </div>
 
-        {/* Stats */}
         <div ref={ref} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
           {stats.map((s, i) => (
             <div
@@ -46,8 +47,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Quick links */}
-        <h2 className="font-semibold text-foreground mb-4">Quick Actions</h2>
+        <h2 className="font-semibold text-foreground mb-4">{t("quickActions")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {quickLinks.map((link) => (
             <Link

@@ -27,6 +27,8 @@ import AdminRentals from "./pages/admin/AdminRentals";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminSettings from "./pages/admin/AdminSettings";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,7 @@ const App = () => (
             <Route path="/cars/rent" element={<CarsForRent />} />
             <Route path="/cars/:id" element={<CarDetail />} />
             <Route path="/lottery" element={<Lottery />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/lottery/select" element={<LotterySelect />} />
             <Route path="/payment" element={<Payment />} />
 
@@ -62,6 +65,7 @@ const App = () => (
             <Route path="/admin/lottery" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLottery /></ProtectedRoute>} />
             <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPayments /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />
 
             {/* Admin + Lottery Staff */}
             <Route path="/admin/lottery-payments" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><LotteryPayments /></ProtectedRoute>} />
