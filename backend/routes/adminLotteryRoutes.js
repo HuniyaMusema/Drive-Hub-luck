@@ -9,10 +9,10 @@ const {
   getAllLotteries,
 } = require('../controllers/adminLotteryController');
 
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 
-// All routes require authentication AND admin role
-router.use(protect, admin);
+// All routes require authentication AND authorized role/mode
+router.use(protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'));
 
 // POST   /api/admin/lottery          → create new lottery
 router.post('/', createLottery);

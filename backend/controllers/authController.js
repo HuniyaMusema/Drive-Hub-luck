@@ -3,8 +3,8 @@ const bcrypt = require('bcryptjs');
 const pool = require('../config/pgPool');
 
 // Generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (id, role, mode = null) => {
+  return jwt.sign({ id, role, mode }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };
@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id),
+      token: generateToken(user.id, user.role),
     });
   } catch (error) {
     console.error('[registerUser]', error.message);
@@ -80,12 +80,14 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    const { mode } = req.body;
+
     res.json({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id),
+      token: generateToken(user.id, user.role, mode),
     });
   } catch (error) {
     console.error('[loginUser]', error.message);
