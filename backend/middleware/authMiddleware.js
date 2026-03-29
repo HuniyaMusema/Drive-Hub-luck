@@ -29,7 +29,8 @@ const protect = async (req, res, next) => {
 
       req.user = rows[0];
 
-      const multiLoginEnabled = SettingsManager.getSetting('MultiLogin_Enabled', false);
+      const security = SettingsManager.getSetting('Security', {});
+      const multiLoginEnabled = security.multiLoginEnabled === true;
       if (!multiLoginEnabled && decoded.sessionToken !== req.user.session_token) {
         return res.status(401).json({ message: 'Session expired. You logged in from another device.' });
       }

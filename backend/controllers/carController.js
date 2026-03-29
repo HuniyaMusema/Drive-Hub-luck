@@ -6,8 +6,9 @@ const SettingsManager = require('../services/SettingsManager');
 // @access  Public
 const getCars = async (req, res) => {
   try {
-    const salesEnabled = SettingsManager.getSetting('Sales_Module_Active', true);
-    const rentalsEnabled = SettingsManager.getSetting('Rental_Module_Active', true);
+    const operational = SettingsManager.getSetting('Operational', {});
+    const salesEnabled = operational.salesModuleEnabled !== false;
+    const rentalsEnabled = operational.rentalsModuleEnabled !== false;
 
     let types = [];
     if (salesEnabled) types.push('sale');
@@ -40,8 +41,9 @@ const getCarById = async (req, res) => {
 
     if (rows.length > 0) {
       const type = rows[0].type;
-      const salesEnabled = SettingsManager.getSetting('Sales_Module_Active', true);
-      const rentalsEnabled = SettingsManager.getSetting('Rental_Module_Active', true);
+      const operational = SettingsManager.getSetting('Operational', {});
+      const salesEnabled = operational.salesModuleEnabled !== false;
+      const rentalsEnabled = operational.rentalsModuleEnabled !== false;
       if (type === 'sale' && !salesEnabled) return res.status(403).json({ message: 'Car Sales are disabled' });
       if (type === 'rental' && !rentalsEnabled) return res.status(403).json({ message: 'Car Rentals are disabled' });
     }

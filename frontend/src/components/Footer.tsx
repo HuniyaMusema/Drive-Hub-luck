@@ -1,9 +1,23 @@
 import { Link } from "react-router-dom";
 import { Car, Mail, MapPin, Phone } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/hooks/useSettings";
 
 export function Footer() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
+
+  const operational = settings?.Operational || {};
+  const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
+  const isSalesEnabled = operational.salesModuleEnabled !== false;
+  const isRentalsEnabled = operational.rentalsModuleEnabled !== false;
+
+  const quickLinks = [
+    { label: t("carsForSale"), href: "/cars/sale", enabled: isSalesEnabled },
+    { label: t("carsForRent"), href: "/cars/rent", enabled: isRentalsEnabled },
+    { label: t("lottery"), href: "/lottery", enabled: isLotteryEnabled },
+    { label: t("contact"), href: "/contact", enabled: true },
+  ].filter(l => l.enabled);
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -22,12 +36,7 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-primary-foreground/50">{t("quickLinks")}</h4>
             <ul className="space-y-2.5">
-              {[
-                { label: t("carsForSale"), href: "/cars/sale" },
-                { label: t("carsForRent"), href: "/cars/rent" },
-                { label: t("lottery"), href: "/lottery" },
-                { label: t("contact"), href: "/contact" },
-              ].map((l) => (
+              {quickLinks.map((l) => (
                 <li key={l.href}>
                   <Link to={l.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
                     {l.label}

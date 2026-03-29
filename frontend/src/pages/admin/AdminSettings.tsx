@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings, useAuditLogs, useBackups, useCreateBackup } from "@/hooks/useSettings";
 import {
   Settings, Shield, Ticket, Power, ScrollText, Bell, Database,
   Save, Upload, RotateCcw, Download, Trash2, FileDown,
@@ -46,6 +47,8 @@ interface LotterySettings {
 interface OperationalSettings {
   platformEnabled: boolean;
   lotteryModuleEnabled: boolean;
+  salesModuleEnabled: boolean;
+  rentalsModuleEnabled: boolean;
   maintenanceMessage: string;
 }
 
@@ -59,8 +62,6 @@ interface NotificationSettings {
 interface BackupSettings {
   backupFrequency: string;
 }
-
-type LogEntry = { id: string; timestamp: string; actor: string; action: string; type: "admin" | "lottery_staff" };
 
 const defaultGeneral: GeneralSettings = {
   platformName: "Gech (ጌች)",
@@ -95,6 +96,8 @@ const defaultLottery: LotterySettings = {
 const defaultOperational: OperationalSettings = {
   platformEnabled: true,
   lotteryModuleEnabled: true,
+  salesModuleEnabled: true,
+  rentalsModuleEnabled: true,
   maintenanceMessage: "",
 };
 
@@ -109,45 +112,59 @@ const defaultBackup: BackupSettings = {
   backupFrequency: "daily",
 };
 
-const demoLogs: LogEntry[] = [
-  { id: "1", timestamp: "2026-03-25 14:32", actor: "Admin User", action: "Updated lottery ticket price to $25", type: "admin" },
-  { id: "2", timestamp: "2026-03-25 13:15", actor: "Lottery Staff", action: "Verified payment PAY-2903", type: "lottery_staff" },
-  { id: "3", timestamp: "2026-03-24 18:40", actor: "Admin User", action: "Disabled user registration", type: "admin" },
-  { id: "4", timestamp: "2026-03-24 16:10", actor: "Lottery Staff", action: "Generated lottery numbers for Draw #18", type: "lottery_staff" },
-  { id: "5", timestamp: "2026-03-24 09:00", actor: "Admin User", action: "Enabled maintenance mode", type: "admin" },
-];
-
-function load<T>(key: string, fallback: T): T {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function persist(key: string, value: unknown) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
 export default function AdminSettings() {
   const { toast } = useToast();
+  const { settings, updateSetting, isLoading: settingsLoading } = useSettings();
+  const { data: auditLogs = [], isLoading: logsLoading } = useAuditLogs();
+  const { data: backups = [], isLoading: backupsLoading } = useBackups();
+  const createBackupMutation = useCreateBackup();
 
-  const [general, setGeneral] = useState<GeneralSettings>(() => load("gech-general", defaultGeneral));
-  const [security, setSecurity] = useState<SecuritySettings>(() => load("gech-security", defaultSecurity));
-  const [lottery, setLottery] = useState<LotterySettings>(() => load("gech-lottery-settings", defaultLottery));
-  const [operational, setOperational] = useState<OperationalSettings>(() => load("gech-operational", defaultOperational));
-  const [notifications, setNotifications] = useState<NotificationSettings>(() => load("gech-notifications", defaultNotifications));
-  const [backup, setBackup] = useState<BackupSettings>(() => load("gech-backup", defaultBackup));
+  const [general, setGeneral] = useState<GeneralSettings>(defaultGeneral);
+  const [security, setSecurity] = useState<SecuritySettings>(defaultSecurity);
+  const [lottery, setLottery] = useState<LotterySettings>(defaultLottery);
+  const [operational, setOperational] = useState<OperationalSettings>(defaultOperational);
+  const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotifications);
+  const [backup, setBackup] = useState<BackupSettings>(defaultBackup);
   const [logFilter, setLogFilter] = useState<"all" | "admin" | "lottery_staff">("all");
 
+  useEffect(() => {
+    if (settings) {
+      if (settings["General"]) setGeneral({ ...defaultGeneral, ...settings["General"] });
+      if (settings["Security"]) setSecurity({ ...defaultSecurity, ...settings["Security"] });
+      if (settings["Lottery"]) setLottery({ ...defaultLottery, ...settings["Lottery"] });
+      if (settings["Operational"]) setOperational({ ...defaultOperational, ...settings["Operational"] });
+      if (settings["Notifications"]) setNotifications({ ...defaultNotifications, ...settings["Notifications"] });
+      if (settings["Backup"]) setBackup({ ...defaultBackup, ...settings["Backup"] });
+    }
+  }, [settings]);
+
   const save = (key: string, data: unknown, label: string) => {
-    persist(key, data);
-    toast({ title: "Settings saved", description: `${label} settings updated successfully.` });
-    window.dispatchEvent(new CustomEvent("settings-updated", { detail: key }));
+    updateSetting.mutate({ key, value: data }, {
+      onSuccess: () => {
+        toast({ title: "Settings saved", description: `${label} settings updated successfully.` });
+      },
+      onError: (err: any) => {
+        toast({ title: "Save failed", description: err.message, variant: "destructive" });
+      }
+    });
   };
 
-  const filteredLogs = logFilter === "all" ? demoLogs : demoLogs.filter((l) => l.type === logFilter);
+  const handleCreateBackup = () => {
+    toast({ title: "Starting Backup", description: "Triggering manual database backup..." });
+    createBackupMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast({ title: "Backup Finalized", description: "Remote SQL dump created successfully." });
+      },
+      onError: (err: any) => {
+        toast({ title: "Backup error", description: err.message, variant: "destructive" });
+      }
+    });
+  };
+
+  const filteredLogs = logFilter === "all" ? auditLogs : auditLogs.filter((l: any) => {
+    if (logFilter === "admin") return l.action_type !== "VERIFY_PAYMENT"; // Example logic
+    return l.action_type === "VERIFY_PAYMENT";
+  });
 
   return (
     <AdminLayout>
@@ -229,7 +246,7 @@ export default function AdminSettings() {
                 </Select>
               </div>
             </div>
-            <Button onClick={() => save("gech-general", general, "General")} className="gap-1.5">
+            <Button onClick={() => save("General", general, "General")} className="gap-1.5" disabled={updateSetting.isPending}>
               <Save className="h-4 w-4" /> Save General Settings
             </Button>
           </div>
@@ -279,7 +296,7 @@ export default function AdminSettings() {
                 <Switch checked={security.multiLoginEnabled} onCheckedChange={(v) => setSecurity({ ...security, multiLoginEnabled: v })} />
               </div>
             </div>
-            <Button onClick={() => save("gech-security", security, "Security")} className="gap-1.5">
+            <Button onClick={() => save("Security", security, "Security")} className="gap-1.5" disabled={updateSetting.isPending}>
               <Save className="h-4 w-4" /> Save Security Settings
             </Button>
           </div>
@@ -365,7 +382,7 @@ export default function AdminSettings() {
               </div>
             </div>
 
-            <Button onClick={() => save("gech-lottery-settings", lottery, "Lottery")} className="gap-1.5">
+            <Button onClick={() => save("Lottery", lottery, "Lottery")} className="gap-1.5" disabled={updateSetting.isPending}>
               <Save className="h-4 w-4" /> Save Lottery Settings
             </Button>
           </div>
@@ -390,6 +407,18 @@ export default function AdminSettings() {
                 </div>
                 <Switch checked={operational.lotteryModuleEnabled} onCheckedChange={(v) => setOperational({ ...operational, lotteryModuleEnabled: v })} />
               </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-card-foreground">Car Sales Module</p>
+                </div>
+                <Switch checked={operational.salesModuleEnabled} onCheckedChange={(v) => setOperational({ ...operational, salesModuleEnabled: v })} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-card-foreground">Car Rentals Module</p>
+                </div>
+                <Switch checked={operational.rentalsModuleEnabled} onCheckedChange={(v) => setOperational({ ...operational, rentalsModuleEnabled: v })} />
+              </div>
               <div className="space-y-2">
                 <Label>Maintenance Mode Message</Label>
                 <Textarea
@@ -400,7 +429,7 @@ export default function AdminSettings() {
                 />
               </div>
             </div>
-            <Button onClick={() => save("gech-operational", operational, "Operational")} className="gap-1.5">
+            <Button onClick={() => save("Operational", operational, "Operational")} className="gap-1.5" disabled={updateSetting.isPending}>
               <Save className="h-4 w-4" /> Save Operational Settings
             </Button>
           </div>
@@ -426,19 +455,27 @@ export default function AdminSettings() {
               </div>
             </div>
             <div className="space-y-2">
-              {filteredLogs.map((log) => (
-                <div key={log.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+              {filteredLogs.map((log: any) => (
+                <div key={log.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 transition-all hover:bg-muted">
                   <div className="flex-1">
-                    <p className="text-sm text-card-foreground">{log.action}</p>
+                    <p className="text-sm text-card-foreground font-medium">{log.action_type}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {log.actor} · {log.timestamp}
+                      {log.user_name} ({log.user_email}) · {new Date(log.timestamp).toLocaleString()}
                     </p>
+                    {log.details && (
+                      <pre className="text-[10px] bg-black/5 p-1 mt-1 rounded text-muted-foreground overflow-x-auto">
+                        {JSON.stringify(log.details, null, 2)}
+                      </pre>
+                    )}
                   </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${log.type === "admin" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"}`}>
-                    {log.type === "admin" ? "Admin" : "Staff"}
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${log.action_type.includes('UPDATE') ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
+                    {log.action_type}
                   </span>
                 </div>
               ))}
+              {filteredLogs.length === 0 && (
+                <div className="text-center py-10 text-muted-foreground italic">No logs found.</div>
+              )}
             </div>
           </div>
         </TabsContent>
@@ -477,7 +514,7 @@ export default function AdminSettings() {
                 <Switch checked={notifications.adminAlertSuspicious} onCheckedChange={(v) => setNotifications({ ...notifications, adminAlertSuspicious: v })} />
               </div>
             </div>
-            <Button onClick={() => save("gech-notifications", notifications, "Notification")} className="gap-1.5">
+            <Button onClick={() => save("Notifications", notifications, "Notification")} className="gap-1.5" disabled={updateSetting.isPending}>
               <Save className="h-4 w-4" /> Save Notification Settings
             </Button>
           </div>
@@ -500,18 +537,26 @@ export default function AdminSettings() {
                 </Select>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button variant="outline" className="gap-1.5" onClick={() => toast({ title: "Backup started", description: "Manual backup has been initiated." })}>
-                  <Database className="h-4 w-4" /> Trigger Manual Backup
+                <Button variant="outline" className="gap-1.5" onClick={handleCreateBackup} disabled={createBackupMutation.isPending}>
+                  <Database className="h-4 w-4" /> {createBackupMutation.isPending ? "Backing up..." : "Trigger Manual Backup"}
                 </Button>
-                <Button variant="outline" className="gap-1.5">
-                  <RotateCcw className="h-4 w-4" /> Restore from Backup
-                </Button>
-                <Button variant="outline" className="gap-1.5">
-                  <Download className="h-4 w-4" /> Download Latest Backup
-                </Button>
+                <div className="w-full space-y-2 mt-4">
+                  <h3 className="text-sm font-medium">Remote SQL Snapshots</h3>
+                  <div className="space-y-1">
+                    {backups.map((b: any) => (
+                      <div key={b.file} className="flex items-center justify-between p-2 text-xs bg-muted rounded border">
+                        <span className="font-mono">{b.file} ({Math.round(b.size / 1024)} KB)</span>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="icon" className="h-6 w-6"><Download className="h-3 w-3" /></Button>
+                        </div>
+                      </div>
+                    ))}
+                    {backups.length === 0 && <p className="text-xs text-muted-foreground italic">No backups available.</p>}
+                  </div>
+                </div>
               </div>
             </div>
-            <Button onClick={() => save("gech-backup", backup, "Backup")} className="gap-1.5">
+            <Button onClick={() => save("Backup", backup, "Backup")} className="gap-1.5" disabled={updateSetting.isPending}>
               <Save className="h-4 w-4" /> Save Backup Settings
             </Button>
           </div>

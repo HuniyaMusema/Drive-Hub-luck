@@ -15,7 +15,8 @@ const generateToken = (id, sessionToken) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-  const isRegistrationEnabled = SettingsManager.getSetting('Registration_Enabled', true);
+  const security = SettingsManager.getSetting('Security', {});
+  const isRegistrationEnabled = security.registrationEnabled !== false;
   if (!isRegistrationEnabled) {
     return res.status(403).json({ message: 'Registration is currently disabled by an administrator' });
   }
@@ -87,7 +88,8 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const multiLoginEnabled = SettingsManager.getSetting('MultiLogin_Enabled', false);
+    const security = SettingsManager.getSetting('Security', {});
+    const multiLoginEnabled = security.multiLoginEnabled === true;
     let sessionToken = user.session_token;
 
     if (!multiLoginEnabled || !sessionToken) {

@@ -8,10 +8,16 @@ import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CarCard } from "@/components/CarCard";
 import { useCars } from "@/hooks/useCars";
+import { useSettings } from "@/hooks/useSettings";
 import heroBg from "@/assets/hero-bg.jpg";
 
 function HeroSection() {
   const { t } = useLanguage();
+
+  const { settings } = useSettings();
+  const operational = settings?.Operational || {};
+  const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
+  const isSalesEnabled = operational.salesModuleEnabled !== false;
 
   return (
     <section className="relative min-h-[100vh] flex items-center overflow-hidden">
@@ -29,16 +35,20 @@ function HeroSection() {
             {t("heroDesc")}
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link to="/cars/sale">
-              <Button variant="hero" size="xl">
-                {t("browseCars")} <ArrowRight className="ml-1 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/lottery">
-              <Button variant="hero-outline" size="xl">
-                {t("enterLottery")}
-              </Button>
-            </Link>
+            {isSalesEnabled && (
+              <Link to="/cars/sale">
+                <Button variant="hero" size="xl">
+                  {t("browseCars")} <ArrowRight className="ml-1 h-5 w-5" />
+                </Button>
+              </Link>
+            )}
+            {isLotteryEnabled && (
+              <Link to="/lottery">
+                <Button variant="hero-outline" size="xl">
+                  {t("enterLottery")}
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -102,11 +112,14 @@ function ServicesSection() {
   const { ref, isVisible } = useScrollReveal();
   const { t } = useLanguage();
 
+  const { settings } = useSettings();
+  const operational = settings?.Operational || {};
+
   const services = [
-    { icon: Car, title: t("buyACar"), desc: t("buyACarDesc"), link: "/cars/sale" },
-    { icon: Key, title: t("rentACar"), desc: t("rentACarDesc"), link: "/cars/rent" },
-    { icon: Ticket, title: t("carLottery"), desc: t("carLotteryDesc"), link: "/lottery" },
-  ];
+    { icon: Car, title: t("buyACar"), desc: t("buyACarDesc"), link: "/cars/sale", enabled: operational.salesModuleEnabled !== false },
+    { icon: Key, title: t("rentACar"), desc: t("rentACarDesc"), link: "/cars/rent", enabled: operational.rentalsModuleEnabled !== false },
+    { icon: Ticket, title: t("carLottery"), desc: t("carLotteryDesc"), link: "/lottery", enabled: operational.lotteryModuleEnabled !== false },
+  ].filter(s => s.enabled);
 
   return (
     <section ref={ref} className="py-24 lg:py-32 bg-surface-warm">
@@ -141,6 +154,9 @@ function ServicesSection() {
 function LotterySection() {
   const { ref, isVisible } = useScrollReveal();
   const { t } = useLanguage();
+  const { settings } = useSettings();
+  
+  if (settings?.Operational?.lotteryModuleEnabled === false) return null;
 
   const lotterySteps = [
     { icon: Ticket, title: t("pickYourNumbers"), desc: t("pickNumbersDesc") },

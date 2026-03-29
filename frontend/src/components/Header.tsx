@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSettings } from "@/hooks/useSettings";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -26,6 +27,19 @@ export function Header() {
   const { language, setLanguage, t } = useLanguage();
   const { savedCarsCount } = useSavedCars();
   const { user } = useAuth();
+  const { settings } = useSettings();
+
+  const operational = settings?.Operational || {};
+  const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
+  const isSalesEnabled = operational.salesModuleEnabled !== false;
+  const isRentalsEnabled = operational.rentalsModuleEnabled !== false;
+
+  const filteredNavLinks = navLinks.filter(link => {
+    if (link.key === "lottery") return isLotteryEnabled;
+    if (link.key === "cars") return isSalesEnabled;
+    if (link.key === "rentals") return isRentalsEnabled;
+    return true;
+  });
 
   const currentLang = languages.find((l) => l.code === language);
 
@@ -59,7 +73,7 @@ export function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
+          {filteredNavLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
@@ -137,7 +151,7 @@ export function Header() {
       {mobileOpen && (
         <div className="md:hidden animate-fade-in-up border-t" style={{ background: mobileBg, borderColor: 'rgba(255,255,255,0.1)' }}>
           <nav className="container mx-auto flex flex-col gap-1 px-4 py-4">
-            {navLinks.map((link) => (
+            {filteredNavLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}

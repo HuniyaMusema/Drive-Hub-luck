@@ -3,7 +3,8 @@ const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 
 const maintenanceGuard = async (req, res, next) => {
-  const platformActive = SettingsManager.getSetting('Platform_Active', true);
+  const operational = SettingsManager.getSetting('Operational', {});
+  const platformActive = operational.platformEnabled !== false;
   if (platformActive) return next();
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -40,9 +41,11 @@ const requireModule = (moduleSettingKey) => {
       } catch (e) {}
     }
 
-    const isEnabled = SettingsManager.getSetting(moduleSettingKey, true);
+    const operational = SettingsManager.getSetting('Operational', {});
+    const isEnabled = operational[moduleSettingKey] !== false;
+    
     if (!isEnabled) {
-      return res.status(403).json({ message: `The ${moduleSettingKey.replace(/_/g, ' ')} module is currently disabled.` });
+      return res.status(503).json({ message: `The ${moduleSettingKey.replace(/ModuleEnabled/g, '').replace(/([A-Z])/g, ' $1').trim()} module is currently disabled for maintenance.` });
     }
     next();
   };
@@ -54,9 +57,10 @@ const requirePermission = (permissionKey) => {
 
     // Check staff granular permission
     if (req.user && req.user.role === 'lottery_staff') {
-      const isAllowed = SettingsManager.getSetting(permissionKey, false);
+      const lottery = SettingsManager.getSetting('Lottery', {});
+      const isAllowed = lottery[permissionKey] === true;
       if (!isAllowed) {
-        return res.status(403).json({ message: `You lack the specific staff permission: ${permissionKey.replace(/_/g, ' ')}` });
+        return res.status(403).json({ message: `Staff action restricted: ${permissionKey.replace(/([A-Z])/g, ' $1').trim()}` });
       }
     }
     

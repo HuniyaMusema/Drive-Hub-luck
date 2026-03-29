@@ -22,7 +22,8 @@ const participateLottery = async (req, res) => {
       [lotteryId, req.user.id]
     );
 
-    const maxTickets = SettingsManager.getSetting('Lottery_Max_Tickets', 1);
+    const lotterySettings = SettingsManager.getSetting('Lottery', {});
+    const maxTickets = lotterySettings.maxTicketsPerUser || 1;
 
     if (existing.length >= maxTickets) {
       return res.status(400).json({ 
