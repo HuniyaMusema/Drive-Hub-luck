@@ -8,6 +8,8 @@ CREATE TYPE lottery_status AS ENUM ('active', 'closed');
 CREATE TYPE lottery_number_status AS ENUM ('available', 'pending', 'confirmed');
 CREATE TYPE payment_method AS ENUM ('CBE', 'Telebirr');
 CREATE TYPE payment_status AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE car_status AS ENUM ('available', 'sold', 'rented', 'maintenance');
+
 
 -- TRIGGER FUNCTION FOR UPDATED_AT
 CREATE OR REPLACE FUNCTION update_timestamp_columns() 
@@ -33,16 +35,20 @@ CREATE TABLE users (
 -- 2. Cars Table
 CREATE TABLE cars (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    seller_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     price NUMERIC(12, 2) NOT NULL,
     type car_type NOT NULL,
+    status car_status NOT NULL DEFAULT 'available',
     description TEXT,
     specs JSONB,
     location VARCHAR(255),
+    contact_phone VARCHAR(50),
     images JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
 
 -- 3. Lottery Settings Table
 CREATE TABLE lottery_settings (
