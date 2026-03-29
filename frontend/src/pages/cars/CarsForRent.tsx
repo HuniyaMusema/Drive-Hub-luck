@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { carsData } from "@/data/cars";
+import { useCars } from "@/hooks/useCars";
 import { Search, Calendar, Fuel } from "lucide-react";
 import { CarCard } from "@/components/CarCard";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -12,12 +12,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 export default function CarsForRent() {
   const [search, setSearch] = useState("");
   const { t } = useLanguage();
+  
+  const { data: carsData = [], isLoading } = useCars();
 
   const cars = useMemo(() => {
     return carsData
       .filter((c) => c.type === "rental")
       .filter((c) => !search || c.name.toLowerCase().includes(search.toLowerCase()));
-  }, [search]);
+  }, [search, carsData]);
 
   const { ref, isVisible } = useScrollReveal(0.1);
 

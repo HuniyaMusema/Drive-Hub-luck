@@ -2,11 +2,12 @@ import { useState } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { carsData } from "@/data/cars";
+import { useCars } from "@/hooks/useCars";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 
 export default function AdminCars() {
   const [search, setSearch] = useState("");
+  const { data: carsData = [] } = useCars();
   const cars = carsData.filter((c) => !search || c.name.toLowerCase().includes(search.toLowerCase()));
 
   return (

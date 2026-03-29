@@ -3,16 +3,20 @@ import type { User, UserRole, AuthContextType } from "@/types/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Default to admin for demo — swap to "lottery_staff" to test
-const defaultUser: User = {
-  id: "1",
-  name: "Admin User",
-  email: "admin@gech.com",
-  role: "admin",
-};
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(defaultUser);
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  React.useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    }
+  }, [user]);
 
   const hasPermission = useCallback(
     (allowedRoles: UserRole[]) => {

@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
-import { carsData } from "@/data/cars";
+import { useCars } from "@/hooks/useCars";
 import { ArrowLeft, Fuel, Gauge, Settings2, Users, Calendar, CheckCircle2, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 export default function CarDetail() {
   const { id } = useParams();
+  const { data: carsData = [], isLoading } = useCars();
   const car = carsData.find((c) => c.id === Number(id));
   const { t } = useLanguage();
   const { isSaved, toggleSave } = useSavedCars();

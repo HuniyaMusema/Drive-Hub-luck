@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { carsData, brands } from "@/data/cars";
+import { useCars } from "@/hooks/useCars";
 import { Search, Grid3X3, List, SlidersHorizontal } from "lucide-react";
 import { CarCard } from "@/components/CarCard";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -15,13 +15,16 @@ export default function CarsForSale() {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
   const { t } = useLanguage();
+  
+  const { data: carsData = [], isLoading } = useCars();
+  const brands = [...new Set(carsData.map((c) => c.brand))];
 
   const cars = useMemo(() => {
     return carsData
       .filter((c) => c.type === "sale")
       .filter((c) => !selectedBrand || c.brand === selectedBrand)
       .filter((c) => !search || c.name.toLowerCase().includes(search.toLowerCase()));
-  }, [search, selectedBrand]);
+  }, [search, selectedBrand, carsData]);
 
   const { ref, isVisible } = useScrollReveal(0.1);
 

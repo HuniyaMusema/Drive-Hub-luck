@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,11 +7,49 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Car, Eye, EyeOff, Check } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password || !email || !firstName) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${firstName} ${lastName}`.trim(),
+          email: email.toLowerCase().trim(),
+          password
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        toast({ title: "Account created", description: "You can now log in." });
+        navigate("/auth/login");
+      } else {
+        toast({ title: "Registration failed", description: data.message || "Please try again.", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to connect to server", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const checks = [
     { label: t("atLeast8"), ok: password.length >= 8 },
@@ -33,20 +71,20 @@ export default function Register() {
               <p className="text-sm text-muted-foreground mt-1">{t("joinGech")}</p>
             </div>
 
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">{t("firstName")}</Label>
-                  <Input id="firstName" placeholder="Marcus" />
+                  <Input id="firstName" placeholder="Marcus" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">{t("lastName")}</Label>
-                  <Input id="lastName" placeholder="Rivera" />
+                  <Input id="lastName" placeholder="Rivera" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t("email")}</Label>
-                <Input id="email" type="email" placeholder="you@example.com" />
+                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">{t("phone")}</Label>

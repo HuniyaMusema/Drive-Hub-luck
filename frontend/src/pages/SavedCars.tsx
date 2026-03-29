@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { PageShell } from "@/components/PageShell";
 import { CarCard } from "@/components/CarCard";
-import { carsData } from "@/data/cars";
+import { useCars } from "@/hooks/useCars";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Heart } from "lucide-react";
@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 
 export default function SavedCars() {
   const { savedCarIds } = useSavedCars();
+  const { data: carsData = [] } = useCars();
   const { t } = useLanguage();
 
   const savedCars = useMemo(() => {
     return carsData.filter((car) => savedCarIds.includes(car.id));
-  }, [savedCarIds]);
+  }, [savedCarIds, carsData]);
 
   return (
     <PageShell>

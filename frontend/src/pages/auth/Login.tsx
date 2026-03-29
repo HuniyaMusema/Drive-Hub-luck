@@ -31,15 +31,39 @@ export default function Login() {
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const account = DEMO_ACCOUNTS[email.toLowerCase().trim()];
-    if (account && account.password === password) {
-      setUser(account.user);
-      toast({ title: `Welcome, ${account.user.name}!`, description: `Logged in as ${account.user.role.replace("_", " ")}` });
-      navigate(account.user.role === "admin" ? "/admin" : "/admin/lottery-payments");
-    } else {
-      toast({ title: "Invalid credentials", description: "Try admin@gech.com / admin123 or staff@gech.com / staff123", variant: "destructive" });
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim(), password })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        const loggedInUser: User = {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          role: data.role as any,
+        };
+        setUser(loggedInUser);
+        toast({ title: `Welcome, ${data.name}!`, description: "Logged in successfully." });
+        navigate(loggedInUser.role === "admin" ? "/admin" : "/admin/lottery-payments");
+      } else {
+        toast({ title: "Login failed", description: data.message || "Invalid credentials", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to connect to server", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
     }
   };
 

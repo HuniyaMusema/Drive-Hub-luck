@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CarCard } from "@/components/CarCard";
-import { carsData } from "@/data/cars";
+import { useCars } from "@/hooks/useCars";
 import heroBg from "@/assets/hero-bg.jpg";
 
 function HeroSection() {
@@ -66,9 +66,11 @@ function FeaturedSection() {
   const { ref, isVisible } = useScrollReveal();
   const { t } = useLanguage();
   
+  const { data: carsData = [] } = useCars();
+  
   const featuredCars = useMemo(() => {
-    return carsData.filter(car => [1, 2, 3].includes(car.id));
-  }, []);
+    return carsData.slice(0, 3);
+  }, [carsData]);
 
   return (
     <section ref={ref} className="py-24 lg:py-32 bg-background">
