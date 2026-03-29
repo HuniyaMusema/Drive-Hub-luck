@@ -1,15 +1,11 @@
 const pool = require('../config/pgPool');
-<<<<<<< HEAD
 const SettingsManager = require('../services/SettingsManager');
-=======
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
 
 // @desc    Get all cars
 // @route   GET /api/cars
 // @access  Public
 const getCars = async (req, res) => {
   try {
-<<<<<<< HEAD
     const operational = SettingsManager.getSetting('Operational', {});
     const salesEnabled = operational.salesModuleEnabled !== false;
     const rentalsEnabled = operational.rentalsModuleEnabled !== false;
@@ -23,15 +19,12 @@ const getCars = async (req, res) => {
     }
 
     const { rows } = await pool.query(
-      'SELECT * FROM cars WHERE type = ANY($1::car_type[]) ORDER BY created_at DESC',
-      [types]
-=======
-    const { rows } = await pool.query(
       `SELECT c.*, u.name AS seller_name, u.email AS seller_email 
        FROM cars c 
        JOIN users u ON c.seller_id = u.id 
-       ORDER BY c.created_at DESC`
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
+       WHERE c.type = ANY($1::car_type[])
+       ORDER BY c.created_at DESC`,
+      [types]
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -44,23 +37,6 @@ const getCars = async (req, res) => {
 // @route   GET /api/cars/:id
 // @access  Public
 const getCarById = async (req, res) => {
-<<<<<<< HEAD
-  try {
-    const { rows } = await pool.query(
-      'SELECT * FROM cars WHERE id = $1',
-      [req.params.id]
-    );
-
-    if (rows.length > 0) {
-      const type = rows[0].type;
-      const operational = SettingsManager.getSetting('Operational', {});
-      const salesEnabled = operational.salesModuleEnabled !== false;
-      const rentalsEnabled = operational.rentalsModuleEnabled !== false;
-      if (type === 'sale' && !salesEnabled) return res.status(403).json({ message: 'Car Sales are disabled' });
-      if (type === 'rental' && !rentalsEnabled) return res.status(403).json({ message: 'Car Rentals are disabled' });
-    }
-
-=======
   const { id } = req.params;
   try {
     const { rows } = await pool.query(
@@ -71,12 +47,19 @@ const getCarById = async (req, res) => {
       [id]
     );
 
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Car not found' });
     }
 
-    res.status(200).json(rows[0]);
+    const car = rows[0];
+    const operational = SettingsManager.getSetting('Operational', {});
+    const salesEnabled = operational.salesModuleEnabled !== false;
+    const rentalsEnabled = operational.rentalsModuleEnabled !== false;
+
+    if (car.type === 'sale' && !salesEnabled) return res.status(403).json({ message: 'Car Sales are disabled' });
+    if (car.type === 'rental' && !rentalsEnabled) return res.status(403).json({ message: 'Car Rentals are disabled' });
+
+    res.status(200).json(car);
   } catch (error) {
     console.error('[getCarById]', error.message);
     res.status(500).json({ message: error.message });
@@ -87,16 +70,6 @@ const getCarById = async (req, res) => {
 // @route   POST /api/cars
 // @access  Private (Any authenticated user can sell)
 const createCar = async (req, res) => {
-<<<<<<< HEAD
-  const { name, price, type, description, specs, location, images } = req.body;
-
-  try {
-    const { rows } = await pool.query(
-      `INSERT INTO cars (name, price, type, description, specs, location, images)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING *`,
-      [name, price, type, description, JSON.stringify(specs), location, JSON.stringify(images)]
-=======
   const { make, model, year, price, type, status, description, image, contactPhone, location } = req.body;
 
   if (!make || !model || !price || !type) {
@@ -115,7 +88,6 @@ const createCar = async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [req.user.id, name, price, sql_type, sql_status, description, specs, location, contactPhone, images]
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
     );
 
     res.status(201).json(rows[0]);
@@ -129,42 +101,16 @@ const createCar = async (req, res) => {
 // @route   PUT /api/cars/:id
 // @access  Private (Owner or Admin)
 const updateCar = async (req, res) => {
-<<<<<<< HEAD
-  const { name, price, type, description, specs, location, images } = req.body;
-
-  try {
-    // Check if car exists
-    const { rows: existing } = await pool.query(
-      'SELECT id FROM cars WHERE id = $1',
-      [req.params.id]
-    );
-=======
   const { id } = req.params;
   const { make, model, year, price, type, status, description, image, contactPhone, location } = req.body;
 
   try {
     const { rows: existing } = await pool.query('SELECT * FROM cars WHERE id = $1', [id]);
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
 
     if (existing.length === 0) {
       return res.status(404).json({ message: 'Car not found' });
     }
 
-<<<<<<< HEAD
-    // Note: Original code had ownership check: car.seller.toString() !== req.user.id
-    // The current schema.sql doesn't have a seller_id in the cars table yet.
-    // If it's intended to be public/admin only for now, we follow the schema.
-    
-    const { rows } = await pool.query(
-      `UPDATE cars 
-       SET name = $1, price = $2, type = $3, description = $4, specs = $5, location = $6, images = $7, updated_at = NOW()
-       WHERE id = $8
-       RETURNING *`,
-      [name, price, type, description, JSON.stringify(specs), location, JSON.stringify(images), req.params.id]
-    );
-
-    res.status(200).json(rows[0]);
-=======
     const car = existing[0];
 
     // Make sure user is car owner or admin
@@ -172,8 +118,8 @@ const updateCar = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to update this car' });
     }
 
-    // Dynamic update logic (simplified)
-    const name = make && model ? `${make} ${model}` : (make || model ? (make ? `${make} ${car.name}` : `${car.name} ${model}`) : car.name);
+    // Dynamic update logic
+    const name = make && model ? `${make} ${model}` : car.name;
     const sql_type = type ? (type.toLowerCase() === 'rent' ? 'rental' : 'sale') : car.type;
     const sql_status = status ? status.toLowerCase() : car.status;
     const specs = year ? JSON.stringify({ ...car.specs, year }) : car.specs;
@@ -199,7 +145,6 @@ const updateCar = async (req, res) => {
     );
 
     res.status(200).json(updated[0]);
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
   } catch (error) {
     console.error('[updateCar]', error.message);
     res.status(400).json({ message: error.message });
@@ -210,19 +155,6 @@ const updateCar = async (req, res) => {
 // @route   DELETE /api/cars/:id
 // @access  Private (Owner or Admin)
 const deleteCar = async (req, res) => {
-<<<<<<< HEAD
-  try {
-    const { rowCount } = await pool.query(
-      'DELETE FROM cars WHERE id = $1',
-      [req.params.id]
-    );
-
-    if (rowCount === 0) {
-      return res.status(404).json({ message: 'Car not found' });
-    }
-
-    res.status(200).json({ id: req.params.id, message: 'Car deleted' });
-=======
   const { id } = req.params;
   try {
     const { rows: existing } = await pool.query('SELECT * FROM cars WHERE id = $1', [id]);
@@ -241,7 +173,6 @@ const deleteCar = async (req, res) => {
     await pool.query('DELETE FROM cars WHERE id = $1', [id]);
 
     res.status(200).json({ id, message: 'Car deleted' });
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
   } catch (error) {
     console.error('[deleteCar]', error.message);
     res.status(400).json({ message: error.message });
@@ -255,4 +186,3 @@ module.exports = {
   updateCar,
   deleteCar,
 };
-

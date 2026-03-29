@@ -5,13 +5,8 @@ const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
 
 // Generate JWT
-<<<<<<< HEAD
-const generateToken = (id, sessionToken) => {
-  return jwt.sign({ id, sessionToken }, process.env.JWT_SECRET, {
-=======
-const generateToken = (id, role, mode = null) => {
-  return jwt.sign({ id, role, mode }, process.env.JWT_SECRET, {
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
+const generateToken = (id, role, sessionToken = null, mode = null) => {
+  return jwt.sign({ id, role, sessionToken, mode }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };
@@ -62,11 +57,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-<<<<<<< HEAD
-      token: generateToken(user.id, null), // sessionToken is optional here or we can initialize it
-=======
       token: generateToken(user.id, user.role),
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
     });
   } catch (error) {
     console.error('[registerUser]', error.message);
@@ -78,7 +69,7 @@ const registerUser = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, mode } = req.body;
 
   try {
     const { rows } = await pool.query(
@@ -97,7 +88,6 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-<<<<<<< HEAD
     const security = SettingsManager.getSetting('Security', {});
     const multiLoginEnabled = security.multiLoginEnabled === true;
     let sessionToken = user.session_token;
@@ -106,20 +96,13 @@ const loginUser = async (req, res) => {
       sessionToken = uuidv4();
       await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
     }
-=======
-    const { mode } = req.body;
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
 
     res.json({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
-<<<<<<< HEAD
-      token: generateToken(user.id, sessionToken),
-=======
-      token: generateToken(user.id, user.role, mode),
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
+      token: generateToken(user.id, user.role, sessionToken, mode),
     });
   } catch (error) {
     console.error('[loginUser]', error.message);
