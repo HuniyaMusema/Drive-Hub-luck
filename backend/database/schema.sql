@@ -27,11 +27,8 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role user_role NOT NULL DEFAULT 'user',
-<<<<<<< HEAD
     session_token VARCHAR(512),
-=======
     mode VARCHAR(50) DEFAULT 'car_mode',
->>>>>>> 67becb57e5a0738af6d5398be4809facff116285
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
