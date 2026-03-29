@@ -25,6 +25,7 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role user_role NOT NULL DEFAULT 'user',
+    session_token VARCHAR(512),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -98,12 +99,21 @@ CREATE TABLE audit_logs (
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 7. App Settings Table
+CREATE TABLE app_settings (
+    config_key VARCHAR(100) PRIMARY KEY,
+    config_value JSONB NOT NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- TRIGGERS
 CREATE TRIGGER set_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_cars_updated_at BEFORE UPDATE ON cars FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_lottery_settings_updated_at BEFORE UPDATE ON lottery_settings FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_lottery_numbers_updated_at BEFORE UPDATE ON lottery_numbers FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_payments_updated_at BEFORE UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
+CREATE TRIGGER set_app_settings_updated_at BEFORE UPDATE ON app_settings FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 
 -- INDEXES
 CREATE INDEX idx_users_role ON users(role);
