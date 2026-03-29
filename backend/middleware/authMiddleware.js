@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../config/pgPool');
+const SettingsManager = require('../services/SettingsManager');
 
 // Protect routes
 const protect = async (req, res, next) => {
@@ -18,7 +19,7 @@ const protect = async (req, res, next) => {
 
       // Get user from PostgreSQL (exclude password)
       const { rows } = await pool.query(
-        'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
+        'SELECT id, name, email, role, session_token, created_at FROM users WHERE id = $1',
         [decoded.id]
       );
 
@@ -27,6 +28,12 @@ const protect = async (req, res, next) => {
       }
 
       req.user = rows[0];
+
+      const multiLoginEnabled = SettingsManager.getSetting('MultiLogin_Enabled', false);
+      if (!multiLoginEnabled && decoded.sessionToken !== req.user.session_token) {
+        return res.status(401).json({ message: 'Session expired. You logged in from another device.' });
+      }
+
       next();
     } catch (error) {
       console.error(error);
