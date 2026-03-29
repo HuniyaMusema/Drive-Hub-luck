@@ -1,12 +1,25 @@
 const pool = require('../config/pgPool');
+const SettingsManager = require('../services/SettingsManager');
 
 // @desc    Get all cars
 // @route   GET /api/cars
 // @access  Public
 const getCars = async (req, res) => {
   try {
+    const salesEnabled = SettingsManager.getSetting('Sales_Module_Active', true);
+    const rentalsEnabled = SettingsManager.getSetting('Rental_Module_Active', true);
+
+    let types = [];
+    if (salesEnabled) types.push('sale');
+    if (rentalsEnabled) types.push('rental');
+
+    if (types.length === 0) {
+      return res.status(200).json([]);
+    }
+
     const { rows } = await pool.query(
-      'SELECT * FROM cars ORDER BY created_at DESC'
+      'SELECT * FROM cars WHERE type = ANY($1::car_type[]) ORDER BY created_at DESC',
+      [types]
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -24,6 +37,14 @@ const getCarById = async (req, res) => {
       'SELECT * FROM cars WHERE id = $1',
       [req.params.id]
     );
+
+    if (rows.length > 0) {
+      const type = rows[0].type;
+      const salesEnabled = SettingsManager.getSetting('Sales_Module_Active', true);
+      const rentalsEnabled = SettingsManager.getSetting('Rental_Module_Active', true);
+      if (type === 'sale' && !salesEnabled) return res.status(403).json({ message: 'Car Sales are disabled' });
+      if (type === 'rental' && !rentalsEnabled) return res.status(403).json({ message: 'Car Rentals are disabled' });
+    }
 
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Car not found' });

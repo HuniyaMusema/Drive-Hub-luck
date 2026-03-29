@@ -1,4 +1,5 @@
 const pool = require('../config/pgPool');
+const SettingsManager = require('../services/SettingsManager');
 
 // @desc    Participate in the lottery (Assign a random available number)
 // @route   POST /api/lottery/participate
@@ -21,10 +22,12 @@ const participateLottery = async (req, res) => {
       [lotteryId, req.user.id]
     );
 
-    if (existing.length > 0) {
+    const maxTickets = SettingsManager.getSetting('Lottery_Max_Tickets', 1);
+
+    if (existing.length >= maxTickets) {
       return res.status(400).json({ 
-        message: 'You have already entered this lottery!', 
-        number: existing[0].number 
+        message: `You have reached the maximum allowed tickets (${maxTickets}) for this lottery.`, 
+        numbers: existing.map(e => e.number)
       });
     }
 
