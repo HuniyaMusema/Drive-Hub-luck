@@ -7,6 +7,7 @@ import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut,
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
+import NotificationBell from "@/components/NotificationBell";
 
 interface NavItem {
   title: string;
@@ -161,6 +162,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <span className="text-xs font-bold tracking-widest text-muted-foreground/60 max-md:hidden uppercase">
                 {user?.role === "lottery_staff" ? "Lottery Portal" : "Administration"}
               </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
             </div>
           </header>
           <main className="flex-1 p-6 lg:p-8 overflow-auto">

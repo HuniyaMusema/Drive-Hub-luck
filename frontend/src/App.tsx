@@ -30,6 +30,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Contact from "./pages/Contact";
 import SavedCars from "./pages/SavedCars";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,8 +59,9 @@ const App = () => (
             <Route path="/saved-cars" element={<SavedCars />} />
 
             {/* User */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/dashboard" element={<ProtectedRoute allowedRoles={["user", "admin", "lottery_staff"]}><Dashboard /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute allowedRoles={["user", "admin", "lottery_staff"]}><Profile /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute allowedRoles={["user", "admin", "lottery_staff"]}><Notifications /></ProtectedRoute>} />
 
             {/* Admin only */}
             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><AdminDashboard /></ProtectedRoute>} />

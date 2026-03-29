@@ -1,0 +1,193 @@
+import React, { useEffect, useState } from 'react';
+import { PageShell } from "@/components/PageShell";
+import { Button } from "@/components/ui/button";
+import { 
+  Bell, 
+  CheckCheck, 
+  Trash2, 
+  Info, 
+  CheckCircle2, 
+  AlertTriangle, 
+  XCircle,
+  Clock
+} from "lucide-react";
+import { 
+  getNotifications, 
+  markAsRead, 
+  markAllAsRead, 
+  deleteNotification, 
+  Notification 
+} from "@/services/notificationService";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { formatDistanceToNow } from "date-fns";
+
+export default function Notifications() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await getNotifications();
+      setNotifications(data);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load notifications.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      await markAsRead(id);
+      setNotifications(notifications.map(n => n.id === id ? { ...n, is_read: true } : n));
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update notification.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllAsRead();
+      setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+      toast({
+        title: "Success",
+        description: "All notifications marked as read.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update notifications.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteNotification(id);
+      setNotifications(notifications.filter(n => n.id !== id));
+      toast({
+        title: "Success",
+        description: "Notification deleted.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete notification.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'success': return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case 'error': return <XCircle className="h-5 w-5 text-destructive" />;
+      default: return <Info className="h-5 w-5 text-blue-500" />;
+    }
+  };
+
+  return (
+    <PageShell>
+      <div className="container mx-auto px-4 lg:px-8 max-w-3xl animate-fade-in-up">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Bell className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
+          </div>
+          {notifications.some(n => !n.is_read) && (
+            <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
+              <CheckCheck className="h-4 w-4 mr-2" />
+              Mark all as read
+            </Button>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="text-muted-foreground">Loading notifications...</p>
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="bg-card rounded-xl border border-dashed p-12 text-center">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Bell className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-1">No notifications yet</h3>
+            <p className="text-muted-foreground">When you have updates, they'll appear here.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {notifications.map((notification) => (
+              <div 
+                key={notification.id}
+                className={cn(
+                  "group relative bg-card rounded-xl border p-4 transition-all hover:shadow-md",
+                  !notification.is_read && "border-primary/30 bg-primary/5"
+                )}
+              >
+                <div className="flex gap-4">
+                  <div className="mt-1">
+                    {getIcon(notification.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className={cn(
+                        "font-semibold text-foreground leading-tight",
+                        !notification.is_read && "text-primary"
+                      )}>
+                        {notification.title}
+                      </h3>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      {notification.message}
+                    </p>
+                    <div className="flex items-center gap-3 mt-3">
+                      {!notification.is_read && (
+                        <button 
+                          onClick={() => handleMarkAsRead(notification.id)}
+                          className="text-xs font-medium text-primary hover:underline"
+                        >
+                          Mark as read
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => handleDelete(notification.id)}
+                        className="text-xs font-medium text-muted-foreground hover:text-destructive flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </PageShell>
+  );
+}
