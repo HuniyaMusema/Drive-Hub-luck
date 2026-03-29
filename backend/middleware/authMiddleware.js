@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../config/pgPool');
+<<<<<<< HEAD
 const SettingsManager = require('../services/SettingsManager');
+=======
+>>>>>>> 67becb57e5a0738af6d5398be4809facff116285
 
 // Protect routes
 const protect = async (req, res, next) => {
@@ -19,7 +22,11 @@ const protect = async (req, res, next) => {
 
       // Get user from PostgreSQL (exclude password)
       const { rows } = await pool.query(
+<<<<<<< HEAD
         'SELECT id, name, email, role, session_token, created_at FROM users WHERE id = $1',
+=======
+        'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
+>>>>>>> 67becb57e5a0738af6d5398be4809facff116285
         [decoded.id]
       );
 
@@ -27,6 +34,7 @@ const protect = async (req, res, next) => {
         return res.status(401).json({ message: 'Not authorized, user not found' });
       }
 
+<<<<<<< HEAD
       req.user = rows[0];
 
       const security = SettingsManager.getSetting('Security', {});
@@ -35,6 +43,13 @@ const protect = async (req, res, next) => {
         return res.status(401).json({ message: 'Session expired. You logged in from another device.' });
       }
 
+=======
+      req.user = {
+        ...rows[0],
+        mode: decoded.mode || null, // Extract mode from JWT
+      };
+      
+>>>>>>> 67becb57e5a0738af6d5398be4809facff116285
       next();
     } catch (error) {
       console.error(error);
@@ -47,7 +62,45 @@ const protect = async (req, res, next) => {
   }
 };
 
+<<<<<<< HEAD
 // Admin authentication middleware
+=======
+/**
+ * Role and Mode-based authorization middleware
+ * @param {Array} allowedRoles - List of authorized roles
+ * @param {String} requiredMode - Required operational mode for admins
+ */
+const authorize = (allowedRoles, requiredMode) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const { role, mode } = req.user;
+
+    // 1. Check if role is allowed
+    if (!allowedRoles.includes(role)) {
+      return res.status(403).json({
+        message: `Your role (${role}) is not authorized for this action`
+      });
+    }
+
+    // 2. Admin specific logic: Check mode
+    if (role === 'admin' && mode !== requiredMode) {
+      return res.status(403).json({
+        message: `Admin access denied: Operation requires '${requiredMode}' mode`
+      });
+    }
+
+    // 3. lottery_staff: Ignore mode (always allowed if role matches)
+    // Implicitly handled because we only check mode for 'admin' above.
+
+    next();
+  };
+};
+
+// Admin authentication middleware (Legacy, kept for compatibility if needed)
+>>>>>>> 67becb57e5a0738af6d5398be4809facff116285
 const admin = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     next();
@@ -56,6 +109,7 @@ const admin = (req, res, next) => {
   }
 };
 
+<<<<<<< HEAD
 // Lottery Staff authentication middleware
 const isLotteryStaff = (req, res, next) => {
   if (req.user && req.user.role === 'lottery_staff') {
@@ -75,3 +129,6 @@ const isAdminOrLotteryStaff = (req, res, next) => {
 };
 
 module.exports = { protect, admin, isLotteryStaff, isAdminOrLotteryStaff };
+=======
+module.exports = { protect, admin, authorize };
+>>>>>>> 67becb57e5a0738af6d5398be4809facff116285

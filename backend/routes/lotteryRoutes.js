@@ -5,11 +5,12 @@ const {
   getLotteryEntries,
   pickWinner
 } = require('../controllers/lotteryController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 const { requireModule } = require('../middleware/systemGuards');
 
-router.route('/').get(protect, admin, getLotteryEntries);
+router.route('/').get(protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'), getLotteryEntries);
 router.post('/participate', protect, requireModule('lotteryModuleEnabled'), participateLottery);
-router.put('/pick-winner', protect, admin, pickWinner);
+router.put('/pick-winner', protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'), pickWinner);
 
 module.exports = router;
+

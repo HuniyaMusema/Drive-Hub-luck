@@ -7,13 +7,14 @@ const {
   updateCar,
   deleteCar,
 } = require('../controllers/carController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 
-router.route('/').get(getCars).post(protect, admin, createCar);
+router.route('/').get(getCars).post(protect, authorize(['admin'], 'car_mode'), createCar);
 router
   .route('/:id')
   .get(getCarById)
-  .put(protect, admin, updateCar)
-  .delete(protect, admin, deleteCar);
+  .put(protect, authorize(['admin'], 'car_mode'), updateCar)
+  .delete(protect, authorize(['admin'], 'car_mode'), deleteCar);
 
 module.exports = router;
+
