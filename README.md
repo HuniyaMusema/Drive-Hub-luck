@@ -1,7 +1,8 @@
-<<<<<<< HEAD
 # Drive-Hub-luck
-=======
 
+A centralized car sales, rentals, and lottery platform.
 
-TODO: Document your project here
->>>>>>> origin/husni
+## Architecture
+- **Frontend**: React (Vite) + TailwindCSS
+- **Backend**: Node.js (Express) + PostgreSQL (node-postgres)
+- **Settings Engine**: Real-time configuration management via Admin UI.
