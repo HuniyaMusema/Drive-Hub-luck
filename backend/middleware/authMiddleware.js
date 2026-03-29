@@ -27,7 +27,14 @@ const protect = async (req, res, next) => {
         return res.status(401).json({ message: 'Not authorized, user not found' });
       }
 
+<<<<<<< HEAD
       const user = rows[0];
+=======
+      req.user = {
+        ...rows[0],
+        mode: decoded.mode || null, // Extract mode from JWT
+      };
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 
       // Block suspended users
       if (user.status === 'suspended') {
@@ -81,21 +88,32 @@ const authorize = (allowedRoles, requiredMode) => {
     }
 
     // 2. Admin specific logic: Check mode
+<<<<<<< HEAD
     // Bypassing strict mode requirements for admins who don't have a mode set
     if (role === 'admin' && mode && mode !== requiredMode) {
+=======
+    if (role === 'admin' && mode && requiredMode && mode !== requiredMode) {
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
       return res.status(403).json({
         message: `Admin access denied: Operation requires '${requiredMode}' mode`
       });
     }
 
+<<<<<<< HEAD
     // 3. lottery_staff: Ignore mode (always allowed if role matches)
     // Implicitly handled because we only check mode for 'admin' above.
 
+=======
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     next();
   };
 };
 
+<<<<<<< HEAD
 // Admin authentication middleware (Legacy, kept for compatibility)
+=======
+// Admin authentication middleware
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 const admin = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     next();
@@ -122,6 +140,7 @@ const isAdminOrLotteryStaff = (req, res, next) => {
   }
 };
 
+<<<<<<< HEAD
 module.exports = {
   protect,
   admin,
@@ -130,3 +149,12 @@ module.exports = {
   isAdminOrLotteryStaff
 };
 
+=======
+module.exports = { 
+  protect, 
+  admin, 
+  isLotteryStaff, 
+  isAdminOrLotteryStaff,
+  authorize 
+};
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9

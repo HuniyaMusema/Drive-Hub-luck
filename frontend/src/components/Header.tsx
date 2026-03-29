@@ -1,11 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Car, Menu, X, Globe, Bookmark } from "lucide-react";
+import { Bookmark, Car, Globe, Menu, X, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/hooks/useSettings";
+import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -124,6 +125,8 @@ export function Header() {
               </span>
             )}
           </Link>
+          
+          <NotificationBell />
 
           {user ? (
             <Link to="/dashboard">
@@ -185,6 +188,21 @@ export function Header() {
                     {savedCarsCount}
                   </span>
                 )}
+              </Link>
+            )}
+
+            {user && (
+              <Link
+                to="/notifications"
+                className={`flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                  isActive("/notifications")
+                    ? "bg-white/20 text-white"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <Bell className="h-4 w-4" />
+                Notifications
               </Link>
             )}
 

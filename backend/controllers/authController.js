@@ -4,12 +4,17 @@ const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
 
+<<<<<<< HEAD
 // @desc    Generate JWT
 // @param   {string} id - User ID
 // @param   {string} role - User Role
 // @param   {string} sessionToken - Unique session identifier
 // @param   {string} mode - Optional operational mode (lottery_mode, car_mode)
 const generateToken = (id, role, sessionToken, mode = null) => {
+=======
+// Generate JWT
+const generateToken = (id, role, sessionToken = null, mode = null) => {
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
   return jwt.sign({ id, role, sessionToken, mode }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
@@ -61,7 +66,11 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+<<<<<<< HEAD
       token: generateToken(user.id, user.role, null), 
+=======
+      token: generateToken(user.id, user.role),
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     });
   } catch (error) {
     console.error('[registerUser]', error.message);

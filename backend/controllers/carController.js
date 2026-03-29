@@ -70,10 +70,14 @@ const getCarById = async (req, res) => {
 // @route   POST /api/cars
 // @access  Private (Any authenticated user can sell)
 const createCar = async (req, res) => {
+<<<<<<< HEAD
   const { 
     make, model, year, price, type, status, description, image, 
     contactPhone, location, mileage, fuel, transmission, seats 
   } = req.body;
+=======
+  const { make, model, year, price, type, status, description, image, contactPhone, location } = req.body;
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 
   if (!make || !model || !price || !type) {
     return res.status(400).json({ message: 'Please provide all required fields (make, model, price, type)' });
@@ -83,6 +87,7 @@ const createCar = async (req, res) => {
     const name = `${make} ${model}`;
     const sql_type = type.toLowerCase() === 'rent' ? 'rental' : 'sale';
     const sql_status = status ? status.toLowerCase() : 'available';
+<<<<<<< HEAD
     const specs = JSON.stringify({ 
       year: Number(year), 
       mileage: mileage || '0 mi', 
@@ -90,6 +95,9 @@ const createCar = async (req, res) => {
       transmission: transmission || 'Automatic', 
       seats: Number(seats) || 5 
     });
+=======
+    const specs = JSON.stringify({ year });
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     const images = JSON.stringify(image ? [image] : []);
 
     const { rows } = await pool.query(
@@ -111,10 +119,14 @@ const createCar = async (req, res) => {
 // @access  Private (Owner or Admin)
 const updateCar = async (req, res) => {
   const { id } = req.params;
+<<<<<<< HEAD
   const { 
     make, model, year, price, type, status, description, image, 
     contactPhone, location, mileage, fuel, transmission, seats 
   } = req.body;
+=======
+  const { make, model, year, price, type, status, description, image, contactPhone, location } = req.body;
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 
   try {
     const { rows: existing } = await pool.query('SELECT * FROM cars WHERE id = $1', [id]);
@@ -131,6 +143,7 @@ const updateCar = async (req, res) => {
     }
 
     // Dynamic update logic
+<<<<<<< HEAD
     // Only combine make and model if both are provided; otherwise use previous name if those are empty
     let name = car.name;
     if (make && model) {
@@ -160,6 +173,13 @@ const updateCar = async (req, res) => {
     // Ensure images stays as an array/object for JSONB
     const currentImages = typeof car.images === 'string' ? JSON.parse(car.images) : (car.images || []);
     const images = image ? [image] : currentImages;
+=======
+    const name = make && model ? `${make} ${model}` : car.name;
+    const sql_type = type ? (type.toLowerCase() === 'rent' ? 'rental' : 'sale') : car.type;
+    const sql_status = status ? status.toLowerCase() : car.status;
+    const specs = year ? JSON.stringify({ ...car.specs, year }) : car.specs;
+    const images = image ? JSON.stringify([image]) : car.images;
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 
     const { rows: updated } = await pool.query(
       `UPDATE cars 
@@ -168,6 +188,7 @@ const updateCar = async (req, res) => {
        RETURNING *`,
       [
         name, 
+<<<<<<< HEAD
         price !== undefined ? Number(price) : car.price, 
         sql_type, 
         sql_status, 
@@ -176,15 +197,28 @@ const updateCar = async (req, res) => {
         location !== undefined ? location : car.location, 
         contactPhone !== undefined ? contactPhone : car.contact_phone, 
         JSON.stringify(images), 
+=======
+        price || car.price, 
+        sql_type, 
+        sql_status, 
+        description || car.description, 
+        specs, 
+        location || car.location, 
+        contactPhone || car.contact_phone, 
+        images, 
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
         id
       ]
     );
 
+<<<<<<< HEAD
     if (updated.length === 0) {
       throw new Error("Failed to update car - row not found during update execution");
     }
 
     console.log(`[updateCar] Successfully updated car ${id}`);
+=======
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     res.status(200).json(updated[0]);
   } catch (error) {
     console.error('[updateCar] Error:', error.message);
@@ -212,6 +246,10 @@ const deleteCar = async (req, res) => {
     }
 
     await pool.query('DELETE FROM cars WHERE id = $1', [id]);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     res.status(200).json({ id, message: 'Car deleted' });
   } catch (error) {
     console.error('[deleteCar]', error.message);
@@ -228,5 +266,8 @@ module.exports = {
   updateCar,
   deleteCar,
 };
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9

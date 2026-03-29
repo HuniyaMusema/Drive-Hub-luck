@@ -16,7 +16,11 @@ class SettingsManager {
       this.isLoaded = true;
       console.log('[SettingsManager] Global settings loaded into memory.');
     } catch (error) {
-      console.error('[SettingsManager] Error loading settings:', error.message);
+      if (error.code === 'ECONNREFUSED') {
+        console.error('[SettingsManager] Connection refused. Please ensure PostgreSQL is running.');
+      } else {
+        console.error('[SettingsManager] Error loading settings:', error.message || error);
+      }
     }
   }
 

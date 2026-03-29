@@ -25,6 +25,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/cars', require('./routes/carRoutes'));
 app.use('/api/lottery', require('./routes/lotteryRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Admin routes (PostgreSQL-backed)
 app.use('/api/admin', require('./routes/adminRoutes'));

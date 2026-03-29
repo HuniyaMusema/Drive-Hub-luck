@@ -10,7 +10,11 @@ const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected PostgreSQL pool error:', err.message);
+  if (err.code === 'ECONNREFUSED') {
+    console.error('PostgreSQL connection refused! Ensure the DB is running on port 5432.');
+  } else {
+    console.error('Unexpected PostgreSQL pool error:', err.message || err);
+  }
 });
 
 module.exports = pool;

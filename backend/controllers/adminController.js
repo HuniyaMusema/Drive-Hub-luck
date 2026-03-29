@@ -33,6 +33,7 @@ const toggleMode = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 const getUsers = async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT id, name, email, role, status, suspension_reason, created_at, mode FROM users ORDER BY created_at DESC');
@@ -124,4 +125,8 @@ module.exports = {
   getDashboardStats,
   updateUserStatus,
   deleteUser
+=======
+module.exports = {
+  toggleMode,
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 };

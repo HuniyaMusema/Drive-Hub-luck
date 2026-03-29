@@ -5,6 +5,7 @@ const SettingsManager = require('../services/SettingsManager');
 // @route   POST /api/lottery/participate
 // @access  Private
 const participateLottery = async (req, res) => {
+<<<<<<< HEAD
   const { numbers } = req.body; // Array of chosen numbers
 
   if (!numbers || !Array.isArray(numbers) || numbers.length === 0) {
@@ -19,10 +20,15 @@ const participateLottery = async (req, res) => {
       return res.status(403).json({ message: 'Lottery module is currently disabled' });
     }
 
+=======
+  const client = await pool.connect();
+  try {
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     await client.query('BEGIN');
 
     // 1. Get the current active lottery
     const { rows: lotteryRows } = await client.query(
+<<<<<<< HEAD
       "SELECT id FROM lottery_settings WHERE status = 'active' LIMIT 1 FOR SHARE"
     );
 
@@ -130,11 +136,75 @@ const submitLotteryPayment = async (req, res) => {
     res.status(500).json({ message: error.message });
   } finally {
     client.release();
+=======
+      "SELECT id FROM lottery_settings WHERE status = 'active' ORDER BY created_at DESC LIMIT 1"
+    );
+
+    if (lotteryRows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'No active lottery currently running.' });
+    }
+    const lotteryId = lotteryRows[0].id;
+
+    // 2. Check if user already has a number for THIS lottery
+    const { rows: existing } = await client.query(
+      'SELECT id, number FROM lottery_numbers WHERE lottery_id = $1 AND user_id = $2',
+      [lotteryId, req.user.id]
+    );
+
+    const lotterySettings = SettingsManager.getSetting('Lottery', {});
+    const maxTickets = lotterySettings.maxTicketsPerUser || 1;
+
+    if (existing.length >= maxTickets) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ 
+        message: `You have reached the maximum allowed tickets (${maxTickets}) for this lottery.`, 
+        numbers: existing.map(e => e.number)
+      });
+    }
+
+    // 3. Find available numbers (Using FOR UPDATE SKIP LOCKED for concurrency safety)
+    const { rows: available } = await client.query(
+      "SELECT id, number FROM lottery_numbers WHERE lottery_id = $1 AND status = 'available' ORDER BY number LIMIT 100 FOR UPDATE SKIP LOCKED",
+      [lotteryId]
+    );
+
+    if (available.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ message: 'All lottery numbers have been taken.' });
+    }
+
+    // 4. Assign a random available number from the fetched batch
+    const randomIndex = Math.floor(Math.random() * available.length);
+    const chosenNumber = available[randomIndex];
+
+    const { rows: updated } = await client.query(
+      `UPDATE lottery_numbers 
+       SET user_id = $1, status = 'confirmed', updated_at = NOW() 
+       WHERE id = $2 
+       RETURNING *`,
+      [req.user.id, chosenNumber.id]
+    );
+
+    await client.query('COMMIT');
+
+    res.status(201).json({
+      message: 'Successfully participated!',
+      ticket: updated[0]
+    });
+  } catch (error) {
+    if (client) await client.query('ROLLBACK');
+    console.error('[participateLottery]', error.message);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (client) client.release();
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
   }
 };
 
 // @desc    Get all lottery entries (joined with users)
 // @route   GET /api/lottery
+<<<<<<< HEAD
 // @access  Private
 const getLotteryEntries = async (req, res) => {
   try {
@@ -155,6 +225,19 @@ const getLotteryEntries = async (req, res) => {
     query += ` ORDER BY ln.updated_at DESC`;
 
     const { rows } = await pool.query(query, params);
+=======
+// @access  Private (Staff/Admin)
+const getLotteryEntries = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT ln.*, u.name AS user_name, u.email AS user_email, ls.prize_text 
+       FROM lottery_numbers ln 
+       JOIN users u ON ln.user_id = u.id 
+       JOIN lottery_settings ls ON ln.lottery_id = ls.id 
+       WHERE ln.user_id IS NOT NULL 
+       ORDER BY ln.created_at DESC`
+    );
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     res.status(200).json(rows);
   } catch (error) {
     console.error('[getLotteryEntries]', error.message);
@@ -168,6 +251,7 @@ const getLotteryEntries = async (req, res) => {
 const pickWinner = async (req, res) => {
   const client = await pool.connect();
   try {
+<<<<<<< HEAD
     await client.query('BEGIN');
 
     // 1. Find the active lottery
@@ -178,12 +262,26 @@ const pickWinner = async (req, res) => {
     if (lotteryRows.length === 0) {
       await client.query('ROLLBACK');
       return res.status(404).json({ message: 'No active lottery found' });
+=======
+    // 1. Get active lottery
+    const { rows: lotteryRows } = await pool.query(
+      "SELECT id FROM lottery_settings WHERE status = 'active' ORDER BY created_at DESC LIMIT 1"
+    );
+
+    if (lotteryRows.length === 0) {
+      return res.status(400).json({ message: 'No active lottery found.' });
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     }
 
     const lotteryId = lotteryRows[0].id;
 
+<<<<<<< HEAD
     // 2. Pick a random confirmed number from that lottery
     const { rows: winnerRows } = await client.query(
+=======
+    // 2. Get all confirmed participants
+    const { rows: participants } = await pool.query(
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
       `SELECT ln.*, u.name as user_name, u.email as user_email
        FROM lottery_numbers ln
        JOIN users u ON ln.user_id = u.id
@@ -193,6 +291,7 @@ const pickWinner = async (req, res) => {
       [lotteryId]
     );
 
+<<<<<<< HEAD
     if (winnerRows.length === 0) {
       await client.query('ROLLBACK');
       return res.status(404).json({ message: 'No participants found for this lottery' });
@@ -215,6 +314,17 @@ const pickWinner = async (req, res) => {
         name: winner.user_name,
         email: winner.user_email
       }
+=======
+    if (participants.length === 0) {
+      return res.status(400).json({ message: 'No confirmed participants to pick from.' });
+    }
+
+    const winner = participants[0];
+
+    res.status(200).json({ 
+      message: `Winner selected! Ticket Number: ${winner.number}`, 
+      winner 
+>>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
     });
   } catch (error) {
     await client.query('ROLLBACK');
