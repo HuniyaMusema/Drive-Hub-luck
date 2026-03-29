@@ -1,10 +1,12 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const pool = require('../config/pgPool');
+const SettingsManager = require('../services/SettingsManager');
+const { v4: uuidv4 } = require('uuid');
 
 // Generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (id, sessionToken) => {
+  return jwt.sign({ id, sessionToken }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };
@@ -13,6 +15,11 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
+  const isRegistrationEnabled = SettingsManager.getSetting('Registration_Enabled', true);
+  if (!isRegistrationEnabled) {
+    return res.status(403).json({ message: 'Registration is currently disabled by an administrator' });
+  }
+
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -49,7 +56,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id),
+      token: generateToken(user.id, null), // sessionToken is optional here or we can initialize it
     });
   } catch (error) {
     console.error('[registerUser]', error.message);
@@ -80,12 +87,20 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    const multiLoginEnabled = SettingsManager.getSetting('MultiLogin_Enabled', false);
+    let sessionToken = user.session_token;
+
+    if (!multiLoginEnabled || !sessionToken) {
+      sessionToken = uuidv4();
+      await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
+    }
+
     res.json({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id),
+      token: generateToken(user.id, sessionToken),
     });
   } catch (error) {
     console.error('[loginUser]', error.message);
