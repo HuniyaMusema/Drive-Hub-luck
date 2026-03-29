@@ -11,11 +11,12 @@ import { useToast } from "@/components/ui/use-toast";
 export default function CarDetail() {
   const { id } = useParams();
   const { data: carsData = [], isLoading } = useCars();
-  const car = carsData.find((c) => c.id === Number(id));
+  const car = carsData.find((c) => c.id === id);
   const { t } = useLanguage();
   const { isSaved, toggleSave } = useSavedCars();
   const { user } = useAuth();
   const { toast } = useToast();
+
 
   const saved = car ? isSaved(car.id) : false;
 
@@ -62,7 +63,14 @@ export default function CarDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in-up">
           <div className="rounded-2xl overflow-hidden bg-card shadow-sm">
-            <img src={car.image} alt={car.name} className="w-full aspect-[4/3] object-cover" />
+            <img 
+              src={car.image} 
+              alt={car.name} 
+              className="w-full aspect-[4/3] object-cover" 
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1549317661-bd32c0e5a809";
+              }}
+            />
           </div>
 
           <div>
@@ -113,7 +121,8 @@ export default function CarDetail() {
             </div>
           </div>
         </div>
-      </div>
+
+</div>
     </PageShell>
   );
 }

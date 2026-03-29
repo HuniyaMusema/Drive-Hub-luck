@@ -26,7 +26,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Car className="h-7 w-7" />
-              <span className="text-xl font-bold font-display">Gech ጌች</span>
+              <span className="text-xl font-bold font-display">{settings?.General?.platformName || "Drive Hub"}</span>
             </Link>
             <p className="text-sm text-primary-foreground/70 leading-relaxed max-w-xs">
               {t("footerDesc")}
@@ -77,14 +77,14 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2.5 text-sm text-primary-foreground/70">
                 <Mail className="h-4 w-4 shrink-0" />
-                <span>info@gech.com</span>
+                <span>{settings?.General?.contactEmail || "info@gech.com"}</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/40">
-          © {new Date().getFullYear()} Gech ጌች. {t("allRightsReserved")}
+          © {new Date().getFullYear()} {settings?.General?.platformName || "Drive Hub"}. {t("allRightsReserved")}
         </div>
       </div>
     </footer>

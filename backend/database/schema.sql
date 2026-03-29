@@ -8,6 +8,8 @@ CREATE TYPE lottery_status AS ENUM ('active', 'closed');
 CREATE TYPE lottery_number_status AS ENUM ('available', 'pending', 'confirmed');
 CREATE TYPE payment_method AS ENUM ('CBE', 'Telebirr');
 CREATE TYPE payment_status AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE car_status AS ENUM ('available', 'sold', 'rented', 'maintenance');
+CREATE TYPE rental_request_status AS ENUM ('pending', 'approved', 'rejected', 'completed');
 
 -- TRIGGER FUNCTION FOR UPDATED_AT
 CREATE OR REPLACE FUNCTION update_timestamp_columns() 
@@ -26,6 +28,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     role user_role NOT NULL DEFAULT 'user',
     session_token VARCHAR(512),
+    mode VARCHAR(50) DEFAULT 'car_mode',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -33,16 +36,20 @@ CREATE TABLE users (
 -- 2. Cars Table
 CREATE TABLE cars (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    seller_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     price NUMERIC(12, 2) NOT NULL,
     type car_type NOT NULL,
+    status car_status NOT NULL DEFAULT 'available',
     description TEXT,
     specs JSONB,
     location VARCHAR(255),
+    contact_phone VARCHAR(50),
     images JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
 
 -- 3. Lottery Settings Table
 CREATE TABLE lottery_settings (
@@ -106,6 +113,18 @@ CREATE TABLE app_settings (
     updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+-- 8. Rental Requests Table
+CREATE TABLE rental_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    car_id UUID NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    total_price NUMERIC(12, 2) NOT NULL,
+    status rental_request_status NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 -- TRIGGERS
 CREATE TRIGGER set_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
@@ -114,6 +133,7 @@ CREATE TRIGGER set_lottery_settings_updated_at BEFORE UPDATE ON lottery_settings
 CREATE TRIGGER set_lottery_numbers_updated_at BEFORE UPDATE ON lottery_numbers FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_payments_updated_at BEFORE UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_app_settings_updated_at BEFORE UPDATE ON app_settings FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
+CREATE TRIGGER set_rental_requests_updated_at BEFORE UPDATE ON rental_requests FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 
 -- INDEXES
 CREATE INDEX idx_users_role ON users(role);
@@ -126,3 +146,6 @@ CREATE INDEX idx_lottery_numbers_status_expires ON lottery_numbers(status, expir
 CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_payments_user_id ON payments(user_id);
 CREATE INDEX idx_payments_lottery_number_id ON payments(lottery_number_id);
+CREATE INDEX idx_rental_requests_status ON rental_requests(status);
+CREATE INDEX idx_rental_requests_user_id ON rental_requests(user_id);
+CREATE INDEX idx_rental_requests_car_id ON rental_requests(car_id);

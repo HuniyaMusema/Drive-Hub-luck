@@ -5,7 +5,12 @@ const SettingsManager = require('../services/SettingsManager');
 const maintenanceGuard = async (req, res, next) => {
   const operational = SettingsManager.getSetting('Operational', {});
   const platformActive = operational.platformEnabled !== false;
-  if (platformActive) return next();
+  
+  // Whitelist auth and public settings to allow admin login during maintenance
+  const isAuthRoute = req.path.startsWith('/api/auth');
+  const isPublicSettings = req.path === '/api/settings' && req.method === 'GET';
+  
+  if (platformActive || isAuthRoute || isPublicSettings) return next();
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {

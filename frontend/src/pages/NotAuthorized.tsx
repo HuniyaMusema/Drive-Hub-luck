@@ -2,8 +2,12 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function NotAuthorized() {
+  const { user } = useAuth();
+  const dashboardPath = user?.role === "admin" || user?.role === "lottery_staff" ? "/admin" : "/dashboard";
+
   return (
     <AdminLayout>
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
@@ -13,7 +17,7 @@ export default function NotAuthorized() {
           You don't have permission to access this page. Contact an administrator if you believe this is an error.
         </p>
         <Button asChild>
-          <Link to="/admin">Back to Dashboard</Link>
+          <Link to={dashboardPath}>Back to Dashboard</Link>
         </Button>
       </div>
     </AdminLayout>

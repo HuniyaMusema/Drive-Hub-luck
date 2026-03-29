@@ -2,9 +2,11 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Phone, MessageCircle, MapPin, Mail, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/hooks/useSettings";
 
 export default function Contact() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -28,7 +30,7 @@ export default function Contact() {
             <div className="space-y-4">
               {/* Phone */}
               <a
-                href="tel:+251911234567"
+                href={`tel:${(settings?.General?.contactPhone || "+251911234567").replace(/\s/g, "")}`}
                 className="flex items-start gap-4 bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group"
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -36,7 +38,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-card-foreground mb-1">{t("phoneLabel")}</h3>
-                  <p className="text-primary font-medium">+251 911 234 567</p>
+                  <p className="text-primary font-medium">{settings?.General?.contactPhone || "+251 911 234 567"}</p>
                   <p className="text-xs text-muted-foreground mt-1">{t("phoneTap")}</p>
                 </div>
               </a>
@@ -60,7 +62,7 @@ export default function Contact() {
 
               {/* Email */}
               <a
-                href="mailto:info@gech.com"
+                href={`mailto:${settings?.General?.contactEmail || "info@gech.com"}`}
                 className="flex items-start gap-4 bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group"
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -68,7 +70,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-card-foreground mb-1">{t("emailLabel")}</h3>
-                  <p className="text-primary font-medium">info@gech.com</p>
+                  <p className="text-primary font-medium">{settings?.General?.contactEmail || "info@gech.com"}</p>
                 </div>
               </a>
 
@@ -79,7 +81,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-card-foreground mb-1">{t("addressLabel")}</h3>
-                  <p className="text-sm text-muted-foreground">{t("addressValue")}</p>
+                  <p className="text-sm text-muted-foreground">{settings?.General?.contactAddress || t("addressValue")}</p>
                 </div>
               </div>
 
@@ -98,7 +100,7 @@ export default function Contact() {
             {/* Map */}
             <div className="rounded-xl overflow-hidden shadow-sm bg-card h-[480px] lg:h-auto min-h-[400px]">
               <iframe
-                title="Gech Location"
+                title="Office Location"
                 src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3941.148077914366!2d38.7046111!3d8.958499999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOMKwNTcnMzAuNiJOIDM4wrA0MicxNi42IkU!5e0!3m2!1sam!2set!4v1774456777329!5m2!1sam!2set"
                 width="100%"
                 height="100%"

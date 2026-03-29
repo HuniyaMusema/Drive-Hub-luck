@@ -4,9 +4,13 @@ const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
 
-// Generate JWT
-const generateToken = (id, sessionToken) => {
-  return jwt.sign({ id, sessionToken }, process.env.JWT_SECRET, {
+// @desc    Generate JWT
+// @param   {string} id - User ID
+// @param   {string} role - User Role
+// @param   {string} sessionToken - Unique session identifier
+// @param   {string} mode - Optional operational mode (lottery_mode, car_mode)
+const generateToken = (id, role, sessionToken, mode = null) => {
+  return jwt.sign({ id, role, sessionToken, mode }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };
@@ -57,7 +61,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id, null), // sessionToken is optional here or we can initialize it
+      token: generateToken(user.id, user.role, null), 
     });
   } catch (error) {
     console.error('[registerUser]', error.message);
@@ -69,11 +73,11 @@ const registerUser = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, mode } = req.body;
 
   try {
     const { rows } = await pool.query(
-      'SELECT id, name, email, password, role FROM users WHERE email = $1',
+      'SELECT id, name, email, password, role, session_token FROM users WHERE email = $1',
       [email]
     );
 
@@ -102,7 +106,7 @@ const loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id, sessionToken),
+      token: generateToken(user.id, user.role, sessionToken, mode),
     });
   } catch (error) {
     console.error('[loginUser]', error.message);
@@ -117,8 +121,48 @@ const getMe = async (req, res) => {
   res.status(200).json(req.user);
 };
 
+// @desc    Get user profile history (rentals, lottery)
+// @route   GET /api/auth/profile-history
+// @access  Private
+const getProfileHistory = async (req, res) => {
+  try {
+    const rentals = await pool.query(`
+      SELECT r.*, c.name as car_name, c.image as car_image
+      FROM rental_requests r
+      JOIN cars c ON r.car_id = c.id
+      WHERE r.user_id = $1
+      ORDER BY r.created_at DESC
+    `, [req.user.id]);
+
+    const lotteries = await pool.query(`
+      SELECT ln.*, ls.status as lottery_status, c.name as prize_name
+      FROM lottery_numbers ln
+      JOIN lottery_settings ls ON ln.lottery_id = ls.id
+      LEFT JOIN cars c ON ls.prize_car_id = c.id
+      WHERE ln.user_id = $1
+      ORDER BY ln.created_at DESC
+    `, [req.user.id]);
+
+    res.json({
+      rentals: rentals.rows.map(r => ({
+        id: r.id, car: r.car_name, dates: `${new Date(r.start_date).toLocaleDateString()} - ${new Date(r.end_date).toLocaleDateString()}`,
+        status: r.status, price: parseFloat(r.total_price), image: r.car_image
+      })),
+      lotteries: lotteries.rows.map(l => ({
+        id: l.id, number: l.number, date: l.created_at, status: l.status,
+        prize: l.prize_name || "Unknown Prize"
+      }))
+    });
+  } catch (error) {
+    console.error('[getProfileHistory]', error.message);
+    res.status(500).json({ message: 'Server error retrieving history' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getMe,
+  getProfileHistory,
 };
+

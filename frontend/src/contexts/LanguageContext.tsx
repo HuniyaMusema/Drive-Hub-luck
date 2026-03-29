@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { useSettings } from "@/hooks/useSettings";
 
 export type Language = "en" | "am" | "om";
 
@@ -23,6 +24,8 @@ const translations: Record<Language, Record<string, string>> = {
     lottery: "Lottery",
     contact: "Contact",
     login: "Login",
+    systemMaintenance: "System Maintenance",
+    retry: "Retry",
     signUp: "Sign Up",
     carsForSale: "Cars for Sale",
     carsForRent: "Cars for Rent",
@@ -76,9 +79,9 @@ const translations: Record<Language, Record<string, string>> = {
     lotteryTagline: "Gech (ጌች) Lottery",
     lotteryTitle: "Pick a Number, Win a Ride",
     lotteryDesc: "Our car lottery is your chance to drive home in a premium vehicle. Select your lucky numbers, confirm your ticket, and wait for the draw.",
-    currentDraw: "Current Draw",
-    grandPrize: "Grand Prize: 2025 Apex GT Coupe",
-    ticketPrice: "Ticket Price",
+    currentDraw: "CURRENT DRAW",
+    grandPrize: "Grand Prize: To Be Announced",
+    ticketPrice: "TICKET PRICE",
     numberRange: "Number Range",
     ticketsLeft: "Tickets Left",
     selectYourNumbers: "Select Your Numbers",
@@ -230,6 +233,8 @@ const translations: Record<Language, Record<string, string>> = {
     lottery: "ሎተሪ",
     contact: "ያግኙን",
     login: "ግባ",
+    systemMaintenance: "ስርዓቱ በጥገና ላይ ነው",
+    retry: "እንደገና ይሞክሩ",
     signUp: "ተመዝገብ",
     carsForSale: "ለሽያጭ መኪናዎች",
     carsForRent: "ለኪራይ መኪናዎች",
@@ -283,9 +288,9 @@ const translations: Record<Language, Record<string, string>> = {
     lotteryTagline: "ጌች ሎተሪ",
     lotteryTitle: "ቁጥር ይምረጡ፣ መኪና ያሸንፉ",
     lotteryDesc: "የመኪና ሎተሪያችን ፕሪሚየም ተሽከርካሪ ወደ ቤት ለመንዳት እድል ነው። ዕድለኛ ቁጥሮችዎን ይምረጡ፣ ትኬትዎን ያረጋግጡ እና ዕጣውን ይጠብቁ።",
-    currentDraw: "ወቅታዊ ዕጣ",
-    grandPrize: "ዋና ሽልማት: 2025 Apex GT Coupe",
-    ticketPrice: "የትኬት ዋጋ",
+    currentDraw: "የአሁኑ ዕጣ",
+    grandPrize: "ዋና ሽልማት: ወደፊት የሚገለፅ",
+    ticketPrice: "የቲኬት ዋጋ",
     numberRange: "የቁጥር ክልል",
     ticketsLeft: "የቀሩ ትኬቶች",
     selectYourNumbers: "ቁጥሮችዎን ይምረጡ",
@@ -437,6 +442,8 @@ const translations: Record<Language, Record<string, string>> = {
     lottery: "Lootarii",
     contact: "Nu Quunnamaa",
     login: "Seeni",
+    systemMaintenance: "Sirni kun suphaa irra jira",
+    retry: "Irra deebi'ii yaali",
     signUp: "Galmaa'i",
     carsForSale: "Konkolaataa Gurgurtaaf",
     carsForRent: "Konkolaataa Kireeffannaaf",
@@ -490,9 +497,9 @@ const translations: Record<Language, Record<string, string>> = {
     lotteryTagline: "Lootarii Gech",
     lotteryTitle: "Lakkoofsa Filadhu, Konkolaataa Moʼi",
     lotteryDesc: "Lootariin konkolaataa keenyaa carraa konkolaataa piriimiyeemii gara manaatti oofuuf ta'a. Lakkoofsa carraa keessan filadhaa, tikeetii keessan mirkaneessaa, qurxii eegadhaa.",
-    currentDraw: "Qurxii Ammaa",
-    grandPrize: "Badhaasa Guddaa: 2025 Apex GT Coupe",
-    ticketPrice: "Gatii Tikeetii",
+    currentDraw: "CARRAA AMMAA",
+    grandPrize: "Badhaasa Guddaa: Fuulduratti Kan Ibsamu",
+    ticketPrice: "GATII TIKKEETTII",
     numberRange: "Daangaa Lakkoofsa",
     ticketsLeft: "Tikeetii Hafe",
     selectYourNumbers: "Lakkoofsa Keessan Filadhaa",
@@ -651,6 +658,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem("gech-lang");
     return (saved as Language) || "en";
   });
+
+  const { settings } = useSettings();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("gech-lang");
+    if (!saved && settings?.General?.defaultLanguage) {
+      setLanguage(settings.General.defaultLanguage as Language);
+    }
+  }, [settings]);
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);

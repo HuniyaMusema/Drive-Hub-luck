@@ -1,23 +1,25 @@
 import { Link } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
-import { Car, Key, Ticket, CreditCard, User, ArrowRight, Heart } from "lucide-react";
+import { Car, Ticket, CreditCard, User, ArrowRight, Heart } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
   const { ref, isVisible } = useScrollReveal(0.1);
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const stats = [
-    { icon: Key, label: t("activeRentals"), value: "1", color: "bg-primary/10 text-primary" },
-    { icon: Ticket, label: t("lotteryEntries"), value: "3", color: "bg-accent/10 text-accent" },
-    { icon: CreditCard, label: t("pendingPayments"), value: "1", color: "bg-amber-50 text-amber-600" },
+
+    { icon: Ticket, label: t("lotteryEntries"), value: "0", color: "bg-accent/10 text-accent" },
+    { icon: CreditCard, label: t("pendingPayments"), value: "0", color: "bg-amber-50 text-amber-600" },
   ];
 
   const quickLinks = [
     { icon: Car, label: t("browseCarsForSale"), to: "/cars/sale" },
-    { icon: Key, label: t("rentACar"), to: "/cars/rent" },
+
     { icon: Heart, label: t("savedCars"), to: "/saved-cars" },
     { icon: Ticket, label: t("enterLotteryAction"), to: "/lottery" },
     { icon: CreditCard, label: t("payment"), to: "/payment" },
@@ -28,7 +30,7 @@ export default function Dashboard() {
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8">
         <div className="mb-8 animate-fade-in-up">
-          <h1 className="text-3xl font-bold text-foreground mb-1">{t("welcomeBack")}, Marcus</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-1">{t("welcomeBack")}, {user?.name?.split(' ')[0] || "User"}</h1>
           <p className="text-muted-foreground">{t("activitySummary")}</p>
         </div>
 

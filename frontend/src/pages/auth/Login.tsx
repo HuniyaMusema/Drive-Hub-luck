@@ -11,16 +11,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import type { User } from "@/types/auth";
 import { useToast } from "@/hooks/use-toast";
 
-const DEMO_ACCOUNTS: Record<string, { password: string; user: User }> = {
-  "admin@gech.com": {
-    password: "admin123",
-    user: { id: "1", name: "Admin User", email: "admin@gech.com", role: "admin" },
-  },
-  "staff@gech.com": {
-    password: "staff123",
-    user: { id: "2", name: "Lottery Staff", email: "staff@gech.com", role: "lottery_staff" },
-  },
-};
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -56,7 +46,13 @@ export default function Login() {
         };
         setUser(loggedInUser);
         toast({ title: `Welcome, ${data.name}!`, description: "Logged in successfully." });
-        navigate(loggedInUser.role === "admin" ? "/admin" : "/admin/lottery-payments");
+        if (loggedInUser.role === "admin") {
+          navigate("/admin");
+        } else if (loggedInUser.role === "lottery_staff") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         toast({ title: "Login failed", description: data.message || "Invalid credentials", variant: "destructive" });
       }
@@ -81,11 +77,6 @@ export default function Login() {
               <p className="text-sm text-muted-foreground mt-1">{t("signInToAccount")}</p>
             </div>
 
-            <div className="mb-6 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground space-y-1">
-              <p className="font-semibold text-foreground text-sm mb-1">{t("demoAccounts")}</p>
-              <p><span className="font-medium">Admin:</span> admin@gech.com / admin123</p>
-              <p><span className="font-medium">Lottery Staff:</span> staff@gech.com / staff123</p>
-            </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">

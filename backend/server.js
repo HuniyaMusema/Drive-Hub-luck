@@ -4,6 +4,8 @@ const cors = require('cors');
 const SettingsManager = require('./services/SettingsManager');
 const { maintenanceGuard } = require('./middleware/systemGuards');
 
+const path = require('path');
+
 const app = express();
 
 // Load settings on startup
@@ -13,6 +15,7 @@ SettingsManager.loadSettings();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Master Platform Toggle
 app.use(maintenanceGuard);
@@ -24,6 +27,7 @@ app.use('/api/lottery', require('./routes/lotteryRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
 
 // Admin routes (PostgreSQL-backed)
+app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/admin/lottery', require('./routes/adminLotteryRoutes'));
 app.use('/api/admin/backups', require('./routes/backupRoutes'));
 app.use('/api/admin/logs', require('./routes/auditLogsRoutes'));

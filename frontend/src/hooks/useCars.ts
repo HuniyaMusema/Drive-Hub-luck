@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/services/api';
 
 export interface BackendCar {
-  id: number;
+  id: string;
   name: string;
   price: number;
   type: "sale" | "rental";
@@ -13,7 +13,7 @@ export interface BackendCar {
 }
 
 export interface Car {
-  id: number;
+  id: string;
   name: string;
   brand: string;
   year: number;
@@ -36,16 +36,16 @@ export const mapBackendCar = (backendCar: BackendCar): Car => {
   return {
     id: backendCar.id,
     name: backendCar.name,
-    brand: specs.brand || 'Unknown',
+    brand: specs.brand || '',
     year: specs.year || new Date().getFullYear(),
-    price: backendCar.price,
-    priceLabel: backendCar.type === 'rental' ? `$${backendCar.price}/day` : `$${backendCar.price.toLocaleString()}`,
+    price: Number(backendCar.price),
+    priceLabel: backendCar.type === 'rental' ? `${Number(backendCar.price).toLocaleString()} Birr / day` : `${Number(backendCar.price).toLocaleString()} Birr`,
     type: backendCar.type,
     available: true,
-    image: images[0] || 'https://images.unsplash.com/photo-1549317661-bd32c0e5a809',
-    mileage: specs.mileage || '0 mi',
-    fuel: specs.fuel || 'Gasoline',
-    transmission: specs.transmission || 'Automatic',
+    image: images[0] || '',
+    mileage: specs.mileage || '',
+    fuel: specs.fuel || '',
+    transmission: specs.transmission || '',
     seats: specs.seats || 5,
     description: backendCar.description || '',
   };
@@ -57,6 +57,64 @@ export const useCars = () => {
     queryFn: async () => {
       const data = await apiFetch('/cars');
       return data.map(mapBackendCar) as Car[];
+    },
+  });
+};
+
+export const useCreateCar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => apiFetch('/cars', { method: 'POST', body: JSON.stringify(data) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cars'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+    },
+  });
+};
+
+export const useUpdateCar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      apiFetch(`/cars/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cars'] });
+    },
+  });
+};
+
+export const useUploadImage = () => {
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/cars/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      return response.json(); // { url: '/uploads/...' }
+    },
+  });
+};
+
+export const useDeleteCar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => apiFetch(`/cars/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cars'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
     },
   });
 };

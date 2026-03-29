@@ -7,12 +7,15 @@ import { Label } from "@/components/ui/label";
 import { User, Mail, Phone, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useProfileHistory } from "@/hooks/useLottery";
+import { Loader2, Car, Ticket } from "lucide-react";
 
 export default function Profile() {
   const [editing, setEditing] = useState(false);
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { data: history, isLoading } = useProfileHistory();
 
   const handleLogout = () => {
     setUser(null);
@@ -78,34 +81,37 @@ export default function Profile() {
           </form>
         </div>
 
-        {/* Rental History */}
-        <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
-          <h3 className="font-semibold text-card-foreground mb-3">Rental History</h3>
-          <div className="text-sm text-muted-foreground space-y-2">
-            <div className="flex justify-between py-2 border-b last:border-0">
-              <span>Prestige Sedan S — 3 days</span>
-              <span className="tabular-nums">$255.00</span>
-            </div>
-            <div className="flex justify-between py-2">
-              <span>Metro City 200 — 1 day</span>
-              <span className="tabular-nums">$45.00</span>
-            </div>
-          </div>
-        </div>
+
 
         {/* Lottery History */}
         <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
-          <h3 className="font-semibold text-card-foreground mb-3">Lottery History</h3>
-          <div className="text-sm text-muted-foreground space-y-2">
-            <div className="flex justify-between py-2 border-b last:border-0">
-              <span>Draw #17 — Numbers: 14, 28, 55</span>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Lost</span>
+          <h3 className="font-semibold text-card-foreground mb-4 flex items-center gap-2">
+            <Ticket className="h-4 w-4 text-primary" /> Purchased Tickets
+          </h3>
+          {isLoading ? (
+            <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
+          ) : (history?.lotteries?.length ?? 0) === 0 ? (
+            <div className="border border-dashed rounded-lg p-8 text-center bg-muted/20">
+              <p className="text-secondary-foreground/60 text-sm italic">No lottery tickets purchased.</p>
             </div>
-            <div className="flex justify-between py-2">
-              <span>Draw #18 — Numbers: 9, 42</span>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">Pending</span>
+          ) : (
+            <div className="space-y-3">
+              {history?.lotteries.map((l) => (
+                <div key={l.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center font-bold text-primary text-xs">
+                       {l.number}
+                    </div>
+                    <div>
+                        <p className="text-[11px] font-bold text-foreground">Ticket #{l.number.toString().padStart(3, '0')}</p>
+                        <p className="text-[9px] text-muted-foreground uppercase font-bold">{l.status} Draw</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] font-medium text-muted-foreground">{new Date(l.date).toLocaleDateString()}</p>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
 
         <Button variant="outline" className="text-destructive hover:text-destructive" onClick={handleLogout}>

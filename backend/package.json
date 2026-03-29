@@ -1,5 +1,5 @@
 {
-  "name": "drive-hub-luck",
+  "name": "drive-hub-luck-backend",
   "version": "1.0.0",
   "description": "Backend API for Drive-Hub-luck",
   "main": "server.js",
@@ -15,9 +15,9 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.3.1",
     "multer": "^2.1.1",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

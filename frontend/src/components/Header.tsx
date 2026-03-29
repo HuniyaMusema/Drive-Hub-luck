@@ -68,7 +68,9 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
         <Link to="/" className="flex items-center gap-2 text-white">
           <Car className="h-7 w-7" />
-          <span className="text-xl font-bold font-display tracking-tight" style={{ textShadow: '3px 5px 10px rgba(0, 0, 0, 0.2)' }}>Gech ጌች</span>
+          <span className="text-xl font-bold font-display tracking-tight" style={{ textShadow: '3px 5px 10px rgba(0, 0, 0, 0.2)' }}>
+            {settings?.General?.platformName || "Drive Hub"}
+          </span>
         </Link>
 
         {/* Desktop nav */}

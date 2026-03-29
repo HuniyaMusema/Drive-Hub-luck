@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings, useAuditLogs, useBackups, useCreateBackup } from "@/hooks/useSettings";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Settings, Shield, Ticket, Power, ScrollText, Bell, Database,
   Save, Upload, RotateCcw, Download, Trash2, FileDown,
@@ -115,6 +116,7 @@ const defaultBackup: BackupSettings = {
 export default function AdminSettings() {
   const { toast } = useToast();
   const { settings, updateSetting, isLoading: settingsLoading } = useSettings();
+  const { setLanguage } = useLanguage();
   const { data: auditLogs = [], isLoading: logsLoading } = useAuditLogs();
   const { data: backups = [], isLoading: backupsLoading } = useBackups();
   const createBackupMutation = useCreateBackup();
@@ -138,10 +140,15 @@ export default function AdminSettings() {
     }
   }, [settings]);
 
-  const save = (key: string, data: unknown, label: string) => {
+  const save = (key: string, data: any, label: string) => {
     updateSetting.mutate({ key, value: data }, {
       onSuccess: () => {
         toast({ title: "Settings saved", description: `${label} settings updated successfully.` });
+        
+        // Immediate UI feedback for language changes
+        if (key === "General" && data.defaultLanguage) {
+          setLanguage(data.defaultLanguage);
+        }
       },
       onError: (err: any) => {
         toast({ title: "Save failed", description: err.message, variant: "destructive" });
@@ -246,6 +253,37 @@ export default function AdminSettings() {
                 </Select>
               </div>
             </div>
+            <div className="pt-2">
+              <h3 className="text-sm font-medium text-muted-foreground mb-4">Contact Information</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Contact Email</Label>
+                  <Input 
+                    type="email"
+                    value={general.contactEmail || ""} 
+                    onChange={(e) => setGeneral({ ...general, contactEmail: e.target.value })} 
+                    placeholder="info@yourbrand.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Contact Phone</Label>
+                  <Input 
+                    value={general.contactPhone || ""} 
+                    onChange={(e) => setGeneral({ ...general, contactPhone: e.target.value })} 
+                    placeholder="+251 911 000 000"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Physical Address</Label>
+                  <Input 
+                    value={general.contactAddress || ""} 
+                    onChange={(e) => setGeneral({ ...general, contactAddress: e.target.value })} 
+                    placeholder="Street, City, Country"
+                  />
+                </div>
+              </div>
+            </div>
+
             <Button onClick={() => save("General", general, "General")} className="gap-1.5" disabled={updateSetting.isPending}>
               <Save className="h-4 w-4" /> Save General Settings
             </Button>

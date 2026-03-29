@@ -45,7 +45,14 @@ export function CarCard({ car, view = "grid", isVisible = true, delay = 0 }: Car
         style={{ transitionDelay: `${delay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
       >
         <div className="relative sm:w-64 aspect-[4/3] sm:aspect-auto overflow-hidden shrink-0">
-          <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
+        <img 
+          src={car.image} 
+          alt={car.name} 
+          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" 
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1549317661-bd32c0e5a809";
+          }}
+        />
           {!car.available && (
             <span className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-xs font-bold px-3 py-1 rounded-full">{car.type === "sale" ? t("sold") : t("rented")}</span>
           )}

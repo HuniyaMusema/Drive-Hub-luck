@@ -37,7 +37,7 @@ export default function Lottery() {
                 </div>
                 <div>
                   <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">{t("ticketPrice")}</p>
-                  <p className="font-bold text-lg tabular-nums">$25.00</p>
+                  <p className="font-bold text-lg tabular-nums">$0.00</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -46,7 +46,7 @@ export default function Lottery() {
                 </div>
                 <div>
                   <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">{t("numberRange")}</p>
-                  <p className="font-bold text-lg tabular-nums">1 – 100</p>
+                  <p className="font-bold text-lg tabular-nums">0 – 0</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -55,7 +55,7 @@ export default function Lottery() {
                 </div>
                 <div>
                   <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">{t("ticketsLeft")}</p>
-                  <p className="font-bold text-lg tabular-nums">73 / 100</p>
+                  <p className="font-bold text-lg tabular-nums">0 / 0</p>
                 </div>
               </div>
             </div>

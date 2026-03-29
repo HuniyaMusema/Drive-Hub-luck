@@ -9,6 +9,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { CarCard } from "@/components/CarCard";
 import { useCars } from "@/hooks/useCars";
 import { useSettings } from "@/hooks/useSettings";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/services/api";
 import heroBg from "@/assets/hero-bg.jpg";
 
 function HeroSection() {
@@ -18,6 +20,11 @@ function HeroSection() {
   const operational = settings?.Operational || {};
   const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
   const isSalesEnabled = operational.salesModuleEnabled !== false;
+
+  const { data: stats } = useQuery({
+    queryKey: ["publicStats"],
+    queryFn: () => apiFetch("/settings/stats"),
+  });
 
   return (
     <section className="relative min-h-[100vh] flex items-center overflow-hidden">
@@ -57,9 +64,9 @@ function HeroSection() {
           style={{ animation: "fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both" }}
         >
           {[
-            { value: "240+", label: t("vehicles") },
-            { value: "1.2K", label: t("happyClients") },
-            { value: "18", label: t("lotteryDraws") },
+            { value: stats ? `${stats.vehicles}+` : "240+", label: t("vehicles") },
+            { value: stats ? `${(stats.happyClients / 1000).toFixed(1)}K` : "1.2K", label: t("happyClients") },
+            { value: stats ? stats.lotteryDraws.toString() : "18", label: t("lotteryDraws") },
           ].map((stat) => (
             <div key={stat.label} className="text-primary-foreground">
               <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
@@ -242,6 +249,31 @@ function TrustSection() {
 }
 
 export default function Index() {
+  const { error } = useSettings();
+  const { t } = useLanguage();
+
+  if (error?.message?.includes("maintenance")) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-surface-warm p-4 text-center">
+        <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-8">
+          <Clock className="h-10 w-10 text-primary animate-pulse" />
+        </div>
+        <h1 className="text-4xl font-bold text-foreground mb-4 font-display">{t("systemMaintenance")}</h1>
+        <p className="text-lg text-muted-foreground max-w-md mb-8">
+          {error.message}
+        </p>
+        <div className="flex gap-4">
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            {t("retry")}
+          </Button>
+          <Link to="/auth/login">
+            <Button variant="ghost">Admin Login</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Header />

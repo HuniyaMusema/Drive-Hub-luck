@@ -8,9 +8,10 @@ export interface SystemSettings {
 export const useSettings = () => {
   const queryClient = useQueryClient();
 
-  const { data: settings = {}, isLoading } = useQuery<SystemSettings>({
+  const { data: settings = {}, isLoading, error } = useQuery<SystemSettings, Error>({
     queryKey: ["settings"],
     queryFn: () => apiFetch("/settings"),
+    retry: false, // Don't retry on 503 so we show maintenance immediately
   });
 
   const updateSetting = useMutation({
@@ -24,7 +25,7 @@ export const useSettings = () => {
     },
   });
 
-  return { settings, isLoading, updateSetting };
+  return { settings, isLoading, error, updateSetting };
 };
 
 export const useAuditLogs = () => {

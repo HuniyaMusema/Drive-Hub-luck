@@ -1,18 +1,20 @@
 import { AdminLayout } from "@/components/AdminLayout";
-import { Car, CalendarCheck, Ticket, CreditCard, Users, TrendingUp, Sparkles } from "lucide-react";
+import { Car, Ticket, CreditCard, Users, TrendingUp, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-
-const cards = [
-  { icon: Car, label: "Total Vehicles", value: "47", change: "+3 this month", color: "text-blue-500", bg: "bg-blue-500/10", border: "hover:border-blue-500/50" },
-  { icon: CalendarCheck, label: "Active Rentals", value: "12", change: "4 pending", color: "text-green-500", bg: "bg-green-500/10", border: "hover:border-green-500/50" },
-  { icon: Ticket, label: "Lottery Entries", value: "73", change: "Draw #18 active", color: "text-purple-500", bg: "bg-purple-500/10", border: "hover:border-purple-500/50" },
-  { icon: CreditCard, label: "Pending Lottery Payments", value: "8", change: "2 new today", color: "text-amber-500", bg: "bg-amber-500/10", border: "hover:border-amber-500/50" },
-  { icon: Users, label: "Registered Users", value: "318", change: "+24 this week", color: "text-pink-500", bg: "bg-pink-500/10", border: "hover:border-pink-500/50" },
-  { icon: TrendingUp, label: "Revenue (MTD)", value: "$14,280", change: "+12%", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "hover:border-emerald-500/50" },
-];
+import { useDashboardStats } from "@/hooks/useAdmin";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const { data: stats, isLoading } = useDashboardStats();
+  
+  const cards = [
+    { icon: Car, label: "Total Vehicles", value: stats?.totalVehicles ?? 0, change: "Live", color: "text-blue-500", bg: "bg-blue-500/10", border: "hover:border-blue-500/50" },
+
+    { icon: Ticket, label: "Lottery Entries", value: stats?.lotteryEntries ?? 0, change: "Live", color: "text-purple-500", bg: "bg-purple-500/10", border: "hover:border-purple-500/50" },
+    { icon: CreditCard, label: "Pending Payments", value: stats?.pendingPayments ?? 0, change: "Review", color: "text-amber-500", bg: "bg-amber-500/10", border: "hover:border-amber-500/50" },
+    { icon: Users, label: "Registered Users", value: stats?.registeredUsers ?? 0, change: "Total", color: "text-pink-500", bg: "bg-pink-500/10", border: "hover:border-pink-500/50" },
+    { icon: TrendingUp, label: "Est. Revenue", value: `$${(stats?.revenue ?? 0).toLocaleString()}`, change: "Est", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "hover:border-emerald-500/50" },
+  ];
   
   const getGreeting = () => {
     const hour = new Date().getHours();

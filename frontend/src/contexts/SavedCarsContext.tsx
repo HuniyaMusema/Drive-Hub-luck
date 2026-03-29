@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 
 interface SavedCarsContextType {
-  savedCarIds: number[];
-  toggleSave: (carId: number) => void;
-  isSaved: (carId: number) => boolean;
+  savedCarIds: string[];
+  toggleSave: (carId: string) => void;
+  isSaved: (carId: string) => boolean;
   savedCarsCount: number;
 }
 
@@ -12,7 +12,7 @@ const SavedCarsContext = createContext<SavedCarsContextType | undefined>(undefin
 
 export function SavedCarsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  const [savedCarIds, setSavedCarIds] = useState<number[]>([]);
+  const [savedCarIds, setSavedCarIds] = useState<string[]>([]);
 
   // Load saved cars from localStorage when user changes
   useEffect(() => {
@@ -40,7 +40,7 @@ export function SavedCarsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [savedCarIds, user]);
 
-  const toggleSave = (carId: number) => {
+  const toggleSave = (carId: string) => {
     if (!user) return; // Should be handled by UI (prompt sign in)
 
     setSavedCarIds((prev) =>
@@ -48,7 +48,7 @@ export function SavedCarsProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const isSaved = (carId: number) => savedCarIds.includes(carId);
+  const isSaved = (carId: string) => savedCarIds.includes(carId);
 
   return (
     <SavedCarsContext.Provider

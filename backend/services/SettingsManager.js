@@ -37,13 +37,13 @@ class SettingsManager {
          VALUES ($1, $2, $3, NOW()) 
          ON CONFLICT (config_key) 
          DO UPDATE SET config_value = EXCLUDED.config_value, updated_by = EXCLUDED.updated_by, updated_at = NOW()`,
-        [key, JSON.stringify(value), adminId]
+        [key, value, adminId]
       );
 
       await pool.query(
         `INSERT INTO audit_logs (action_type, performed_by, details) 
          VALUES ('UPDATE_SETTING', $1, $2)`,
-        [adminId, JSON.stringify({ key, old_value: oldValue, new_value: value })]
+        [adminId, { key, old_value: oldValue, new_value: value }]
       );
 
       this.cache[key] = value;

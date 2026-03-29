@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { useSettings } from "@/hooks/useSettings";
 
 import Index from "./pages/Index";
 import Login from "./pages/auth/Login";
@@ -24,7 +26,6 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCars from "./pages/admin/AdminCars";
-import AdminRentals from "./pages/admin/AdminRentals";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -34,11 +35,23 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const PlatformTitle = () => {
+  const { settings } = useSettings();
+  const platformName = settings?.General?.platformName || "Drive Hub";
+  
+  useEffect(() => {
+    document.title = `${platformName} | Car Sales & Rentals`;
+  }, [platformName]);
+  
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
       <LanguageProvider>
       <AuthProvider>
       <SavedCarsProvider>
+        <PlatformTitle />
         <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -64,7 +77,7 @@ const App = () => (
             {/* Admin only */}
             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/cars" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCars /></ProtectedRoute>} />
-            <Route path="/admin/rentals" element={<ProtectedRoute allowedRoles={["admin"]}><AdminRentals /></ProtectedRoute>} />
+
             <Route path="/admin/lottery" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLottery /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsers /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />

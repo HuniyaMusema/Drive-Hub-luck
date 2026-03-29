@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayoutDashboard, Car, CalendarCheck, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown, UserCheck, Settings } from "lucide-react";
+import { useSettings } from "@/hooks/useSettings";
+import { LayoutDashboard, Car, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown, UserCheck, Settings } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
@@ -18,7 +19,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard, roles: ["admin", "lottery_staff"] },
   { title: "Cars", url: "/admin/cars", icon: Car, roles: ["admin"] },
-  { title: "Rentals", url: "/admin/rentals", icon: CalendarCheck, roles: ["admin"] },
+
   { title: "Lottery", url: "/admin/lottery", icon: Ticket, roles: ["admin"] },
   { title: "Users", url: "/admin/users", icon: Users, roles: ["admin"] },
   { title: "Lottery Payments", url: "/admin/lottery-payments", icon: CreditCard, roles: ["admin", "lottery_staff"] },
@@ -31,6 +32,7 @@ function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { user, setUser } = useAuth();
+  const { settings } = useSettings();
   const [isLotteryMode, setIsLotteryMode] = useState(() => {
     const op = localStorage.getItem("gech-operational");
     if (op) {
@@ -85,7 +87,7 @@ function AdminSidebar() {
           <div className="bg-sidebar-primary p-2 rounded-xl shadow-sm text-sidebar-primary-foreground shrink-0">
              <Car className="h-5 w-5" />
           </div>
-          {!collapsed && <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sidebar-foreground to-sidebar-foreground/70 font-display tracking-tight transition-all">Gech</span>}
+          {!collapsed && <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sidebar-foreground to-sidebar-foreground/70 font-display tracking-tight transition-all">{settings?.General?.platformName || "Drive Hub"}</span>}
         </div>
         <SidebarGroup>
           <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-sidebar-foreground/40 font-bold px-5 mb-2">
