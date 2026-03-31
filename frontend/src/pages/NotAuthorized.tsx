@@ -1,4 +1,4 @@
-import { AdminLayout } from "@/components/AdminLayout";
+import { PageShell } from "@/components/PageShell";
 import { ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -9,17 +9,21 @@ export default function NotAuthorized() {
   const dashboardPath = user?.role === "admin" || user?.role === "lottery_staff" ? "/admin" : "/dashboard";
 
   return (
-    <AdminLayout>
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <ShieldX className="h-16 w-16 text-destructive mb-4" />
-        <h1 className="text-2xl font-bold text-foreground mb-2">Not Authorized</h1>
-        <p className="text-muted-foreground mb-6 max-w-md">
-          You don't have permission to access this page. Contact an administrator if you believe this is an error.
-        </p>
-        <Button asChild>
-          <Link to={dashboardPath}>Back to Dashboard</Link>
-        </Button>
+    <PageShell>
+      <div className="container mx-auto px-4 flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <div className="bg-card rounded-2xl shadow-lg p-12 max-w-lg w-full animate-fade-in-up">
+          <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-6">
+            <ShieldX className="h-8 w-8 text-destructive" />
+          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-3 font-display">Not Authorized</h1>
+          <p className="text-muted-foreground mb-8 leading-relaxed">
+            You don't have permission to access this page. If you believe this is an error, please contact the platform administrator.
+          </p>
+          <Button asChild size="lg" className="rounded-full px-8">
+            <Link to={dashboardPath}>Back to Dashboard</Link>
+          </Button>
+        </div>
       </div>
-    </AdminLayout>
+    </PageShell>
   );
 }

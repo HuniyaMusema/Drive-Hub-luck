@@ -18,8 +18,8 @@ function HeroSection() {
 
   const { settings } = useSettings();
   const operational = settings?.Operational || {};
-  const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
-  const isSalesEnabled = operational.salesModuleEnabled !== false;
+  const isLotteryEnabled = true;
+  const isSalesEnabled = true;
 
   const { data: stats } = useQuery({
     queryKey: ["publicStats"],
@@ -123,9 +123,9 @@ function ServicesSection() {
   const operational = settings?.Operational || {};
 
   const services = [
-    { icon: Car, title: t("buyACar"), desc: t("buyACarDesc"), link: "/cars/sale", enabled: operational.salesModuleEnabled !== false },
-    { icon: Key, title: t("rentACar"), desc: t("rentACarDesc"), link: "/cars/rent", enabled: operational.rentalsModuleEnabled !== false },
-    { icon: Ticket, title: t("carLottery"), desc: t("carLotteryDesc"), link: "/lottery", enabled: operational.lotteryModuleEnabled !== false },
+    { icon: Car, title: t("buyACar"), desc: t("buyACarDesc"), link: "/cars/sale", enabled: true },
+    { icon: Key, title: t("rentACar"), desc: t("rentACarDesc"), link: "/cars/rent", enabled: true },
+    { icon: Ticket, title: t("carLottery"), desc: t("carLotteryDesc"), link: "/lottery", enabled: true },
   ].filter(s => s.enabled);
 
   return (
@@ -163,7 +163,7 @@ function LotterySection() {
   const { t } = useLanguage();
   const { settings } = useSettings();
   
-  if (settings?.Operational?.lotteryModuleEnabled === false) return null;
+  // Lottery section is now always visible on the landing page
 
   const lotterySteps = [
     { icon: Ticket, title: t("pickYourNumbers"), desc: t("pickNumbersDesc") },

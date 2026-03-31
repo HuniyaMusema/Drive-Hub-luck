@@ -11,7 +11,6 @@ const {
 } = require('../controllers/carController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-<<<<<<< HEAD
 // Multer Config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -32,9 +31,6 @@ router.post('/upload', protect, authorize(['admin'], 'car_mode'), upload.single(
     url: `/uploads/${req.file.filename}` 
   });
 });
-
-=======
->>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 router.route('/').get(getCars).post(protect, authorize(['admin'], 'car_mode'), createCar);
 router
   .route('/:id')

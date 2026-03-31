@@ -9,11 +9,7 @@ CREATE TYPE lottery_number_status AS ENUM ('available', 'pending', 'confirmed');
 CREATE TYPE payment_method AS ENUM ('CBE', 'Telebirr');
 CREATE TYPE payment_status AS ENUM ('pending', 'approved', 'rejected');
 CREATE TYPE car_status AS ENUM ('available', 'sold', 'rented', 'maintenance');
-<<<<<<< HEAD
 CREATE TYPE rental_request_status AS ENUM ('pending', 'approved', 'rejected', 'completed');
-=======
-
->>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 
 -- TRIGGER FUNCTION FOR UPDATED_AT
 CREATE OR REPLACE FUNCTION update_timestamp_columns() 
@@ -149,11 +145,8 @@ CREATE TRIGGER set_lottery_settings_updated_at BEFORE UPDATE ON lottery_settings
 CREATE TRIGGER set_lottery_numbers_updated_at BEFORE UPDATE ON lottery_numbers FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_payments_updated_at BEFORE UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
 CREATE TRIGGER set_app_settings_updated_at BEFORE UPDATE ON app_settings FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
-<<<<<<< HEAD
 CREATE TRIGGER set_rental_requests_updated_at BEFORE UPDATE ON rental_requests FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
-=======
 CREATE TRIGGER set_notifications_updated_at BEFORE UPDATE ON notifications FOR EACH ROW EXECUTE FUNCTION update_timestamp_columns();
->>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
 
 -- INDEXES
 CREATE INDEX idx_users_role ON users(role);
@@ -166,11 +159,8 @@ CREATE INDEX idx_lottery_numbers_status_expires ON lottery_numbers(status, expir
 CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_payments_user_id ON payments(user_id);
 CREATE INDEX idx_payments_lottery_number_id ON payments(lottery_number_id);
-<<<<<<< HEAD
 CREATE INDEX idx_rental_requests_status ON rental_requests(status);
 CREATE INDEX idx_rental_requests_user_id ON rental_requests(user_id);
 CREATE INDEX idx_rental_requests_car_id ON rental_requests(car_id);
-=======
 CREATE INDEX idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX idx_notifications_is_read ON notifications(is_read);
->>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9

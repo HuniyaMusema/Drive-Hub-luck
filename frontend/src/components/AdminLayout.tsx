@@ -1,32 +1,36 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/hooks/useSettings";
-import { LayoutDashboard, Car, Ticket, CreditCard, Users, LogOut, Dices, ChevronDown, UserCheck, Settings } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LayoutDashboard, Car, Ticket, CreditCard, Users, LogOut, Hash, ChevronDown, UserCheck, Settings, Trophy, ShieldCheck, Zap, Bell, Menu } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
 import NotificationBell from "@/components/NotificationBell";
+import { cn } from "@/lib/utils";
 
 interface NavItem {
   title: string;
+  labelKey: string;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
   roles: UserRole[];
 }
 
-const navItems: NavItem[] = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard, roles: ["admin", "lottery_staff"] },
-  { title: "Cars", url: "/admin/cars", icon: Car, roles: ["admin"] },
+const lotteryItems: NavItem[] = [
+  { title: "Generate Numbers", labelKey: "Generate Numbers",  url: "/admin/lottery",              icon: Trophy,     roles: ["admin"] },
+  { title: "Lottery Payments", labelKey: "Lottery Payments",  url: "/admin/lottery-payments",     icon: CreditCard, roles: ["admin", "lottery_staff"] },
+  { title: "Number Board",     labelKey: "Number Board",      url: "/admin/generate-lottery",     icon: Hash,       roles: ["admin", "lottery_staff"] },
+  { title: "Participants",     labelKey: "Participants",      url: "/admin/lottery-participants", icon: UserCheck,  roles: ["admin", "lottery_staff"] },
+];
 
-  { title: "Lottery", url: "/admin/lottery", icon: Ticket, roles: ["admin"] },
-  { title: "Users", url: "/admin/users", icon: Users, roles: ["admin"] },
-  { title: "Lottery Payments", url: "/admin/lottery-payments", icon: CreditCard, roles: ["admin", "lottery_staff"] },
-  { title: "Generate Numbers", url: "/admin/generate-lottery", icon: Dices, roles: ["admin", "lottery_staff"] },
-  { title: "Participants", url: "/admin/lottery-participants", icon: UserCheck, roles: ["admin", "lottery_staff"] },
-  { title: "Settings", url: "/admin/settings", icon: Settings, roles: ["admin"] },
+const systemItems: NavItem[] = [
+  { title: "Dashboard", labelKey: "Dashboard",  url: "/admin",          icon: LayoutDashboard, roles: ["admin", "lottery_staff"] },
+  { title: "Inventory", labelKey: "Inventory",  url: "/admin/cars",     icon: Car,             roles: ["admin"] },
+  { title: "Users",     labelKey: "Users",       url: "/admin/users",    icon: Users,           roles: ["admin"] },
+  { title: "Settings",  labelKey: "Settings",    url: "/admin/settings", icon: Settings,        roles: ["admin"] },
 ];
 
 function AdminSidebar() {
@@ -34,110 +38,117 @@ function AdminSidebar() {
   const collapsed = state === "collapsed";
   const { user, setUser } = useAuth();
   const { settings } = useSettings();
-  const [isLotteryMode, setIsLotteryMode] = useState(() => {
-    const op = localStorage.getItem("gech-operational");
-    if (op) {
-      try {
-        const parsed = JSON.parse(op);
-        return parsed.lotteryModuleEnabled ?? true;
-      } catch {}
-    }
-    return true;
-  });
+  const { t } = useLanguage();
+  const location = useLocation();
+  
+  const isLotteryMode = settings?.Operational?.lotteryModuleEnabled ?? true;
 
-  useEffect(() => {
-    const loadMode = () => {
-      const op = localStorage.getItem("gech-operational");
-      if (op) {
-        try {
-          const parsed = JSON.parse(op);
-          setIsLotteryMode(parsed.lotteryModuleEnabled ?? true);
-        } catch {}
-      }
-    };
-    loadMode();
-    const handleUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.type === "storage" || (customEvent.type === "settings-updated" && customEvent.detail === "gech-operational")) {
-        loadMode();
-      }
-    };
-    window.addEventListener("settings-updated", handleUpdate);
-    window.addEventListener("storage", handleUpdate);
-    return () => {
-      window.removeEventListener("settings-updated", handleUpdate);
-      window.removeEventListener("storage", handleUpdate);
-    };
-  }, []);
+  const filterItems = (items: NavItem[]) =>
+    items.filter((item) => {
+      if (!user || !item.roles.includes(user.role)) return false;
+      const isLotteryPage = lotteryItems.some(l => l.url === item.url);
+      if (!isLotteryMode && isLotteryPage && user.role !== "lottery_staff") return false;
+      return true;
+    });
 
-  const visibleItems = navItems.filter((item) => {
-    if (!user || !item.roles.includes(user.role)) return false;
-    
-    const isLotteryPage = ["Lottery", "Lottery Payments", "Generate Numbers", "Participants"].includes(item.title);
-    
-    // Admin users hide lottery pages if lottery mode is off. Staff always see their pages.
-    if (!isLotteryMode && isLotteryPage && user.role !== "lottery_staff") return false;
-    
-    return true;
-  });
+  const visibleSystem  = filterItems(systemItems);
+  const visibleLottery = filterItems(lotteryItems);
+
+  const SidebarLink = ({ item }: { item: NavItem }) => {
+    const isActive = location.pathname === item.url;
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild tooltip={item.title}>
+          <Link 
+            to={item.url} 
+            className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 group relative",
+              isActive 
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold" 
+                : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+            )}
+          >
+            <item.icon className={cn(
+              "h-5 w-5 transition-transform duration-300 group-hover:scale-110",
+              isActive ? "text-primary-foreground" : "text-sidebar-foreground/40 group-hover:text-primary"
+            )} />
+            {!collapsed && <span className="text-xs uppercase tracking-widest leading-none mt-0.5">{item.title}</span>}
+            {isActive && !collapsed && (
+               <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
+            )}
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border shadow-2xl bg-sidebar z-40">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar/80 backdrop-blur-xl z-40">
       <SidebarContent className="bg-transparent">
-        <div className="p-5 flex items-center gap-3 border-b border-sidebar-border mb-3">
-          <div className="bg-sidebar-primary p-2 rounded-xl shadow-sm text-sidebar-primary-foreground shrink-0">
-             <Car className="h-5 w-5" />
+        <div className="p-6 flex items-center gap-3 mb-4">
+          <div className="bg-primary p-2.5 rounded-2xl shadow-xl shadow-primary/20 text-primary-foreground shrink-0 rotate-3 transition-transform hover:rotate-0 cursor-pointer">
+             <Car className="h-5 w-5" strokeWidth={2.5} />
           </div>
-          {!collapsed && <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sidebar-foreground to-sidebar-foreground/70 font-display tracking-tight transition-all">{settings?.General?.platformName || "Drive Hub"}</span>}
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="text-lg font-black text-foreground tracking-tighter leading-none">{settings?.General?.platformName || "Drive Hub"}</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-primary mt-1">Management Portal</span>
+            </div>
+          )}
         </div>
+
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-sidebar-foreground/40 font-bold px-5 mb-2">
-            {user?.role === "lottery_staff" ? "Lottery Ops" : "Management"}
-          </SidebarGroupLabel>
+          <div className="px-6 py-2 mb-2 font-black text-[9px] uppercase tracking-[0.2em] text-muted-foreground/50">
+            {!collapsed ? "Core Management" : "•••"}
+          </div>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1 px-3">
-              {visibleItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end 
-                      className="px-3 py-2.5 rounded-xl transition-all duration-200 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group" 
-                      activeClassName="bg-sidebar-accent text-sidebar-primary font-semibold shadow-sm"
-                    >
-                      <item.icon className="mr-3 h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+            <SidebarMenu className="gap-1.5 px-3">
+              {visibleSystem.map((item) => <SidebarLink key={item.title} item={item} />)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <div className="mt-auto p-4 flex flex-col gap-2">
+
+        {visibleLottery.length > 0 && (
+          <SidebarGroup className="mt-4">
+            <div className="px-6 py-2 mb-2 font-black text-[9px] uppercase tracking-[0.2em] text-primary/50">
+               {!collapsed ? "Lottery Operations" : "•••"}
+            </div>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-1.5 px-3">
+                {visibleLottery.map((item) => <SidebarLink key={item.title} item={item} />)}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        <div className="mt-auto p-4 space-y-4">
           {!collapsed && user && (
-            <div className="p-3 rounded-2xl bg-sidebar-accent/30 border border-sidebar-border/50 shadow-sm transition-all hover:bg-sidebar-accent/50 group">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] text-sidebar-foreground/50 uppercase tracking-wider font-bold mb-1.5">{user.role.replace("_", " ")}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-sidebar-primary/20 flex items-center justify-center text-sidebar-primary font-bold text-xs ring-1 ring-sidebar-primary/30">
-                   {user.name.charAt(0)}
-                 </div>
-                 <p className="text-sm font-semibold text-sidebar-foreground truncate">{user.name}</p>
-              </div>
+            <div className="p-4 rounded-3xl bg-sidebar-accent/30 border border-sidebar-border/50 shadow-inner group overflow-hidden relative">
+               <div className="absolute -right-4 -top-4 w-12 h-12 rounded-full bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+               <div className="flex items-center gap-3 relative z-10">
+                  <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-sm border border-primary/20 shadow-sm">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-foreground truncate uppercase tracking-tighter">{user.name}</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 flex items-center gap-1">
+                       <Zap className="h-2 w-2 text-primary" /> {user.role.replace("_", " ")}
+                    </p>
+                  </div>
+               </div>
             </div>
           )}
+
           <SidebarMenu>
             <SidebarMenuItem className="px-1">
               <SidebarMenuButton asChild>
                 <Link 
                   to="/" 
                   onClick={() => { if (setUser) setUser(null); }}
-                  className="px-3 py-2.5 rounded-xl text-sidebar-foreground/70 transition-all duration-200 hover:bg-destructive hover:text-destructive-foreground group flex w-full"
+                  className="flex items-center gap-3 px-4 py-3 rounded-2xl text-muted-foreground transition-all duration-300 hover:bg-destructive hover:text-destructive-foreground font-bold shadow-sm"
                 >
-                  <LogOut className="mr-3 h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
-                  {!collapsed && <span className="font-medium">{user?.role === "lottery_staff" ? "Exit Lottery Staff" : "Exit Admin"}</span>}
+                  <LogOut className="h-5 w-5" />
+                  {!collapsed && <span className="text-[10px] uppercase font-black tracking-widest">Terminate Session</span>}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -148,29 +159,41 @@ function AdminSidebar() {
   );
 }
 
-
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-muted/20">
+      <div className="min-h-screen flex w-full bg-[#f8f9fc]">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-16 flex items-center justify-between border-b border-border/40 px-6 bg-background/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors" />
-              <div className="h-4 w-px bg-border max-md:hidden" />
-              <span className="text-xs font-bold tracking-widest text-muted-foreground/60 max-md:hidden uppercase">
-                {user?.role === "lottery_staff" ? "Lottery Portal" : "Administration"}
-              </span>
+        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+          <header className="h-20 shrink-0 flex items-center justify-between border-b border-border/40 px-8 bg-white/60 backdrop-blur-2xl sticky top-0 z-30 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+            <div className="flex items-center gap-6">
+              <SidebarTrigger className="text-muted-foreground hover:text-primary transition-all p-2 rounded-xl hover:bg-primary/5 active:scale-95" />
+              <div className="h-6 w-px bg-border/60" />
+              <div className="flex items-center gap-3">
+                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 active:scale-95 transition-all cursor-default">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/70">Engine Healthy</span>
+                 </div>
+                 <div className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/30 ml-2">
+                    {user?.role === "lottery_staff" ? "staff portal" : "global admin"}
+                 </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-muted/50 border border-border/40">
+                 <ShieldCheck className="h-3 w-3 text-primary" /> System ID: <span className="text-foreground">#7B591</span>
+              </div>
               <NotificationBell />
             </div>
           </header>
-          <main className="flex-1 p-6 lg:p-8 overflow-auto">
-            {children}
+          <main className="flex-1 overflow-y-auto overflow-x-hidden p-8 lg:p-12 custom-scrollbar">
+            <div className="max-w-[1600px] mx-auto">
+              {children}
+            </div>
           </main>
         </div>
       </div>

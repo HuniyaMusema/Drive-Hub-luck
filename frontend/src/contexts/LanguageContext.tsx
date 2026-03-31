@@ -224,6 +224,162 @@ const translations: Record<Language, Record<string, string>> = {
     savedCars: "Saved Cars",
     noSavedCars: "You haven't saved any cars yet.",
     signInToSave: "Please sign in to save cars.",
+
+    // Admin
+    adminDashboard: "Admin Dashboard",
+    management: "Management",
+    lotteryOps: "Lottery Ops",
+    adminCars: "Cars Management",
+    adminUsers: "User Management",
+    adminLottery: "Lottery Settings",
+    lotteryPayments: "Lottery Payments",
+    generateNumbers: "Generate Numbers",
+    participants: "Participants",
+    adminSettings: "System Settings",
+    totalVehicles: "Total Vehicles",
+    estRevenue: "Est. Revenue",
+    goodMorning: "Good morning",
+    goodAfternoon: "Good afternoon",
+    goodEvening: "Good evening",
+    lotteryPortal: "Lottery Portal",
+    adminCommandCenter: "Admin Command Center",
+    overviewMetrics: "Overview Metrics",
+    live: "Live",
+    review: "Review",
+    totalLabel: "Total",
+    est: "Est",
+
+    // Admin Common
+    cancel: "Cancel",
+    actions: "Actions",
+    confirmDeletion: "Confirm Deletion",
+    delete: "Delete",
+
+    // Admin Cars
+    carManagement: "Car Management",
+    addEditRemoveVehicles: "Add, edit, or remove vehicles from your inventory",
+    addVehicle: "Add Vehicle",
+    searchByName: "Search by name...",
+    vehicleDetails: "Vehicle Details",
+    priceBirr: "Price (Birr)",
+    noVehiclesInventory: "No vehicles in inventory",
+    editVehicleDetails: "Edit Vehicle Details",
+    addNewVehicle: "Add New Vehicle",
+    make: "Make",
+    model: "Model",
+    dealType: "Deal Type",
+    availability: "Availability",
+    vehicleShowcaseImage: "Vehicle Showcase Image",
+    clickToUploadImage: "Click to upload image",
+    vehicleDescription: "Vehicle Description",
+    updateVehicle: "Update Vehicle",
+    areYouSureDeleteCar: "Are you sure you want to remove this vehicle from your inventory? This action is permanent.",
+    deleteCar: "Delete Car",
+
+    // Admin Users
+    userManagement: "User Management",
+    manageSystemAccess: "Manage system access and roles",
+    searchUsersPrompt: "Search users by name or email...",
+    userDetails: "User Details",
+    loadingUserDatabase: "Loading user database...",
+    noMatchingUsers: "No matching users found",
+    suspendUser: "Suspend User",
+    activateUser: "Activate User",
+    deleteAccount: "Delete Account",
+    areYouSureDeleteUser: "Are you sure you want to permanently delete this user? This action cannot be undone.",
+    suspensionReason: "Suspension Reason",
+    confirmSuspension: "Confirm Suspension",
+    suspensionPrompt: "Please provide a reason for suspending this account. The user will be immediately blocked from all access.",
+
+    // Admin Lottery
+    lotteryManagement: "Lottery Management",
+    activeDraw: "Active Draw",
+    lotteryControl: "Lottery Control",
+    activePrize: "Active Prize",
+    range: "Range",
+    stopLottery: "Stop Lottery",
+    numberRangeLabel: "Number Range",
+    ticketPriceCalc: "Ticket Price",
+    initializeNewDraw: "Initialize New Draw",
+    prepareForDraw: "Prepare for the Draw",
+    drawWinnerDesc: "Once the lottery is closed and all payments are verified, you can select a random winner from the confirmed participants.",
+    drawTheWinner: "Draw the Winner",
+    lotteryConfirmed: "Confirmed",
+    lotteryPending: "Pending",
+    lotteryFree: "Free",
+
+    // Admin Settings - General
+    generalSettings: "General System Settings",
+    platformName: "Platform Name",
+    logo: "Logo",
+    uploadLogo: "Upload Logo",
+    defaultCurrency: "Default Currency",
+    defaultLanguage: "Default Language",
+    timezone: "Timezone",
+    dateFormat: "Date Format",
+    contactInformation: "Contact Information",
+    contactEmail: "Contact Email",
+    contactPhone: "Contact Phone",
+    physicalAddress: "Physical Address",
+    saveGeneralSettings: "Save General Settings",
+
+    // Admin Settings - Security
+    securityAccess: "Security & Access",
+    enableRegistration: "Enable User Registration",
+    registrationDesc: "Allow new users to create accounts",
+    minPasswordLength: "Minimum Password Length",
+    sessionTimeout: "Session Timeout (minutes)",
+    requireUppercase: "Require Uppercase Characters",
+    uppercaseDesc: "Password must contain at least one uppercase letter",
+    requireNumbers: "Require Numbers",
+    numbersDesc: "Password must contain at least one digit",
+    allowMultiLogin: "Allow Multi-Login",
+    multiLoginDesc: "Allow same account to be logged in on multiple devices",
+    saveSecuritySettings: "Save Security Settings",
+
+    // Admin Settings - Lottery
+    lotteryModule: "Lottery Module",
+    lotteryModuleDesc: "When disabled, users cannot view lottery, buy tickets, or upload payments.",
+    lotteryConfiguration: "Lottery Configuration",
+    drawFrequency: "Draw Frequency",
+    autoCloseLabel: "Auto-Close Before Draw (min)",
+    staffPermissions: "Lottery Staff Permissions",
+    paymentVerificationPerm: "Payment Verification",
+    numberGenPerm: "Number Generation",
+    adminOverridePerm: "Admin Override",
+    saveLotterySettings: "Save Lottery Settings",
+
+    // Admin Settings - Operational
+    operationalControls: "Operational Controls",
+    operationalDesc: "Master switches for emergency shutdown or audits.",
+    enableEntirePlatform: "Enable Entire Platform",
+    platformShutdownDesc: "Turning off shuts down the entire platform for all users",
+    maintenanceMessageLabel: "Maintenance Mode Message",
+    saveOperationalSettings: "Save Operational Settings",
+
+    // Admin Settings - Logs
+    systemLogs: "System Logs",
+    allActions: "All Actions",
+    adminOnly: "Admin Only",
+    staffOnly: "Staff Only",
+    exportCSV: "Export CSV",
+    noLogsFound: "No logs found.",
+
+    // Admin Settings - Notifications
+    notificationSettings: "Notification Settings",
+    emailNotifications: "Email Notifications",
+    smsNotifications: "SMS Notifications",
+    largePaymentAlerts: "Large Payment Alerts",
+    suspiciousActivityAlerts: "Suspicious Activity Alerts",
+    saveNotificationSettings: "Save Notification Settings",
+
+    // Admin Settings - Backup
+    backupRecovery: "Backup & Recovery",
+    backupFrequency: "Backup Frequency",
+    manualBackup: "Trigger Manual Backup",
+    remoteSnapshots: "Remote SQL Snapshots",
+    saveBackupSettings: "Save Backup Settings",
+
   },
   am: {
     // Nav
@@ -433,6 +589,175 @@ const translations: Record<Language, Record<string, string>> = {
     savedCars: "የተቀመጡ መኪናዎች",
     noSavedCars: "እስካሁን ምንም የተቀመጡ መኪናዎች የሉም።",
     signInToSave: "መኪናዎችን ለማስቀመጥ እባክዎ ይግቡ።",
+
+    // Admin
+    adminDashboard: "አስተዳዳሪ ዳሽቦርድ",
+    management: "አስተዳደር",
+    lotteryOps: "የሎተሪ ስራዎች",
+    adminCars: "የመኪና አስተዳደር",
+    adminUsers: "የተጠቃሚዎች አስተዳደር",
+    adminLottery: "የሎተሪ ቅንጅቶች",
+    lotteryPayments: "የሎተሪ ክፍያዎች",
+    generateNumbers: "ቁጥሮችን ማመንጨት",
+    participants: "ተሳታፊዎች",
+    adminSettings: "የስርዓት ቅንጅቶች",
+    totalVehicles: "ጠቅላላ ተሽከርካሪዎች",
+    estRevenue: "ግምታዊ ገቢ",
+    goodMorning: "እንደምን አደሩ",
+    goodAfternoon: "እንደምን ዋሉ",
+    goodEvening: "እንደምን አመሹ",
+
+
+    // Admin Common
+    cancel: "ሰርዝ",
+    actions: "እርምጃዎች",
+    confirmDeletion: "መሰረዙን ያረጋግጡ",
+    delete: "ሰርዝ",
+
+    // Admin Cars
+    carManagement: "የመኪና አስተዳደር",
+    addEditRemoveVehicles: "ተሽከርካሪዎችን ከዝርዝርዎ ውስጥ ይጨምሩ፣ ያርሙ ወይም ያስወግዱ",
+    addVehicle: "መኪና ጨምር",
+    searchByName: "በስም ፈልግ...",
+    vehicleDetails: "የተሽከርካሪ ዝርዝሮች",
+    priceBirr: "ዋጋ (ብር)",
+    noVehiclesInventory: "በዝርዝሩ ውስጥ ምንም ተሽከርካሪ የለም",
+    editVehicleDetails: "የተሽከርካሪ ዝርዝሮችን ያርሙ",
+    addNewVehicle: "አዲስ ተሽከርካሪ ጨምር",
+    make: "ብራንድ",
+    model: "ሞዴል",
+    dealType: "የስምምነት ዓይነት",
+    availability: "ዝግጁነት",
+    vehicleShowcaseImage: "የተሽከርካሪ ማሳያ ምስል",
+    clickToUploadImage: "ምስል ለመጫን እዚህ ይጫኑ",
+    vehicleDescription: "የተሽከርካሪ መግለጫ",
+    updateVehicle: "ተሽከርካሪውን አዘምን",
+    areYouSureDeleteCar: "ይህንን ተሽከርካሪ ከዝርዝርዎ ውስጥ ማስወገድዎን እርግጠኛ ነዎት? ይህ እርምጃ ሊመለስ የማይችል ነው።",
+    deleteCar: "መኪናውን ሰርዝ",
+
+    // Admin Users
+    userManagement: "የተጠቃሚዎች አስተዳደር",
+    manageSystemAccess: "የስርዓት መዳረሻን እና ሚናዎችን ያስተዳድሩ",
+    searchUsersPrompt: "ተጠቃሚዎችን በስም ወይም በኢሜይል ይፈልጉ...",
+    userDetails: "የተጠቃሚ ዝርዝሮች",
+    loadingUserDatabase: "የተጠቃሚዎች ዳታቤዝ በመጫን ላይ ነው...",
+    noMatchingUsers: "ምንም ተዛማጅ ተጠቃሚ አልተገኘም",
+    suspendUser: "ተጠቃሚን አግድ",
+    activateUser: "ተጠቃሚን አንቃ",
+    deleteAccount: "መለያ ሰርዝ",
+    areYouSureDeleteUser: "ይህንን ተጠቃሚ በቋሚነት መሰረዝዎን እርግጠኛ ነዎት? ይህ እርምጃ ሊመለስ የማይችል ነው።",
+    suspensionReason: "የመታገጃ ምክንያት",
+    confirmSuspension: "እገዳውን ያረጋግጡ",
+    suspensionPrompt: "እባክዎን ይህንን መለያ ለማገድ ምክንያት ይስጡ። ተጠቃሚው ወዲያውኑ ከመድረሻ ይታገዳል።",
+
+    // Admin Lottery
+    lotteryManagement: "የሎተሪ አስተዳደር",
+    activeDraw: "ንቁ እጣ",
+    lotteryControl: "የሎተሪ መቆጣጠሪያ",
+    activePrize: "ንቁ ሽልማት",
+    range: "ክልል",
+    stopLottery: "ሎተሪውን ያቁሙ",
+    numberRangeLabel: "የቁጥሮች ክልል",
+    ticketPriceCalc: "የቲኬት ዋጋ",
+    initializeNewDraw: "አዲስ እጣ ይጀምሩ",
+    prepareForDraw: "ለእጣው ይዘጋጁ",
+    drawWinnerDesc: "ሎተሪው ሲዘጋ እና ሁሉም ክፍያዎች ሲረጋገጡ ከተረጋገጡ ተሳታፊዎች መካከል በዘፈቀደ አሸናፊ መምረጥ ይችላሉ።",
+    drawTheWinner: "አሸናፊውን ይምረጡ",
+    lotteryConfirmed: "የተረጋገጠ",
+    lotteryPending: "በጥበቃ ላይ",
+    lotteryFree: "ነፃ",
+
+    // Admin Settings - General
+    generalSettings: "አጠቃላይ የስርዓት ቅንጅቶች",
+    platformName: "የመድረክ ስም",
+    logo: "ሎጎ",
+    uploadLogo: "ሎጎ ይጫኑ",
+    defaultCurrency: "መደበኛ ምንዛሬ",
+    defaultLanguage: "መደበኛ ቋንቋ",
+    timezone: "የሰዓት ቀጠና",
+    dateFormat: "የቀን ፎርማት",
+    contactInformation: "የመገናኛ መረጃ",
+    contactEmail: "የመገናኛ ኢሜይል",
+    contactPhone: "የመገናኛ ስልክ",
+    physicalAddress: "አድራሻ",
+    saveGeneralSettings: "አጠቃላይ ቅንጅቶችን አስቀምጥ",
+
+    // Admin Settings - Security
+    securityAccess: "ደህንነት እና መዳረሻ",
+    enableRegistration: "የተጠቃሚ ምዝገባን ፍቀድ",
+    registrationDesc: "አዳዲስ ተጠቃሚዎች መለያ እንዲፈጥሩ ይፍቀዱ",
+    minPasswordLength: "ዝቅተኛ የይለፍ ቃል ርዝመት",
+    sessionTimeout: "የቆይታ ገደብ (ደቂቃዎች)",
+    requireUppercase: "ትልቅ ፊደላትን ይጠይቁ",
+    uppercaseDesc: "የይለፍ ቃል ቢያንስ አንድ ትልቅ ፊደል መያዝ አለበት",
+    requireNumbers: "ቁጥሮችን ይጠይቁ",
+    numbersDesc: "የይለፍ ቃል ቢያንስ አንድ አሃዝ መያዝ አለበት",
+    allowMultiLogin: "ባለብዙ መግቢያ ፍቀድ",
+    multiLoginDesc: "ተመሳሳይ መለያ በበርካታ መሳሪያዎች ላይ እንዲገባ ይፍቀዱ",
+    saveSecuritySettings: "የደህንነት ቅንጅቶችን አስቀምጥ",
+
+    // Admin Settings - Lottery
+    lotteryModule: "የሎተሪ ሞጁል",
+    lotteryModuleDesc: "ሲጠፋ ተጠቃሚዎች ሎተሪ ማየት፣ ትኬት መግዛት ወይም ክፍያ መጫን አይችሉም።",
+    lotteryConfiguration: "የሎተሪ ውቅር",
+    drawFrequency: "የዕጣ ድግግሞሽ",
+    autoCloseLabel: "ከዕጣ በፊት በራስ-ሰር መዝጊያ (ደቂቃ)",
+    staffPermissions: "የሎተሪ ሰራተኞች ፈቃዶች",
+    paymentVerificationPerm: "የክፍያ ማረጋገጫ",
+    numberGenPerm: "የቁጥር ማመንጨት",
+    adminOverridePerm: "የአስተዳዳሪ ማለፊያ",
+    saveLotterySettings: "የሎተሪ ቅንጅቶችን አስቀምጥ",
+
+    // Admin Settings - Operational
+    operationalControls: "ተግባራዊ ቁጥጥሮች",
+    operationalDesc: "ለድንገተኛ ጊዜ መዝጊያ ወይም ኦዲት ዋና መቀያየሪያዎች።",
+    enableEntirePlatform: "ጠቅላላ መድረኩን አንቃ",
+    platformShutdownDesc: "ማጥፋት መድረኩን ለሁሉም ተጠቃሚዎች ይዘጋል",
+    maintenanceMessageLabel: "የጥገና ሁኔታ መልዕክት",
+    saveOperationalSettings: "ተግባራዊ ቅንጅቶችን አስቀምጥ",
+
+    // Admin Settings - Logs
+    systemLogs: "የስርዓት ምዝግብ ማስታወሻዎች",
+    allActions: "ሁሉም እርምጃዎች",
+    adminOnly: "አስተዳዳሪ ብቻ",
+    staffOnly: "ሰራተኞች ብቻ",
+    exportCSV: "ኤክስፖርት CSV",
+    noLogsFound: "ምንም ምዝግብ አልተገኘም።",
+
+    // Admin Settings - Notifications
+    notificationSettings: "የማሳወቂያ ቅንጅቶች",
+    emailNotifications: "የኢሜይል ማሳወቂያዎች",
+    smsNotifications: "የኤስኤምኤስ ማሳወቂያዎች",
+    largePaymentAlerts: "የትልልቅ ክፍያ ማንቂያዎች",
+    suspiciousActivityAlerts: "የአጠራጠሪ እንቅስቃሴ ማንቂያዎች",
+    saveNotificationSettings: "የማሳወቂያ ቅንጅቶችን አስቀምጥ",
+
+    // Admin Settings - Backup
+    backupRecovery: "ምትኬ እና መልሶ ማግኛ",
+    backupFrequency: "የምትኬ ድግግሞሽ",
+    manualBackup: "በእጅ ምትኬ ይጀምሩ",
+    remoteSnapshots: "የSQL ስናፕሾቶች",
+    saveBackupSettings: "የምትኬ ቅንጅቶችን አስቀምጥ",
+
+    // Admin Layout & Dashboard
+    administration: "አስተዳደር",
+    exitAdmin: "ከአስተዳዳሪው ይውጡ",
+    exitLotteryStaff: "ከሎተሪ ሰራተኛ ይውጡ",
+    lotteryPortal: "የሎተሪ ፖርታል",
+    adminCommandCenter: "የአስተዳደር ትዕዛዝ ማዕከል",
+    overviewMetrics: "አጠቃላይ መለኪያዎች",
+    live: "ቀጥታ",
+    review: "ግምገማ",
+    totalLabel: "ጠቅላላ",
+    est: "ግምት",
+    platformConfiguration: "የመድረክ ውቅር",
+    settings: "ቅንጅቶች",
+    general: "አጠቃላይ",
+    security: "ደህንነት",
+    operational: "ተግባራዊ",
+    logs: "ምዝግብ ማስታወሻዎች",
+    notifications: "ማሳወቂያዎች",
+    backup: "ምትኬ",
   },
   om: {
     // Nav
@@ -642,6 +967,175 @@ const translations: Record<Language, Record<string, string>> = {
     savedCars: "Konkolaataa Olka'ame",
     noSavedCars: "Hamma yoonaatti konkolaataa olkaa'ame hin qabdu.",
     signInToSave: "Konkolaataa olkaasuuf maaloo seenaa.",
+
+    // Admin
+    adminDashboard: "Daashboordii Bulchiinsaa",
+    management: "Bulchiinsa",
+    lotteryOps: "Hojii Lootarii",
+    adminCars: "Bulchiinsa Konkolaataa",
+    adminUsers: "Bulchiinsa Fayyadamtootaa",
+    adminLottery: "Qindaa'ina Lootarii",
+    lotteryPayments: "Kaffaltii Lootarii",
+    generateNumbers: "Lakkoofsa Maddisiisuu",
+    participants: "Hirmaattota",
+    adminSettings: "Qindaa'ina Sirnaa",
+    totalVehicles: "Waliigala Konkolaataa",
+    estRevenue: "Galii Tilmaamamuu",
+    goodMorning: "Akkam bulte",
+    goodAfternoon: "Akkam oolte",
+    goodEvening: "Akkam galte",
+
+    // Admin Common
+    cancel: "Haquu",
+    actions: "Gochaawwan",
+    confirmDeletion: "Haqamuu Mirkaneessi",
+    delete: "Haquu",
+
+    // Admin Cars
+    carManagement: "Bulchiinsa Konkolaataa",
+    addEditRemoveVehicles: "Konkolaataa kuusaa keessaa dabali, sirreessi ykn haqi",
+    addVehicle: "Konkolaataa Dabali",
+    searchByName: "Maqaadhaan barbaadi...",
+    vehicleDetails: "Ibsa Konkolaataa",
+    priceBirr: "Gatii (Birr)",
+    noVehiclesInventory: "Kuusaa keessa konkolaataan hin jiru",
+    editVehicleDetails: "Ibsa Konkolaataa Sirreessi",
+    addNewVehicle: "Konkolaataa Haaraa Dabali",
+    make: "Oomishamaa",
+    model: "Moodela",
+    dealType: "Gosa Waliigaltee",
+    availability: "Argamaa",
+    vehicleShowcaseImage: "Suuraa Konkolaataa",
+    clickToUploadImage: "Suuraa fe'uuf as tuqi",
+    vehicleDescription: "Ibsa Konkolaataa",
+    updateVehicle: "Konkolaataa Haaromsi",
+    areYouSureDeleteCar: "Konkolaataa kana kuusaa keessaa haquu kee mirkaneeffattee? Gochi kun hin deebi'u.",
+    deleteCar: "Konkolaataa Haquu",
+
+    // Admin Users
+    userManagement: "Bulchiinsa Fayyadamtootaa",
+    manageSystemAccess: "Akkasumas qooda fayyadamtootaa bulchi",
+    searchUsersPrompt: "Fayyadamtoota maqaa ykn imeeliidhaan barbaadi...",
+    userDetails: "Ibsa Fayyadamaa",
+    loadingUserDatabase: "Kuusaa fayyadamtootaa fe'amaa jira...",
+    noMatchingUsers: "Fayyadamaa walsimu hin argamne",
+    suspendUser: "Fayyadamaa Hagugi",
+    activateUser: "Fayyadamaa Bani",
+    deleteAccount: "Herrega Haquu",
+    areYouSureDeleteUser: "Fayyadamaa kana guutummaatti haquu kee mirkaneeffattee? Gochi kun hin deebi'u.",
+    suspensionReason: "Sababa Hagugamuuf",
+    confirmSuspension: "Hagugamuu Mirkaneessi",
+    suspensionPrompt: "Maaloo sababa herrega kana hagugiteef ibsi. Fayyadamaan sun battalumatti ni dharramama.",
+
+    // Admin Lottery
+    lotteryManagement: "Bulchiinsa Lootarii",
+    activeDraw: "Qurxii Hojii Irra Jiru",
+    lotteryControl: "To'annaa Lootarii",
+    activePrize: "Badhaasa Hojii Irra Jiru",
+    range: "Daangaa",
+    stopLottery: "Lootarii Dhaabi",
+    numberRangeLabel: "Daangaa Lakkoofsaa",
+    ticketPriceCalc: "Gatii Tikkeettii",
+    initializeNewDraw: "Qurxii Haaraa Jalqabi",
+    prepareForDraw: "Qurxiidhaaf Qophaa'i",
+    drawWinnerDesc: "Erga lootariin cufamee fi kaffaltiin hundi mirkanaa'ee booda, hirmaattota mirkanaa'an keessaa carraan mo'ataa filachuu dandeessa.",
+    drawTheWinner: "Mo'ataa Filadhu",
+    lotteryConfirmed: "Mirkanaa'e",
+    lotteryPending: "Eeggataa",
+    lotteryFree: "Bilisa",
+
+    // Admin Settings - General
+    generalSettings: "Qindaa'ina Sirnaa Waliigalaa",
+    platformName: "Maqaa Madalichaa",
+    logo: "Loogoo",
+    uploadLogo: "Loogoo Fe'i",
+    defaultCurrency: "Maallaqa Idilee",
+    defaultLanguage: "Afaan Idilee",
+    timezone: "Naannoo Sa'aatii",
+    dateFormat: "Bifa Guyyaa",
+    contactInformation: "Odeeffannoo Quunnamtii",
+    contactEmail: "Imeelii Quunnamtii",
+    contactPhone: "Bilbila Quunnamtii",
+    physicalAddress: "Teessoo",
+    saveGeneralSettings: "Qindaa'ina Waliigalaa Olka'i",
+
+    // Admin Settings - Security
+    securityAccess: "Nageenya & Seensa",
+    enableRegistration: "Galmee Fayyadamaa Hayyami",
+    registrationDesc: "Fayyadamtoonni haaraan herrega akka uumaniif hayyami",
+    minPasswordLength: "Dheerina Jecha Darbii Xiqqaa",
+    sessionTimeout: "Yeroo Turtii (daqiiqaa)",
+    requireUppercase: "Arfii Gurguddaa Gaafadhu",
+    uppercaseDesc: "Jechi darbii yoo xiqqaate qubee guddaa tokko of keessaa qabaachuu qaba",
+    requireNumbers: "Lakkoofsa Gaafadhu",
+    numbersDesc: "Jechi darbii yoo xiqqaate lakkoofsa tokko of keessaa qabaachuu qaba",
+    allowMultiLogin: "Seensa Hedduu Hayyami",
+    multiLoginDesc: "Herregni tokko meeshaalee hedduu irratti akka seenu hayyami",
+    saveSecuritySettings: "Qindaa'ina Nageenyaa Olka'i",
+
+    // Admin Settings - Lottery
+    lotteryModule: "Moojulii Lootarii",
+    lotteryModuleDesc: "Yeroo dhaabatu, fayyadamtoonni lootarii ilaaluu, tikeetii bituu ykn kaffaltii fe'uu hin danda'an.",
+    lotteryConfiguration: "Qindaa'ina Lootarii",
+    drawFrequency: "Irra-deddeebii Qurxii",
+    autoCloseLabel: "Qurxii Dura Ofumaan Cufuu (daqiiqaa)",
+    staffPermissions: "Hayyama Hojjettoota Lootarii",
+    paymentVerificationPerm: "Mirkaneessa Kaffaltii",
+    numberGenPerm: "Madda Lakkoofsaa",
+    adminOverridePerm: "Bulchiinsa Ol'aanaa",
+    saveLotterySettings: "Qindaa'ina Lootarii Olka'i",
+
+    // Admin Settings - Operational
+    operationalControls: "To'annoo Hojii",
+    operationalDesc: "Cufiinsa ariifataa ykn odiitiidhaaf furtuuwwan gurguddoo.",
+    enableEntirePlatform: "Madalicha Guutuu Bani",
+    platformShutdownDesc: "Cufuu jechuun fayyadamtoota hundaaf madalicha cufuu dha",
+    maintenanceMessageLabel: "Ergaa Haala Suphaa",
+    saveOperationalSettings: "Qindaa'ina Hojii Olka'i",
+
+    // Admin Settings - Logs
+    systemLogs: "Galmee Sirnaa",
+    allActions: "Gochaawwan Hunda",
+    adminOnly: "Bulchiinsa Qofa",
+    staffOnly: "Hojjettoota Qofa",
+    exportCSV: "CSV fe'i",
+    noLogsFound: "Galmeen hin argamne.",
+
+    // Admin Settings - Notifications
+    notificationSettings: "Qindaa'ina Beeksisaa",
+    emailNotifications: "Beeksisa Imeelii",
+    smsNotifications: "Beeksisa SMS",
+    largePaymentAlerts: "Beeksisa Kaffaltii Guddaa",
+    suspiciousActivityAlerts: "Beeksisa Sochii Shakkisiisaa",
+    saveNotificationSettings: "Qindaa'ina Beeksisaa Olka'i",
+
+    // Admin Settings - Backup
+    backupRecovery: "Olka'iinsa & Deebisanii Argachuu",
+    backupFrequency: "Irra-deddeebii Olka'iinsaa",
+    manualBackup: "Olka'iinsa Harkaa Jalqabi",
+    remoteSnapshots: "SQL Snapshots",
+    saveBackupSettings: "Qindaa'ina Olka'iinsaa Olka'i",
+
+    // Admin Layout & Dashboard
+    administration: "Bulchiinsa",
+    exitAdmin: "Bulchiinsa keessaa ba'i",
+    exitLotteryStaff: "Hojjetaa keessaa ba'i",
+    lotteryPortal: "Toora Lootarii",
+    adminCommandCenter: "Giddugala Bulchiinsaa",
+    overviewMetrics: "Muzira Waliigalaa",
+    live: "Dhugaa",
+    review: "Sakatta'i",
+    totalLabel: "Waliigala",
+    est: "Tilmaama",
+    activitySummary: "Madalla kee to'adhu, fayyadamtoota bulchi fi hojii lootarii hordofi.",
+    platformConfiguration: "Qindaa'ina Madalichaa",
+    settings: "Qindaa'ina",
+    general: "Waliigala",
+    security: "Nageenya",
+    operational: "Hojii",
+    logs: "Galmeewwan",
+    notifications: "Beeksisa",
+    backup: "Olka'iinsa",
   },
 };
 
@@ -663,17 +1157,28 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("gech-lang");
-    if (!saved && settings?.General?.defaultLanguage) {
-      setLanguage(settings.General.defaultLanguage as Language);
+    const systemDefault = settings?.General?.defaultLanguage as Language;
+    
+    // Only force external settings if user hasn't made a choice yet
+    // Otherwise keep current session language
+    if (systemDefault && !saved) {
+      setLanguage(systemDefault);
     }
-  }, [settings]);
+  }, [settings?.General?.defaultLanguage]);
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
     localStorage.setItem("gech-lang", lang);
   };
 
-  const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;
+  const t = (key: string) => {
+    const translation = translations[language]?.[key] || translations.en[key];
+    if (!translation) {
+      // console.warn(`Missing translation for key: ${key}`);
+      return key;
+    }
+    return translation;
+  };
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>

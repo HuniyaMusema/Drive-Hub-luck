@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Bookmark, Car, Globe, Menu, X, Bell } from "lucide-react";
+import { Bookmark, Car, Globe, Menu, X, Bell, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
@@ -31,16 +31,11 @@ export function Header() {
   const { settings } = useSettings();
 
   const operational = settings?.Operational || {};
-  const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
-  const isSalesEnabled = operational.salesModuleEnabled !== false;
-  const isRentalsEnabled = operational.rentalsModuleEnabled !== false;
+  const isLotteryEnabled = true;
+  const isSalesEnabled = true;
+  const isRentalsEnabled = true;
 
-  const filteredNavLinks = navLinks.filter(link => {
-    if (link.key === "lottery") return isLotteryEnabled;
-    if (link.key === "cars") return isSalesEnabled;
-    if (link.key === "rentals") return isRentalsEnabled;
-    return true;
-  });
+  const filteredNavLinks = navLinks;
 
   const currentLang = languages.find((l) => l.code === language);
 
@@ -188,6 +183,21 @@ export function Header() {
                     {savedCarsCount}
                   </span>
                 )}
+              </Link>
+            )}
+
+            {user && (
+              <Link
+                to="/profile?tab=history"
+                className={`flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                  isActive("/profile")
+                    ? "bg-white/20 text-white"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <Ticket className="h-4 w-4" />
+                My Tickets
               </Link>
             )}
 

@@ -4,17 +4,12 @@ const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
 
-<<<<<<< HEAD
 // @desc    Generate JWT
 // @param   {string} id - User ID
 // @param   {string} role - User Role
 // @param   {string} sessionToken - Unique session identifier
 // @param   {string} mode - Optional operational mode (lottery_mode, car_mode)
-const generateToken = (id, role, sessionToken, mode = null) => {
-=======
-// Generate JWT
 const generateToken = (id, role, sessionToken = null, mode = null) => {
->>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
   return jwt.sign({ id, role, sessionToken, mode }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
@@ -66,11 +61,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-<<<<<<< HEAD
-      token: generateToken(user.id, user.role, null), 
-=======
-      token: generateToken(user.id, user.role),
->>>>>>> 326023c160955673a9228ba12856ca7c2ba911e9
+      token: generateToken(user.id, user.role, null),
     });
   } catch (error) {
     console.error('[registerUser]', error.message);
@@ -136,7 +127,7 @@ const getMe = async (req, res) => {
 const getProfileHistory = async (req, res) => {
   try {
     const rentals = await pool.query(`
-      SELECT r.*, c.name as car_name, c.image as car_image
+      SELECT r.*, c.name as car_name, c.images->>0 as car_image
       FROM rental_requests r
       JOIN cars c ON r.car_id = c.id
       WHERE r.user_id = $1
@@ -144,10 +135,15 @@ const getProfileHistory = async (req, res) => {
     `, [req.user.id]);
 
     const lotteries = await pool.query(`
-      SELECT ln.*, ls.status as lottery_status, c.name as prize_name
+      SELECT ln.*, ls.status as lottery_status, c.name as prize_name, p.status as payment_status
       FROM lottery_numbers ln
       JOIN lottery_settings ls ON ln.lottery_id = ls.id
       LEFT JOIN cars c ON ls.prize_car_id = c.id
+      LEFT JOIN (
+        SELECT DISTINCT ON (lottery_number_id) status, lottery_number_id
+        FROM payments
+        ORDER BY lottery_number_id, created_at DESC
+      ) p ON ln.id = p.lottery_number_id
       WHERE ln.user_id = $1
       ORDER BY ln.created_at DESC
     `, [req.user.id]);
@@ -159,6 +155,7 @@ const getProfileHistory = async (req, res) => {
       })),
       lotteries: lotteries.rows.map(l => ({
         id: l.id, number: l.number, date: l.created_at, status: l.status,
+        payment_status: l.payment_status || null,
         prize: l.prize_name || "Unknown Prize"
       }))
     });

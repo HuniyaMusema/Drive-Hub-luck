@@ -96,13 +96,13 @@ const createLottery = async (req, res) => {
       let   paramIdx = 1;
 
       for (let num = start; num <= end; num++) {
-        values.push(`($${paramIdx}, $${paramIdx + 1}, 'available', $${paramIdx + 2})`);
-        params.push(lottery.id, num, req.user.id);
-        paramIdx += 3;
+        values.push(`($${paramIdx}, $${paramIdx + 1}, 'available')`);
+        params.push(lottery.id, num);
+        paramIdx += 2;
       }
 
       await client.query(
-        `INSERT INTO lottery_numbers (lottery_id, number, status, generated_by)
+        `INSERT INTO lottery_numbers (lottery_id, number, status)
          VALUES ${values.join(', ')}`,
         params
       );
@@ -340,6 +340,9 @@ const verifyPayment = async (req, res) => {
       return res.status(400).json({ message: `Payment is already ${rows[0].status}` });
     }
 
+    const payment = rows[0];
+
+    // 1. Approve the payment
     const { rows: updated } = await client.query(
       `UPDATE payments 
        SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), updated_at = NOW()
@@ -348,7 +351,15 @@ const verifyPayment = async (req, res) => {
       [req.user.id, id]
     );
 
-    await createAuditLog(client, 'PAYMENT_VERIFIED', req.user.id, id, { status: 'approved' });
+    // 2. CRITICAL: Lock the lottery number to this user (confirmed)
+    await client.query(
+      `UPDATE lottery_numbers
+       SET status = 'confirmed', user_id = $1, updated_at = NOW()
+       WHERE id = $2`,
+      [payment.user_id, payment.lottery_number_id]
+    );
+
+    await createAuditLog(client, 'PAYMENT_VERIFIED', req.user.id, id, { status: 'approved', lottery_number_id: payment.lottery_number_id });
 
     await client.query('COMMIT');
     return res.status(200).json(updated[0]);
@@ -385,6 +396,9 @@ const rejectPayment = async (req, res) => {
       return res.status(404).json({ message: 'Payment not found' });
     }
 
+    const payment = rows[0];
+
+    // 1. Reject the payment
     const { rows: updated } = await client.query(
       `UPDATE payments 
        SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), rejection_reason = $2, updated_at = NOW()
@@ -393,7 +407,15 @@ const rejectPayment = async (req, res) => {
       [req.user.id, rejection_reason, id]
     );
 
-    await createAuditLog(client, 'PAYMENT_REJECTED', req.user.id, id, { reason: rejection_reason });
+    // 2. CRITICAL: Release the lottery number back to available so others can pick it
+    await client.query(
+      `UPDATE lottery_numbers
+       SET status = 'available', user_id = NULL, updated_at = NOW()
+       WHERE id = $1`,
+      [payment.lottery_number_id]
+    );
+
+    await createAuditLog(client, 'PAYMENT_REJECTED', req.user.id, id, { reason: rejection_reason, lottery_number_id: payment.lottery_number_id });
 
     await client.query('COMMIT');
     return res.status(200).json(updated[0]);
@@ -414,11 +436,10 @@ const rejectPayment = async (req, res) => {
 const getLotteryNumbers = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT ln.*, u.name as generated_by_name, us.name as assigned_to_name
+      `SELECT ln.*, u.name as assigned_to_name
        FROM lottery_numbers ln
-       LEFT JOIN users u ON ln.generated_by = u.id
-       LEFT JOIN users us ON ln.user_id = us.id
-       ORDER BY ln.created_at DESC`
+       LEFT JOIN users u ON ln.user_id = u.id
+       ORDER BY ln.number ASC`
     );
     return res.status(200).json(rows);
   } catch (error) {

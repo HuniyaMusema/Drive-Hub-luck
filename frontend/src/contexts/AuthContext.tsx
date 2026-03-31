@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { User, UserRole, AuthContextType } from "@/types/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -9,6 +10,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
+  const queryClient = useQueryClient();
+
   React.useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
@@ -16,7 +19,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
     }
-  }, [user]);
+    // CRITICAL: Clear all query caches when user state changes (Login/Logout)
+    // This prevents stale data from the previous user leaking into the next session
+    queryClient.clear();
+  }, [user, queryClient]);
 
   const hasPermission = useCallback(
     (allowedRoles: UserRole[]) => {

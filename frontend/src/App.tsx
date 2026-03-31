@@ -25,7 +25,6 @@ import Payment from "./pages/Payment";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminCars from "./pages/admin/AdminCars";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -78,8 +77,6 @@ const App = () => (
 
             {/* Admin only */}
             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/cars" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCars /></ProtectedRoute>} />
-
             <Route path="/admin/lottery" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLottery /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsers /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />

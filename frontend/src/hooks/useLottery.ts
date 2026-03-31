@@ -44,6 +44,7 @@ export interface ProfileHistory {
     id: string;
     number: number;
     status: string;
+    payment_status?: string | null;
     date: string;
     prize: string;
   }>;
@@ -52,7 +53,7 @@ export interface ProfileHistory {
 export const useCurrentLottery = () => {
   return useQuery<{ lottery: Lottery; number_stats: LotteryStats }>({
     queryKey: ['lottery', 'current'],
-    queryFn: () => apiFetch('/admin/lottery/current').catch(() => null), // Gracefully handle no lottery
+    queryFn: () => apiFetch('/lottery/current').catch(() => null), // Gracefully handle no lottery
     retry: false,
   });
 };
@@ -111,14 +112,16 @@ export const useLotteryPayments = () => {
 export const useVerifyPayment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, verify }: { id: string; verify: boolean; reason?: string }) =>
+    mutationFn: ({ id, verify, reason }: { id: string; verify: boolean; reason?: string }) =>
       apiFetch(`/admin/lottery/payments/${id}/${verify ? 'verify' : 'reject'}`, {
         method: 'POST',
-        body: !verify ? JSON.stringify({ rejection_reason: 'Rejected by admin' }) : undefined,
+        body: !verify ? JSON.stringify({ rejection_reason: reason || 'Rejected by staff' }) : undefined,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lottery', 'payments'] });
       queryClient.invalidateQueries({ queryKey: ['lottery', 'current'] });
+      queryClient.invalidateQueries({ queryKey: ['lottery', 'numbers'] });
+      queryClient.invalidateQueries({ queryKey: ['lottery', 'taken'] });
     },
   });
 };
@@ -140,6 +143,32 @@ export const useRentCar = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', 'history'] });
+    },
+  });
+};
+
+export const useCreateLottery = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { start_number: number; end_number: number; prize_text: string }) =>
+      apiFetch('/admin/lottery', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lottery', 'current'] });
+      queryClient.invalidateQueries({ queryKey: ['lottery', 'numbers'] });
+    },
+  });
+};
+
+export const usePickWinner = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      apiFetch('/lottery/pick-winner', { method: 'PUT' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lottery'] });
     },
   });
 };
