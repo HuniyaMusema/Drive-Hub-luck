@@ -423,9 +423,7 @@ export default function AdminSettings() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { label: "Lottery Engine", desc: "Toggle ticketing and draws", key: "lotteryModuleEnabled" },
-                    { label: "Sales Module", desc: "Toggle vehicle inventory for sale", key: "salesModuleEnabled" },
-                    { label: "Rental Module", desc: "Toggle reservation desk", key: "rentalsModuleEnabled" }
+                    { label: "Lottery Engine", desc: "Toggle ticketing and draws", key: "lotteryModuleEnabled" }
                   ].map((item) => (
                     <div key={item.key} className="flex items-center justify-between p-5 rounded-2xl border border-border/40 hover:border-primary/20 transition-all">
                        <div>

@@ -5,12 +5,18 @@ import type { User, UserRole, AuthContextType } from "@/types/auth";
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  // Always start unauthenticated on fresh app load — no auto-restore from localStorage.
+  // The JWT token is kept in localStorage only for API calls made during the active session.
+  const [user, setUser] = useState<User | null>(null);
 
   const queryClient = useQueryClient();
+
+  // Clear any stale saved user from a previous session on initial mount
+  React.useEffect(() => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   React.useEffect(() => {
     if (user) {
@@ -19,8 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
     }
-    // CRITICAL: Clear all query caches when user state changes (Login/Logout)
-    // This prevents stale data from the previous user leaking into the next session
     queryClient.clear();
   }, [user, queryClient]);
 

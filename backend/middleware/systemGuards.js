@@ -63,7 +63,8 @@ const requirePermission = (permissionKey) => {
     // Check staff granular permission
     if (req.user && req.user.role === 'lottery_staff') {
       const lottery = SettingsManager.getSetting('Lottery', {});
-      const isAllowed = lottery[permissionKey] === true;
+      // Default to true if undefined, meaning staff inherit full access unless explicitly denied in Admin Settings
+      const isAllowed = lottery[permissionKey] !== false;
       if (!isAllowed) {
         return res.status(403).json({ message: `Staff action restricted: ${permissionKey.replace(/([A-Z])/g, ' $1').trim()}` });
       }

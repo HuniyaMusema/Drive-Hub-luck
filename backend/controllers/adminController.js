@@ -1,4 +1,48 @@
 const pool = require('../config/pgPool');
+const bcrypt = require('bcryptjs');
+
+const createStaffAccount = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Name, email, and password are required' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters' });
+  }
+
+  try {
+    // Check if user already exists
+    const userExist = await pool.query('SELECT email FROM users WHERE email = $1', [email]);
+    if (userExist.rows.length > 0) {
+      return res.status(400).json({ message: 'A user with this email already exists' });
+    }
+
+    // Explicitly add enum if not present to avoid constraint errors
+    await pool.query(`ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'lottery_staff'`);
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Insert staff account explicitly mapped to the lottery_staff role
+    const { rows } = await pool.query(
+      `INSERT INTO users (name, email, password, role) 
+       VALUES ($1, $2, $3, 'lottery_staff') 
+       RETURNING id, name, email, role, status, created_at`,
+      [name, email, hashedPassword]
+    );
+
+    res.status(201).json({
+      message: 'Staff account created successfully',
+      user: rows[0],
+    });
+  } catch (error) {
+    console.error('[createStaffAccount]', error);
+    res.status(500).json({ message: 'Server error creating staff account' });
+  }
+};
 
 /**
  * @desc    Toggle admin operational mode
@@ -119,6 +163,7 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
+  createStaffAccount,
   toggleMode,
   getUsers,
   getDashboardStats,

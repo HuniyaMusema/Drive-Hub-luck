@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2, Trash2, ShieldAlert, UserX, UserCheck, AlertTriangle, Users, Mail, Shield, Calendar, Filter, RefreshCw } from "lucide-react";
-import { useAdminUsers, useUpdateUserStatus, useDeleteUser } from "@/hooks/useAdmin";
+import { Search, Loader2, Trash2, ShieldAlert, UserX, UserCheck, AlertTriangle, Users, Mail, Shield, Calendar, Filter, RefreshCw, UserPlus, Lock } from "lucide-react";
+import { useAdminUsers, useUpdateUserStatus, useDeleteUser, useCreateStaff } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,9 +38,13 @@ export default function AdminUsers() {
   });
   const [suspensionReason, setSuspensionReason] = useState("");
   
+  const [addStaffDialog, setAddStaffDialog] = useState(false);
+  const [staffForm, setStaffForm] = useState({ name: "", email: "", password: "" });
+
   const { data: users = [], isLoading } = useAdminUsers();
   const updateStatusMutation = useUpdateUserStatus();
   const deleteUserMutation = useDeleteUser();
+  const createStaffMutation = useCreateStaff();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
@@ -109,6 +113,24 @@ export default function AdminUsers() {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
+  const handleAddStaff = async () => {
+    if (!staffForm.name || !staffForm.email || !staffForm.password) {
+      toast({ title: "Validation Error", description: "All fields are required.", variant: "destructive" });
+      return;
+    }
+    if (staffForm.password.length < 6) {
+      toast({ title: "Validation Error", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    try {
+      await createStaffMutation.mutateAsync(staffForm);
+      toast({ title: "Staff Created", description: "The new lottery staff account was generated successfully." });
+      setAddStaffDialog(false);
+      setStaffForm({ name: "", email: "", password: "" });
+    } catch (err: any) {
+      toast({ title: "Generation failed", description: err.message || "Could not create staff account.", variant: "destructive" });
+    }
+  };
 
   return (
     <AdminLayout>
@@ -142,6 +164,16 @@ export default function AdminUsers() {
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
+          </Button>
+          <Button
+            className="gap-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md h-9"
+            onClick={() => {
+              setStaffForm({ name: "", email: "", password: "" });
+              setAddStaffDialog(true);
+            }}
+          >
+            <UserPlus className="h-4 w-4" />
+            Add Staff
           </Button>
         </div>
       </div>
@@ -339,6 +371,64 @@ export default function AdminUsers() {
             >
               {updateStatusMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-1" />Processing</> : t("confirmSuspension")}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Staff Dialog */}
+      <Dialog open={addStaffDialog} onOpenChange={setAddStaffDialog}>
+        <DialogContent className="rounded-2xl border-border/60 bg-card max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-primary text-xl font-extrabold">
+              <UserPlus className="h-6 w-6" />
+              Provision Staff Account
+            </DialogTitle>
+            <DialogDescription className="font-medium text-xs leading-relaxed">
+              Generate a secure login exclusively for the lottery staff role. Regular users cannot request this access.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Users className="h-3 w-3 "/> Full Name</Label>
+              <Input
+                placeholder="John Doe"
+                value={staffForm.name}
+                onChange={(e) => setStaffForm(prev => ({ ...prev, name: e.target.value }))}
+                className="rounded-xl bg-muted/20 border-border/60"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Mail className="h-3 w-3 "/> Work Email</Label>
+              <Input
+                type="email"
+                placeholder="staff@drivehub.com"
+                value={staffForm.email}
+                onChange={(e) => setStaffForm(prev => ({ ...prev, email: e.target.value }))}
+                className="rounded-xl bg-muted/20 border-border/60"
+              />
+            </div>
+             <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Lock className="h-3 w-3 "/> Initial Password</Label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={staffForm.password}
+                onChange={(e) => setStaffForm(prev => ({ ...prev, password: e.target.value }))}
+                className="rounded-xl bg-muted/20 border-border/60 font-mono tracking-widest"
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex-row gap-2 mt-2">
+             <Button variant="ghost" onClick={() => setAddStaffDialog(false)} className="flex-1 rounded-xl font-bold">
+               Cancel
+             </Button>
+             <Button
+               disabled={!staffForm.name || !staffForm.email || !staffForm.password || createStaffMutation.isPending}
+               onClick={handleAddStaff}
+               className="flex-1 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all active:scale-95"
+             >
+               {createStaffMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Generating</> : "Create Staff"}
+             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
