@@ -28,7 +28,6 @@ const lotteryItems: NavItem[] = [
 
 const systemItems: NavItem[] = [
   { title: "Dashboard", labelKey: "Dashboard",  url: "/admin",          icon: LayoutDashboard, roles: ["admin", "lottery_staff"] },
-  { title: "Inventory", labelKey: "Inventory",  url: "/admin/cars",     icon: Car,             roles: ["admin"] },
   { title: "Users",     labelKey: "Users",       url: "/admin/users",    icon: Users,           roles: ["admin"] },
   { title: "Settings",  labelKey: "Settings",    url: "/admin/settings", icon: Settings,        roles: ["admin"] },
 ];
