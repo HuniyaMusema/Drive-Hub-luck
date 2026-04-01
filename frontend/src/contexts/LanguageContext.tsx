@@ -175,6 +175,11 @@ const translations: Record<Language, Record<string, string>> = {
     browseCarsForSale: "Browse Cars for Sale",
     enterLotteryAction: "Enter Lottery",
     myProfile: "My Profile",
+    activeEntries: "Active Entries",
+    verifiedTickets: "Verified Tickets",
+    awaitingVerification: "Awaiting Verification",
+    savedVehicles: "Saved Assets",
+    watchingStatus: "Watching Status",
 
     // Auth
     welcomeBackLogin: "Welcome Back",
@@ -540,6 +545,11 @@ const translations: Record<Language, Record<string, string>> = {
     browseCarsForSale: "ለሽያጭ መኪናዎችን ይመልከቱ",
     enterLotteryAction: "ሎተሪ ይግቡ",
     myProfile: "መገለጫዬ",
+    activeEntries: "ንቁ ተሳትፎዎች",
+    verifiedTickets: "የተረጋገጡ ትኬቶች",
+    awaitingVerification: "በመጠባበቅ ላይ",
+    savedVehicles: "የተቀመጡ ተሽከርካሪዎች",
+    watchingStatus: "ክትትል ላይ",
 
     // Auth
     welcomeBackLogin: "እንኳን ደና ተመለሱ",
@@ -918,6 +928,11 @@ const translations: Record<Language, Record<string, string>> = {
     browseCarsForSale: "Konkolaataa Gurgurtaaf Ilaali",
     enterLotteryAction: "Lootarii Seeni",
     myProfile: "Piroofaayilii Koo",
+    activeEntries: "Hirmaannaa Hojii Irra Jiru",
+    verifiedTickets: "Tikkeettii Mirkanaa'e",
+    awaitingVerification: "Mirkaneessa Eeggataa",
+    savedVehicles: "Konkolaataa Olka'ame",
+    watchingStatus: "Haala Hordofaa Jiru",
 
     // Auth
     welcomeBackLogin: "Baga Nagaan Deebitee",
@@ -1127,7 +1142,6 @@ const translations: Record<Language, Record<string, string>> = {
     review: "Sakatta'i",
     totalLabel: "Waliigala",
     est: "Tilmaama",
-    activitySummary: "Madalla kee to'adhu, fayyadamtoota bulchi fi hojii lootarii hordofi.",
     platformConfiguration: "Qindaa'ina Madalichaa",
     settings: "Qindaa'ina",
     general: "Waliigala",

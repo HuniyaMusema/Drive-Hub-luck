@@ -135,17 +135,40 @@ const getProfileHistory = async (req, res) => {
     `, [req.user.id]);
 
     const lotteries = await pool.query(`
-      SELECT ln.*, ls.status as lottery_status, c.name as prize_name, p.status as payment_status
-      FROM lottery_numbers ln
-      JOIN lottery_settings ls ON ln.lottery_id = ls.id
-      LEFT JOIN cars c ON ls.prize_car_id = c.id
-      LEFT JOIN (
-        SELECT DISTINCT ON (lottery_number_id) status, lottery_number_id
-        FROM payments
-        ORDER BY lottery_number_id, created_at DESC
-      ) p ON ln.id = p.lottery_number_id
-      WHERE ln.user_id = $1
-      ORDER BY ln.created_at DESC
+      SELECT * FROM (
+        SELECT 
+          ln.number, 
+          ln.id, 
+          ls.status as lottery_status, 
+          c.name as prize_name, 
+          p.status as payment_status, 
+          p.created_at as payment_date, 
+          ln.created_at as reservation_date,
+          ln.status as number_status
+        FROM payments p
+        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+        JOIN lottery_settings ls ON ln.lottery_id = ls.id
+        LEFT JOIN cars c ON ls.prize_car_id = c.id
+        WHERE p.user_id = $1
+
+        UNION ALL
+
+        SELECT 
+          ln.number, 
+          ln.id, 
+          ls.status as lottery_status, 
+          c.name as prize_name, 
+          NULL::payment_status as payment_status, 
+          NULL::timestamptz as payment_date, 
+          ln.created_at as reservation_date,
+          ln.status as number_status
+        FROM lottery_numbers ln
+        JOIN lottery_settings ls ON ln.lottery_id = ls.id
+        LEFT JOIN cars c ON ls.prize_car_id = c.id
+        WHERE ln.user_id = $1
+        AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.lottery_number_id = ln.id AND p.user_id = $1)
+      ) AS history
+      ORDER BY COALESCE(payment_date, reservation_date) DESC
     `, [req.user.id]);
 
     res.json({
@@ -154,7 +177,10 @@ const getProfileHistory = async (req, res) => {
         status: r.status, price: parseFloat(r.total_price), image: r.car_image
       })),
       lotteries: lotteries.rows.map(l => ({
-        id: l.id, number: l.number, date: l.created_at, status: l.status,
+        id: l.id, 
+        number: l.number, 
+        date: l.payment_date || l.reservation_date, 
+        status: l.number_status,
         payment_status: l.payment_status || null,
         prize: l.prize_name || "Unknown Prize"
       }))

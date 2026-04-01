@@ -4,7 +4,7 @@ import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Phone, LogOut, Loader2, Car, Ticket, Sparkles, ShieldCheck, Zap, ChevronRight, Clock, CheckCircle2, XCircle, History, Calendar, Settings2, Trash2, Edit3, ArrowRight } from "lucide-react";
+import { User, Mail, Phone, LogOut, Loader2, Car, Ticket, Sparkles, ShieldCheck, Zap, ChevronRight, Clock, CheckCircle2, XCircle, History, Calendar, Settings2, Trash2, Edit3, ArrowRight, Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useProfileHistory } from "@/hooks/useLottery";
@@ -38,7 +38,7 @@ export default function Profile() {
     pending:  { icon: Clock,          className: "text-amber-600 border-amber-500/20 bg-amber-500/5", label: "Reserved" },
     approved: { icon: CheckCircle2,   className: "text-emerald-600 border-emerald-500/20 bg-emerald-500/5", label: "Confirmed" },
     rejected: { icon: XCircle,        className: "text-destructive border-destructive/20 bg-destructive/5", label: "Rejected" },
-    win:      { icon: TrophyIcon,     className: "text-primary border-primary/20 bg-primary/5 shadow-lg shadow-primary/10", label: "WINNER" },
+    win:      { icon: Trophy,         className: "text-primary border-primary/20 bg-primary/5 shadow-lg shadow-primary/10", label: "WINNER" },
   };
 
   const stats = useMemo(() => ({
@@ -213,21 +213,21 @@ export default function Profile() {
                           let s = statusConfig.pending;
                           let label = "Pending";
 
-                          if (l.status === 'confirmed' || l.payment_status === 'approved') {
-                             s = statusConfig.approved;
-                             label = "Confirmed Entry";
-                          } else if (l.payment_status === "pending") {
-                             s = { icon: Clock, className: "text-blue-600 border-blue-500/20 bg-blue-500/5", label: "Verifying Receipt" };
-                             label = "Verifying Receipt";
-                          } else if (l.status === "pending" && !l.payment_status) {
-                             s = { icon: Clock, className: "text-amber-600 border-amber-500/20 bg-amber-500/5", label: "Awaiting Payment" };
-                             label = "Awaiting Payment";
-                          } else if (l.status === 'win') {
+                          if (l.status === 'win') {
                              s = statusConfig.win;
                              label = "WINNER";
+                          } else if (l.payment_status === 'approved' || l.status === 'confirmed') {
+                             s = statusConfig.approved;
+                             label = "Confirmed Entry";
                           } else if (l.payment_status === 'rejected') {
                              s = statusConfig.rejected;
                              label = "Rejected";
+                          } else if (l.payment_status === "pending") {
+                             s = { icon: Clock, className: "text-blue-600 border-blue-500/20 bg-blue-500/5", label: "Verifying Receipt" };
+                             label = "Verifying Receipt";
+                          } else {
+                             s = { icon: Clock, className: "text-amber-600 border-amber-500/20 bg-amber-500/5", label: "Awaiting Payment" };
+                             label = "Awaiting Payment";
                           }
 
                           const Icon = s.icon;

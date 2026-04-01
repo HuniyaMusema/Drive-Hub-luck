@@ -122,6 +122,7 @@ export const useVerifyPayment = () => {
       queryClient.invalidateQueries({ queryKey: ['lottery', 'current'] });
       queryClient.invalidateQueries({ queryKey: ['lottery', 'numbers'] });
       queryClient.invalidateQueries({ queryKey: ['lottery', 'taken'] });
+      queryClient.invalidateQueries({ queryKey: ['profile', 'history'] });
     },
   });
 };

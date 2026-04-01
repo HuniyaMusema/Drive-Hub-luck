@@ -52,7 +52,11 @@ export default function Payment() {
   }, [history, passedTickets]);
 
   const selectableTickets = useMemo(() => {
-    return processedTickets.filter(t => t.status === 'pending');
+    return processedTickets.filter(t => 
+      t.status === 'pending' && 
+      t.payment_status !== 'pending' && 
+      t.payment_status !== 'approved'
+    );
   }, [processedTickets]);
 
   useEffect(() => {
@@ -404,10 +408,13 @@ export default function Payment() {
                         </div>
                         <div className="flex flex-col items-end gap-2.5">
                            <div className="text-base font-black tabular-nums text-foreground tracking-tighter">{(ticketPrice).toLocaleString()} <span className="text-[10px] opacity-40 uppercase">{currency}</span></div>
-                           <span className={cn("inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm", s.className)}>
-                            <Icon className={cn("h-3 w-3", s.label.includes("Verifying") || s.label.includes("Awaiting") ? 'animate-pulse' : '')} strokeWidth={3} />
-                            {label}
-                          </span>
+                           <div className="flex flex-col items-end gap-1.5">
+                              <span className={cn("inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm", s.className)}>
+                                <Icon className={cn("h-3 w-3", s.label.includes("Verifying") || s.label.includes("Awaiting") ? 'animate-pulse' : '')} strokeWidth={3} />
+                                {label}
+                              </span>
+                              {p.rejection_reason && <p className="text-[8px] text-destructive font-bold italic text-right max-w-[120px] line-clamp-1">"{p.rejection_reason}"</p>}
+                           </div>
                         </div>
                       </div>
                     );

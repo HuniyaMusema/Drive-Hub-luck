@@ -22,6 +22,7 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileHistory } from "@/hooks/useLottery";
+import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
@@ -29,6 +30,8 @@ export default function Dashboard() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { savedCarsCount } = useSavedCars();
+
   const { data: history, isLoading } = useProfileHistory();
 
   useEffect(() => {
@@ -39,7 +42,7 @@ export default function Dashboard() {
 
   const stats = useMemo(() => {
     const lotteries = history?.lotteries || [];
-    const pending = lotteries.filter(l => l.status === 'pending').length;
+    const pending = lotteries.filter(l => l.status === 'pending' || l.payment_status === 'pending').length;
     const confirmed = lotteries.filter(l => l.status === 'confirmed' || l.payment_status === 'approved').length;
     
     return [
@@ -47,31 +50,34 @@ export default function Dashboard() {
         icon: Ticket, 
         label: t("activeEntries") || "Active Entries", 
         value: confirmed.toString(), 
-        sub: "Verified Tickets",
+        sub: t("verifiedTickets") || "Verified Tickets",
         color: "text-primary", 
         bg: "bg-primary/10",
-        progress: 75 
+        progress: confirmed > 0 ? 100 : 0,
+        to: "/profile?tab=history"
       },
       { 
         icon: CreditCard, 
         label: t("pendingPayments") || "Pending Action", 
         value: pending.toString(), 
-        sub: "Awaiting Verification",
+        sub: t("awaitingVerification") || "Awaiting Verification",
         color: "text-amber-500", 
         bg: "bg-amber-500/10",
-        progress: 30
+        progress: pending > 0 ? 50 : 0,
+        to: "/profile?tab=history"
       },
       { 
         icon: Heart, 
         label: t("savedVehicles") || "Saved Assets", 
-        value: "4", 
-        sub: "Watching Status",
+        value: savedCarsCount.toString(), 
+        sub: t("watchingStatus") || "Watching Status",
         color: "text-rose-500", 
         bg: "bg-rose-500/10",
-        progress: 45
+        progress: savedCarsCount > 0 ? 100 : 0,
+        to: "/saved-cars"
       },
     ];
-  }, [history, t]);
+  }, [history, t, savedCarsCount]);
 
   const quickLinks = [
     { icon: Car, label: t("browseCarsForSale"), to: "/cars/sale", desc: "Find your next masterpiece", color: "bg-blue-500" },
@@ -128,8 +134,9 @@ export default function Dashboard() {
           {stats.map((s, i) => (
             <div
               key={s.label}
+              onClick={() => navigate(s.to)}
               className={cn(
-                "group relative bg-card rounded-[2.5rem] p-10 border border-slate-100 shadow-2xl shadow-slate-200/50 hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-700 overflow-hidden",
+                "group relative bg-card rounded-[2.5rem] p-10 border border-slate-100 shadow-2xl shadow-slate-200/50 hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-700 overflow-hidden cursor-pointer",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
               )}
               style={{ transitionDelay: `${i * 150}ms` }}
