@@ -9,13 +9,14 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useLotteryPayments, useVerifyPayment } from "@/hooks/useLottery";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type FilterType = "all" | "pending" | "approved" | "rejected";
 
 const statusConfig: Record<string, { icon: typeof Clock; label: string; className: string }> = {
-  pending:  { icon: Clock,        label: "Pending",  className: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
-  approved: { icon: CheckCircle2, label: "Approved", className: "bg-green-500/10 text-green-600 border-green-500/20" },
-  rejected: { icon: XCircle,      label: "Rejected", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  pending:  { icon: Clock,        label: "Pending",  className: "bg-amber-50 text-amber-700 border-amber-200 shadow-sm" },
+  approved: { icon: CheckCircle2, label: "Approved", className: "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm" },
+  rejected: { icon: XCircle,      label: "Rejected", className: "bg-red-50 text-red-700 border-red-200 shadow-sm" },
 };
 
 const filterTabs: { key: FilterType; label: string; color: string }[] = [
@@ -36,6 +37,7 @@ export default function LotteryPayments() {
   const [search, setSearch] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const filtered = useMemo(() => {
     let list = filter === "all" ? payments : payments.filter(p => p.status === filter);
@@ -89,20 +91,20 @@ export default function LotteryPayments() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm">
-            <CreditCard className="h-5 w-5 text-primary" />
+          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-slate-200">
+            <CreditCard className="h-6 w-6 text-emerald-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Lottery Payments</h1>
-            <p className="text-muted-foreground text-xs mt-0.5">Review and verify user payment receipts for lottery tickets.</p>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{t("payLotteryPayments")}</h1>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5">{t("payReviewVerify")}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
-              className="pl-9 rounded-xl bg-muted/30 border-border/60 focus-visible:ring-primary/30 h-9"
-              placeholder="Search by name or ticket #…"
+              className="pl-9 rounded-2xl bg-white border-slate-200 focus-visible:ring-emerald-500/20 h-10 font-black text-slate-900"
+              placeholder={t("lpSearchPlaceholder")}
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -110,46 +112,46 @@ export default function LotteryPayments() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-xl border-border/60 hover:border-primary/30 hover:text-primary transition-all shadow-sm h-9"
+            className="gap-2 rounded-2xl border-slate-200 bg-white hover:text-slate-900 transition-all shadow-sm h-10 px-5 font-black text-slate-500"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-emerald-600' : ''}`} />
+            {t("payRefresh")}
           </Button>
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10">
         {[
-          { label: "Total",    value: counts.all,      color: "text-foreground",  bg: "bg-primary/5",      border: "border-primary/10" },
-          { label: "Pending",  value: counts.pending,  color: "text-amber-600",   bg: "bg-amber-500/5",    border: "border-amber-500/10" },
-          { label: "Approved", value: counts.approved, color: "text-green-600",   bg: "bg-green-500/5",    border: "border-green-500/10" },
-          { label: "Rejected", value: counts.rejected, color: "text-destructive", bg: "bg-destructive/5",  border: "border-destructive/10" },
-        ].map(({ label, value, color, bg, border }) => (
-          <div key={label} className={`rounded-2xl p-5 border ${border} ${bg} hover:shadow-md transition-all relative overflow-hidden`}>
-            <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-10 bg-current blur-2xl -mr-8 -mt-8" />
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-1">{label}</p>
-            <p className={`text-3xl font-extrabold tabular-nums ${color}`}>{value}</p>
+          { label: t("payTotal"),    value: counts.all,      color: "text-slate-900", bg: "bg-white", border: "border-slate-200" },
+          { label: t("lpPendingReview"),  value: counts.pending,  valueColor: "text-amber-600", color: "text-amber-600", bg: "bg-amber-50/30", border: "border-amber-200/50" },
+          { label: t("payApprove"), value: counts.approved, valueColor: "text-emerald-600", color: "text-emerald-600", bg: "bg-emerald-50/30", border: "border-emerald-200/50" },
+          { label: t("payReject"), value: counts.rejected, valueColor: "text-red-600", color: "text-red-600", bg: "bg-red-50/30", border: "border-red-200/50" },
+        ].map(({ label, value, color, bg, border, valueColor }) => (
+          <div key={label} className={`rounded-3xl p-8 border ${border} ${bg} shadow-sm hover:translate-y-[-4px] transition-all relative overflow-hidden group`}>
+            <div className={`absolute top-0 right-0 w-24 h-24 rounded-full opacity-[0.03] bg-current blur-3xl -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700 ${color}`} />
+            <p className="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-3">{label}</p>
+            <p className={`text-4xl font-black tabular-nums tracking-tighter ${valueColor || 'text-slate-900'}`}>{value}</p>
           </div>
         ))}
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {filterTabs.map(({ key, label, color }) => (
+      <div className="flex flex-wrap gap-3 mb-8">
+        {filterTabs.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-150
+            className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all duration-300
               ${filter === key
-                ? 'bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20'
-                : 'bg-card text-muted-foreground border-border/60 hover:border-primary/40 hover:text-foreground shadow-sm'}`}
+                ? 'bg-[#10b981] text-white border-[#10b981] shadow-lg shadow-emerald-500/20 scale-105'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-emerald-500/40 hover:text-slate-900 shadow-sm'}`}
           >
-            {label}
-            <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[10px] font-extrabold tabular-nums
-              ${filter === key ? 'bg-primary-foreground/20' : 'bg-muted'}`}>
+            {key === 'all' ? t("payAll") : key === 'pending' ? t("lpPendingReview") : key === 'approved' ? t("payApprove") : t("payReject")}
+            <span className={`ml-2 px-2 py-0.5 rounded-lg text-[9px] font-black tabular-nums transition-colors
+              ${filter === key ? 'bg-white/20' : 'bg-slate-100'}`}>
               {counts[key]}
             </span>
           </button>
@@ -157,29 +159,31 @@ export default function LotteryPayments() {
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-2xl shadow-xl border border-border/60 overflow-hidden shadow-primary/5">
+      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden shadow-slate-200/50 mb-10">
         <div className="overflow-x-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary opacity-30" /></div>
+            <div className="flex items-center justify-center py-24"><Loader2 className="h-12 w-12 animate-spin text-emerald-500 opactiy-20" /></div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                <ImageIcon className="h-8 w-8 text-muted-foreground opacity-30" />
+            <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+              <div className="w-20 h-20 rounded-3xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-inner">
+                <ImageIcon className="h-10 w-10 text-slate-300" strokeWidth={1.5} />
               </div>
-              <p className="font-bold text-foreground">{search || filter !== "all" ? "No payments matching your filter." : "No lottery payment records found."}</p>
-              <p className="text-muted-foreground text-xs">Payments appear once users submit their receipts.</p>
+              <div>
+                <p className="font-black text-slate-900 uppercase tracking-widest text-xs">{search || filter !== "all" ? t("payNoPaymentsFilter") : t("payNoLotteryPayments")}</p>
+                <p className="text-slate-400 text-[10px] uppercase font-black tracking-widest mt-1">{t("payPaymentsAppearOnce")}</p>
+              </div>
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b text-left bg-muted/30">
-                  <th className="px-5 py-4 font-bold text-muted-foreground uppercase tracking-widest text-[10px]">#</th>
-                  <th className="px-5 py-4 font-bold text-muted-foreground uppercase tracking-widest text-[10px]">User</th>
-                  <th className="px-5 py-4 font-bold text-muted-foreground uppercase tracking-widest text-[10px]">Method</th>
-                  <th className="px-5 py-4 font-bold text-muted-foreground uppercase tracking-widest text-[10px]">Ticket</th>
-                  <th className="px-5 py-4 font-bold text-muted-foreground uppercase tracking-widest text-[10px]">Receipt</th>
-                  <th className="px-5 py-4 font-bold text-muted-foreground uppercase tracking-widest text-[10px]">Status</th>
-                  <th className="px-5 py-4 font-bold text-muted-foreground uppercase tracking-widest text-[10px] text-right">Actions</th>
+                <tr className="border-b text-left bg-slate-50/50">
+                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">#</th>
+                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payUser")}</th>
+                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payMethod")}</th>
+                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payTicket")}</th>
+                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payReceipt")}</th>
+                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payStatus")}</th>
+                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px] text-right">{t("payActions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -187,69 +191,69 @@ export default function LotteryPayments() {
                   const sc = statusConfig[p.status] || statusConfig.pending;
                   const StatusIcon = sc.icon;
                   return (
-                    <tr key={p.id} className="border-b last:border-0 hover:bg-muted/10 transition-colors group">
-                      <td className="px-5 py-4 tabular-nums text-muted-foreground text-xs font-bold">{i + 1}</td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-extrabold text-primary shrink-0">
+                    <tr key={p.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors group">
+                      <td className="px-8 py-6 tabular-nums text-slate-400 text-[10px] font-black">{i + 1}</td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center text-xs font-black text-emerald-700 shrink-0 border border-emerald-200">
                             {p.user_name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-semibold text-foreground group-hover:text-primary transition-colors">{p.user_name}</p>
-                            <p className="text-[10px] text-muted-foreground">{p.user_email}</p>
+                            <p className="font-black text-slate-900 tracking-tighter uppercase text-[11px] group-hover:text-emerald-600 transition-colors">{p.user_name}</p>
+                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">{p.user_email}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-4">
-                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border shadow-sm
-                          ${p.method === 'CBE' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'}`}>
+                      <td className="px-8 py-6">
+                        <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm
+                          ${p.method === 'CBE' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
                           {p.method}
                         </span>
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="font-extrabold text-primary tabular-nums text-lg">
+                      <td className="px-8 py-6">
+                        <span className="font-black text-emerald-600 tabular-nums text-xl tracking-tighter">
                           {p.ticket_number.toString().padStart(3, '0')}
                         </span>
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="px-8 py-6">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 gap-2 rounded-lg border-border/60 hover:border-primary/40 hover:text-primary text-xs shadow-sm transition-all"
+                          className="h-10 gap-2 rounded-2xl border-slate-200 hover:border-emerald-500/40 hover:text-emerald-600 text-[10px] font-black uppercase tracking-widest shadow-sm transition-all px-4"
                           onClick={() => setPreviewUrl(p.receipt_url)}
                         >
-                          <Eye className="h-3.5 w-3.5" /> View
+                          <Eye className="h-4 w-4" /> {t("payView")}
                         </Button>
                       </td>
-                      <td className="px-5 py-4">
-                        <div className="flex flex-col gap-1">
-                          <span className={`flex items-center gap-1 w-fit text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border font-bold ${sc.className}`}>
-                            <StatusIcon className="h-3 w-3" />
-                            {sc.label}
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col gap-1.5">
+                          <span className={`flex items-center gap-2 w-fit text-[9px] uppercase tracking-[0.15em] px-4 py-1.5 rounded-full border font-black ${sc.className}`}>
+                            <StatusIcon className="h-3.5 w-3.5" />
+                            {p.status === 'pending' ? t("lpPendingReview") : p.status === 'approved' ? t("payApprove") : t("payReject")}
                           </span>
-                          {p.rejection_reason && <p className="text-[9px] text-destructive font-medium italic mt-0.5 max-w-[150px] truncate">"{p.rejection_reason}"</p>}
+                          {p.rejection_reason && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1 opacity-70">"{p.rejection_reason}"</p>}
                         </div>
                       </td>
-                      <td className="px-5 py-4 text-right">
-                        <div className="flex justify-end gap-2">
+                      <td className="px-8 py-6 text-right">
+                        <div className="flex justify-end gap-3">
                           {p.status === "pending" && (
                             <>
                               <Button
                                 size="sm"
-                                className="h-8 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg shadow-green-500/20 rounded-lg px-3 font-bold text-xs transition-all"
+                                className="h-10 bg-[#10b981] hover:bg-[#059669] text-white shadow-lg shadow-emerald-500/20 rounded-2xl px-5 font-black text-[10px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
                                 onClick={() => setActionDialog({ id: p.id, type: "approve" })}
                                 disabled={verifyMutation.isPending}
                               >
-                                <Check className="h-3.5 w-3.5 mr-1" /> Approve
+                                <Check className="h-4 w-4 mr-2" /> {t("payApprove")}
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 text-destructive hover:bg-destructive/10 rounded-lg px-3 font-bold text-xs transition-all"
+                                className="h-10 text-red-500 hover:bg-red-50 rounded-2xl px-5 font-black text-[10px] uppercase tracking-widest transition-all"
                                 onClick={() => setActionDialog({ id: p.id, type: "reject" })}
                                 disabled={verifyMutation.isPending}
                               >
-                                <X className="h-3.5 w-3.5 mr-1" /> Deny
+                                <X className="h-4 w-4 mr-2" /> {t("payReject")}
                               </Button>
                             </>
                           )}
@@ -263,10 +267,10 @@ export default function LotteryPayments() {
           )}
         </div>
         {filtered.length > 0 && (
-          <div className="px-5 py-3 border-t bg-muted/10 text-xs text-muted-foreground flex justify-between">
-            <span>Showing {filtered.length} of {payments.length} payments</span>
+          <div className="px-8 py-5 border-t border-slate-100 bg-slate-50/30 text-[10px] font-black uppercase tracking-widest text-slate-400 flex justify-between">
+            <span>Showing <span className="text-slate-900">{filtered.length}</span> of <span className="text-slate-900">{payments.length}</span> payments</span>
             {(search || filter !== "all") && (
-              <button onClick={() => { setSearch(""); setFilter("all"); }} className="text-primary hover:underline font-bold">Clear filters</button>
+              <button onClick={() => { setSearch(""); setFilter("all"); }} className="text-emerald-600 hover:text-emerald-700 font-black tracking-widest">{t("lpClearFilters") || "Clear filters"}</button>
             )}
           </div>
         )}

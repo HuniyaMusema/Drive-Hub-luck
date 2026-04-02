@@ -89,7 +89,7 @@ export const useUploadImage = () => {
       const formData = new FormData();
       formData.append('image', file);
       
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch('/api/cars/upload', {
         method: 'POST',
         body: formData,

@@ -27,8 +27,8 @@ router.post('/upload-receipt', protect, upload.single('receipt'), (req, res) => 
 router.route('/').get(protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'), getLotteryEntries);
 router.get('/taken', getTakenNumbers);
 router.get('/current', getCurrentLottery);
-router.post('/participate', protect, requireModule('lotteryModuleEnabled'), participateLottery);
-router.post('/submit-payment', protect, submitLotteryPayment);
+router.post('/participate', protect, authorize(['user']), requireModule('lotteryModuleEnabled'), participateLottery);
+router.post('/submit-payment', protect, authorize(['user']), submitLotteryPayment);
 router.put('/pick-winner', protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'), pickWinner);
 
 module.exports = router;

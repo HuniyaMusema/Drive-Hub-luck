@@ -79,14 +79,14 @@ export default function AdminLottery() {
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Generate Numbers</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Set a number range and prize — the system generates all tickets instantly.</p>
+          <h1 className="text-3xl font-black text-white tracking-tighter uppercase">{t("alGenerateNumbers")}</h1>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1.5">{t("alSetRangeAndPrize")}</p>
         </div>
         {lottery && (
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20 shadow-sm shadow-primary/5">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase tracking-widest border border-amber-500/20 shadow-lg shadow-amber-500/5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
             </span>
             {t("activeDraw")}
           </div>
@@ -95,117 +95,120 @@ export default function AdminLottery() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Settings */}
-        <div className="bg-card rounded-xl shadow-xl shadow-primary/5 p-6 border border-border/60">
-          <h2 className="font-semibold text-card-foreground mb-4 flex items-center gap-2">
-            <Square className="h-4 w-4 text-primary" />
+        <div className="bg-white/5 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl p-10 border border-white/5">
+          <h2 className="font-black text-slate-500 text-[10px] uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
+            <Square className="h-4.5 w-4.5 text-amber-500" />
             {t("lotteryControl")}
           </h2>
           {lotteryLoading ? (
              <div className="flex justify-center py-6"><Loader2 className="h-6 w-6 animate-spin text-primary opacity-50" /></div>
           ) : lottery ? (
             <div className="space-y-6">
-              <div className="p-4 rounded-lg bg-gradient-to-br from-muted/40 to-muted/10 border border-border/50 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
-                <p className="text-sm font-bold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">{t("activePrize")}</p>
-                <p className="text-lg font-extrabold text-foreground">{lottery.prize_car_name || lottery.prize_text}</p>
-                <div className="mt-4 grid grid-cols-2 gap-4">
+              <div className="p-8 rounded-[2rem] bg-white/5 border border-white/5 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/[0.03] rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-amber-500/[0.05] transition-colors" />
+                <p className="text-[9px] font-black text-slate-500 mb-2 uppercase tracking-[0.2em]">{t("activePrize")}</p>
+                <p className="text-xl font-black text-white uppercase tracking-tight leading-tight">{lottery.prize_car_name || lottery.prize_text}</p>
+                <div className="mt-8 grid grid-cols-2 gap-6">
                    <div>
-                     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest leading-relaxed">{t("range")}</p>
-                     <p className="text-sm font-bold tabular-nums">{lottery.start_number} - {lottery.end_number}</p>
+                     <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1.5">{t("range")}</p>
+                     <p className="text-sm font-black text-white tabular-nums tracking-widest">{lottery.start_number} - {lottery.end_number}</p>
                    </div>
                    <div>
-                     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest leading-relaxed">{t("status")}</p>
-                     <p className="text-sm font-bold capitalize tabular-nums text-primary">{lottery.status}</p>
+                     <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1.5">{t("status")}</p>
+                     <p className="text-sm font-black uppercase tabular-nums text-amber-500">{lottery.status}</p>
                    </div>
                 </div>
               </div>
               
               <div className="grid grid-cols-3 gap-2">
-                <div className="text-center p-2 rounded-lg bg-green-500/5 border border-green-500/10 transition-colors hover:bg-green-500/10">
-                  <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider">{t("lotteryConfirmed")}</p>
-                  <p className="text-lg font-extrabold text-green-700">{stats?.confirmed || 0}</p>
+                <div className="text-center p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                  <p className="text-[8px] text-amber-500 font-black uppercase tracking-widest mb-1.5">{t("lotteryConfirmed")}</p>
+                  <p className="text-xl font-black text-white tabular-nums tracking-tighter">{stats?.confirmed || 0}</p>
                 </div>
-                <div className="text-center p-2 rounded-lg bg-amber-500/5 border border-amber-500/10 transition-colors hover:bg-amber-500/10">
-                  <p className="text-[10px] text-amber-600 font-bold uppercase tracking-wider">{t("lotteryPending")}</p>
-                  <p className="text-lg font-extrabold text-amber-700">{stats?.pending || 0}</p>
+                <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1.5">{t("lotteryPending")}</p>
+                  <p className="text-xl font-black text-amber-500 tabular-nums tracking-tighter">{stats?.pending || 0}</p>
                 </div>
-                <div className="text-center p-2 rounded-lg bg-blue-500/5 border border-blue-500/10 transition-colors hover:bg-blue-500/10">
-                  <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{t("lotteryFree")}</p>
-                  <p className="text-lg font-extrabold text-blue-700">{stats?.available || 0}</p>
+                <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10 opacity-40">
+                  <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest mb-1.5">{t("lotteryFree")}</p>
+                  <p className="text-xl font-black text-slate-400 tabular-nums tracking-tighter">{stats?.available || 0}</p>
                 </div>
               </div>
 
-              <Button variant="destructive" className="w-full shadow-lg shadow-destructive/20 font-bold tracking-wide" onClick={handleStop}>
+              <Button variant="ghost" className="w-full h-14 rounded-2xl shadow-sm font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20" onClick={handleStop}>
                 <Square className="h-4 w-4 mr-2" /> {t("stopLottery")}
               </Button>
             </div>
           ) : (
-            <form className="space-y-5" onSubmit={handleStart}>
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-wider font-bold text-muted-foreground">{t("numberRangeLabel")}</Label>
-                <div className="flex gap-3">
-                  <Input type="number" min={1} value={startNumber} onChange={(e) => setStartNumber(e.target.value)} required placeholder="1" className="bg-muted/30 focus-visible:ring-primary/40 font-bold tabular-nums" />
-                  <span className="self-center text-muted-foreground font-bold">→</span>
-                  <Input type="number" min={2} value={endNumber} onChange={(e) => setEndNumber(e.target.value)} required placeholder="100" className="bg-muted/30 focus-visible:ring-primary/40 font-bold tabular-nums" />
+            <form className="space-y-8" onSubmit={handleStart}>
+              <div className="space-y-4">
+                <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 ml-1">{t("numberRangeLabel")}</Label>
+                <div className="flex gap-4">
+                  <Input type="number" min={1} value={startNumber} onChange={(e) => setStartNumber(e.target.value)} required placeholder="1" className="h-16 bg-white/5 border-white/10 focus-visible:ring-amber-500/20 font-black text-white tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
+                  <span className="self-center text-slate-700 font-black">→</span>
+                  <Input type="number" min={2} value={endNumber} onChange={(e) => setEndNumber(e.target.value)} required placeholder="100" className="h-16 bg-white/5 border-white/10 focus-visible:ring-amber-500/20 font-black text-white tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
                 </div>
               </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                   <Label className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Main Prize</Label>
-                   <span className="text-[10px] text-muted-foreground italic tracking-wide">Ticket Price via Settings</span>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center ml-1">
+                   <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">{t("alMainPrize")}</Label>
+                   <span className="text-[8px] text-slate-600 font-black uppercase tracking-widest">{t("alTicketPriceSettings")}</span>
                 </div>
-                <Input value={prizeText} onChange={(e) => setPrizeText(e.target.value)} required placeholder="e.g. 2024 Toyota Camry" className="bg-muted/30 focus-visible:ring-primary/40" />
+                <Input value={prizeText} onChange={(e) => setPrizeText(e.target.value)} required placeholder={t("alPrizeExample")} className="h-16 bg-white/5 border-white/10 focus-visible:ring-amber-500/20 text-white font-black rounded-[1.25rem] px-6 shadow-inner" />
               </div>
-              <Button disabled={createMutation.isPending} className="w-full font-bold shadow-xl shadow-primary/20 bg-gradient-to-r from-primary to-primary/80 hover:to-primary h-12 text-md transition-all">
-                {createMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Play className="h-5 w-5 mr-2" />} 
-                {createMutation.isPending ? "Initializing..." : t("initializeNewDraw")}
+              <Button disabled={createMutation.isPending} className="w-full h-16 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.25em] shadow-2xl shadow-[#3df0a2]/20 bg-[#3df0a2] text-slate-950 hover:bg-[#34ce8b] border-0 transition-all active:scale-95 disabled:opacity-50 mt-4">
+                {createMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Play className="h-5 w-5 mr-3 fill-current" />} 
+                {createMutation.isPending ? t("alInitializing") : t("initializeNewDraw")}
               </Button>
             </form>
           )}
         </div>
 
         {/* Action Panel */}
-        <div className="lg:col-span-2 relative overflow-hidden bg-card rounded-2xl border border-border/60 shadow-xl shadow-primary/5 p-8 flex flex-col items-center justify-center text-center space-y-6 min-h-[400px]">
+        <div className="lg:col-span-2 relative overflow-hidden bg-white/5 rounded-[3rem] border border-white/5 shadow-2xl p-12 flex flex-col items-center justify-center text-center space-y-10 min-h-[500px] backdrop-blur-3xl">
            {/* Visual background gradient pulse */}
-           <div className={`absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent transition-opacity duration-1000 ${isDrawing ? 'opacity-100' : 'opacity-0'}`} />
+           <div className={`absolute inset-0 bg-gradient-to-br from-[#3df0a2]/[0.05] to-transparent transition-opacity duration-1000 ${isDrawing ? 'opacity-100' : 'opacity-0'}`} />
            
-           <div className={`w-28 h-28 rounded-full flex items-center justify-center mb-2 transition-all duration-500 z-10 ${isDrawing ? 'bg-primary shadow-[0_0_30px_rgba(var(--primary),0.5)] scale-110' : 'bg-primary/10 shadow-lg'}`}>
-              <Trophy className={`h-14 w-14 transition-all duration-500 ${isDrawing ? 'text-primary-foreground animate-pulse' : 'text-primary'}`} />
+           <div className={`w-40 h-40 rounded-[3rem] flex items-center justify-center transition-all duration-700 z-10 
+             ${isDrawing ? 'bg-[#3df0a2] shadow-[0_0_50px_rgba(61,240,162,0.35)] scale-110' : 'bg-white/5 border border-white/10 shadow-inner'}`}>
+              <Trophy className={`h-20 w-20 transition-all duration-700 ${isDrawing ? 'text-slate-950 animate-pulse' : 'text-[#3df0a2]'}`} />
            </div>
            
-           <div className="max-w-md z-10 transition-transform duration-300">
-             <h3 className="text-3xl font-extrabold tracking-tight text-foreground">{t("prepareForDraw")}</h3>
-             <p className="text-muted-foreground mt-3 leading-relaxed">
+           <div className="max-w-md z-10">
+             <h3 className="text-5xl font-black tracking-tighter text-white uppercase leading-[0.9] mb-6">{t("prepareForDraw")}</h3>
+             <p className="text-slate-500 font-bold leading-relaxed uppercase tracking-widest text-[10px] px-8">
                {lottery?.prize_car_name || lottery?.prize_text 
-                 ? `One lucky ticket holder will win the ${lottery?.prize_car_name || lottery?.prize_text}. Ensure all payments are verified before drawing.` 
+                 ? t("alOneLuckyWinner")
                  : t("drawWinnerDesc")}
              </p>
            </div>
            
            <Button 
               size="lg" 
-              className={`px-12 h-14 rounded-2xl text-lg font-bold transition-all shadow-xl z-10
-                ${stats?.confirmed! > 0 && !isDrawing ? 'bg-gradient-to-r from-primary to-blue-600 hover:scale-105 hover:shadow-primary/30 text-white border-0' : 'bg-muted text-muted-foreground hover:bg-muted/80 border-border'}
-                ${isDrawing ? 'animate-pulse cursor-not-allowed' : ''}
+              className={`px-20 h-20 rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.3em] transition-all shadow-2xl z-10 border-0
+                ${stats?.confirmed! > 0 && !isDrawing ? 'bg-[#3df0a2] text-slate-950 hover:bg-[#34ce8b] hover:scale-105 active:scale-95 shadow-[#3df0a2]/20' : 'bg-white/5 text-slate-600 cursor-not-allowed border-white/5'}
+                ${isDrawing ? 'animate-pulse' : ''}
               `} 
               disabled={!lottery || stats?.confirmed === 0 || isDrawing || pickWinnerMutation.isPending}
               onClick={handleDraw}
             >
               {isDrawing || pickWinnerMutation.isPending ? (
                 <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Drawing Winner...
+                  <Loader2 className="h-6 w-6 mr-3 animate-spin" />
+                  {t("alDrawingWinner")}
                 </>
               ) : (
                 <>
-                  <Trophy className={`h-5 w-5 mr-2 ${stats?.confirmed === 0 ? 'opacity-50' : ''}`} />
+                  <Trophy className={`h-6 w-6 mr-4 ${stats?.confirmed === 0 ? 'opacity-30' : 'fill-current'}`} />
                   {t("drawTheWinner")}
                 </>
               )}
            </Button>
            
            {lottery && stats?.confirmed === 0 && !isDrawing && (
-             <p className="text-[11px] text-amber-600/80 font-bold tracking-widest uppercase z-10 transition-opacity">Requires at least 1 confirmed ticket payment to draw.</p>
+             <p className="text-[10px] text-[#3df0a2] font-black tracking-[0.2em] uppercase z-10 transition-opacity bg-[#3df0a2]/10 px-6 py-2.5 rounded-full border border-[#3df0a2]/20 animate-pulse">
+               {t("alRequiresConfirmedTicket")}
+             </p>
            )}
         </div>
       </div>

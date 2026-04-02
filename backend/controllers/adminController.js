@@ -89,13 +89,21 @@ const getUsers = async (req, res) => {
 
 const getDashboardStats = async (req, res) => {
   try {
-    const carsCount = await pool.query("SELECT COUNT(*) FROM cars");
-    const lotteryEntriesCount = await pool.query("SELECT COUNT(*) FROM lottery_numbers");
-    const pendingPaymentsCount = await pool.query("SELECT COUNT(*) FROM payments WHERE status = 'pending'");
-    const usersCount = await pool.query("SELECT COUNT(*) FROM users");
+    const [
+      carsCount,
+      lotteryEntriesCount,
+      pendingPaymentsCount,
+      usersCount,
+      approvedPaymentsCount
+    ] = await Promise.all([
+      pool.query("SELECT COUNT(*) FROM cars"),
+      pool.query("SELECT COUNT(*) FROM lottery_numbers"),
+      pool.query("SELECT COUNT(*) FROM payments WHERE status = 'pending'"),
+      pool.query("SELECT COUNT(*) FROM users"),
+      pool.query("SELECT COUNT(*) FROM payments WHERE status = 'approved'")
+    ]);
     
     // Revenue logic: just multiply payments approved by an assumed ticket price
-    const approvedPaymentsCount = await pool.query("SELECT COUNT(*) FROM payments WHERE status = 'approved'");
     const revenue = parseInt(approvedPaymentsCount.rows[0].count) * 15;
 
     res.json({

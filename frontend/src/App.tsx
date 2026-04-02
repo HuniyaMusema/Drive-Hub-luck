@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
+import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useSettings } from "@/hooks/useSettings";
@@ -39,17 +39,19 @@ const PlatformTitle = () => {
   const { settings } = useSettings();
   const platformName = settings?.General?.platformName || "Drive Hub";
   
+  const { t } = useLanguage();
+  
   useEffect(() => {
-    document.title = `${platformName} | Car Sales & Rentals`;
-  }, [platformName]);
+    document.title = `${platformName} | ${t("appSuffix")}`;
+  }, [platformName, t]);
   
   return null;
 };
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
       <AuthProvider>
+      <LanguageProvider>
       <SavedCarsProvider>
         <PlatformTitle />
         <TooltipProvider>
@@ -91,8 +93,8 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
       </SavedCarsProvider>
-      </AuthProvider>
       </LanguageProvider>
+      </AuthProvider>
     </QueryClientProvider>
 );
 

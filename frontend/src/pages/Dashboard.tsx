@@ -91,37 +91,39 @@ export default function Dashboard() {
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8 py-12">
         {/* Cinematic Welcome Header */}
-        <div className="relative mb-16 rounded-[3rem] overflow-hidden bg-slate-900 p-12 lg:p-20 shadow-2xl animate-fade-in-up">
-           <div className="absolute inset-0 z-0">
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/40 to-transparent" />
-              <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12">
-                 <ShieldCheck className="w-64 h-64 text-primary" />
+        <div className="relative mb-16 rounded-[3rem] overflow-hidden p-12 lg:p-20 shadow-2xl animate-fade-in-up" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2a1e 50%, #0a1e30 100%)' }}>
+           {/* Ambient glow orbs */}
+           <div className="absolute inset-0 z-0 pointer-events-none">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-32 -mt-32" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.18) 0%, transparent 70%)' }} />
+              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[120px] -ml-20 -mb-20" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.10) 0%, transparent 70%)' }} />
+              <div className="absolute top-0 right-0 p-10 opacity-5 rotate-12">
+                 <ShieldCheck className="w-64 h-64 text-white" />
               </div>
            </div>
            
            <div className="relative z-10 flex flex-col md:flex-row items-end justify-between gap-8">
               <div className="max-w-2xl">
-                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest mb-6 border border-primary/20">
-                    <Sparkles className="h-3 w-3" /> {t("userAccountTier") || "Premium Member"}
-                 </div>
-                 <h1 className="text-5xl lg:text-7xl font-black text-white tracking-tighter leading-none mb-4 uppercase">
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border" style={{ background: 'rgba(61,240,162,0.12)', borderColor: 'rgba(61,240,162,0.28)', color: '#3df0a2' }}>
+                     <Sparkles className="h-3 w-3" /> {t("userAccountTier")}
+                  </div>
+                 <h1 className="text-5xl lg:text-7xl font-black text-white tracking-tighter leading-none mb-4 uppercase" style={{ textShadow: '0 4px 40px rgba(0,0,0,0.4)' }}>
                     {t("welcomeBack")}, <br />
-                    <span className="text-primary underline decoration-primary/20 decoration-8 underline-offset-8">
+                    <span style={{ color: '#3df0a2' }}>
                        {user?.name?.split(' ')[0] || "User"}
                     </span>
                  </h1>
-                 <p className="text-slate-400 text-lg font-medium leading-relaxed max-w-md">
-                    {t("dashboardSubtitle") || "Your command center for luxury acquisitions and active sweepstakes management."}
+                 <p className="text-lg font-medium leading-relaxed max-w-md" style={{ color: 'rgba(190,220,210,0.80)' }}>
+                    {t("dashboardSubtitle")}
                  </p>
               </div>
               <div className="flex gap-4">
                  <Link to="/profile">
-                   <Button variant="outline" className="h-14 px-8 rounded-2xl border-white/10 text-white hover:bg-white/5 font-black uppercase text-xs tracking-widest transition-all">
+                   <Button variant="ghost" className="h-14 px-8 rounded-2xl font-black uppercase text-xs tracking-widest transition-all border" style={{ background: 'rgba(255,255,255,0.08)', color: 'white', borderColor: 'rgba(255,255,255,0.15)' }}>
                       <Settings className="mr-2 h-4 w-4" /> Manage Profile
                    </Button>
                  </Link>
                  <Link to="/lottery">
-                   <Button className="h-14 px-8 rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-transform">
+                   <Button className="h-14 px-8 rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all border-0" style={{ background: '#3df0a2', color: '#0a1628', boxShadow: '0 0 30px rgba(61,240,162,0.30)' }}>
                       <Trophy className="mr-2 h-4 w-4" /> New Draw
                    </Button>
                  </Link>
@@ -207,13 +209,13 @@ export default function Dashboard() {
 
         {/* Recent Drawing Stream */}
         <div className={cn("animate-fade-in-up space-y-8 pb-32", isVisible ? "opacity-100" : "opacity-0")}>
-           <div className="flex items-center justify-between mb-2 px-4">
-              <div className="flex items-center gap-3">
-                 <div className="w-1.5 h-6 bg-primary rounded-full" />
-                 <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase leading-none text-white">Recent Drawing Stream</h2>
-              </div>
-              <Link to="/profile?tab=history" className="text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:underline transition-all group-hover:text-white">Full Registry →</Link>
-           </div>
+            <div className="flex items-center justify-between mb-2 px-4">
+               <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-6 bg-primary rounded-full" />
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">{t("profRecentActivity")}</h2>
+               </div>
+               <Link to="/profile?tab=history" className="text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:underline px-4 py-1.5 border border-primary/20 rounded-full bg-primary/5 transition-all">{t("profSynchronizedLedger")} →</Link>
+            </div>
 
            <div className="grid grid-cols-1 gap-4">
               {isLoading ? (
@@ -222,14 +224,14 @@ export default function Dashboard() {
                  ))
               ) : (history?.lotteries?.length ?? 0) === 0 ? (
                  <div className="bg-slate-900/40 backdrop-blur-xl rounded-[3rem] p-20 text-center border border-white/5 shadow-2xl relative overflow-hidden group">
-                    <History className="h-16 w-16 text-slate-700 mx-auto mb-6" />
-                    <h3 className="text-xl font-black text-white tracking-tighter mb-2 uppercase">No Active Participations</h3>
-                    <p className="text-slate-400 text-sm font-medium mb-8 max-w-xs mx-auto text-center">
-                       You haven't entered any draws in this session. Start your journey by picking your lucky numbers.
-                    </p>
-                    <Link to="/lottery">
-                       <Button className="rounded-full h-14 px-8 font-black uppercase tracking-widest text-xs">Enter a Draw Now</Button>
-                    </Link>
+                     <History className="h-16 w-16 text-slate-700 mx-auto mb-6" />
+                     <h3 className="text-xl font-black text-white tracking-tighter mb-2 uppercase">{t("profNoActiveHistory")}</h3>
+                     <p className="text-slate-400 text-sm font-medium mb-8 max-w-xs mx-auto text-center">
+                        {t("profStartJourney")}
+                     </p>
+                     <Link to="/lottery">
+                        <Button className="rounded-full h-14 px-8 font-black uppercase tracking-widest text-xs">{t("enterLotteryAction")}</Button>
+                     </Link>
                  </div>
               ) : (
                  history?.lotteries?.slice(0, 3).map((l: any) => {
@@ -254,26 +256,25 @@ export default function Dashboard() {
                              <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:bg-primary/5 transition-all text-white font-black text-2xl tabular-nums">
                                 #{l.number.toString().padStart(2, '0')}
                              </div>
-                             <div className="space-y-1.5 text-center sm:text-left">
-                                <p className="text-sm font-black text-white uppercase tracking-tight leading-none group-hover:text-primary transition-colors">Lottery Participation Entry</p>
-                                <div className="flex items-center justify-center sm:justify-start gap-3 opacity-40">
-                                   <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-300">
-                                      <Clock className="h-3.5 w-3.5" /> {new Date(l.date || l.created_at).toLocaleDateString()}
-                                   </div>
-                                   <div className="w-1 h-1 rounded-full bg-slate-700" />
-                                   <div className="text-[10px] font-black uppercase tracking-widest text-primary">ID: {l.id.slice(0,8)}</div>
+                              <div className="space-y-1.5 text-center sm:text-left">
+                                 <p className="text-sm font-black text-white uppercase tracking-tight leading-none group-hover:text-primary transition-colors">{t("profStandardEntry")}</p>
+                                 <div className="flex items-center justify-center sm:justify-start gap-3 opacity-40">
+                                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-300">
+                                       <Clock className="h-3.5 w-3.5" /> {new Date(l.date || l.created_at).toLocaleDateString()}
+                                    </div>
+                                    <div className="w-1 h-1 rounded-full bg-slate-700" />
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-primary">ID: {l.id.slice(0,8)}</div>
                                  </div>
-                             </div>
+                              </div>
                           </div>
-                          
                           <div className={cn(
-                             "px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg min-w-[160px] text-center transition-all",
-                             isConfirmed ? "bg-emerald-500 text-white shadow-emerald-500/20" : 
-                             isPending ? "bg-blue-600 text-white shadow-blue-500/20 animate-pulse" : 
-                             "bg-amber-500 text-white shadow-amber-500/20 hover:scale-105 active:scale-95"
-                          )}>
-                             {isConfirmed ? "Confirmed Entry" : isPending ? "Under Review" : "Awaiting payment"}
-                          </div>
+                              "px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg min-w-[160px] text-center transition-all",
+                              isConfirmed ? "bg-emerald-500 text-white shadow-emerald-500/20" : 
+                              isPending ? "bg-blue-600 text-white shadow-blue-500/20 animate-pulse" : 
+                              "bg-amber-500 text-white shadow-amber-500/20 hover:scale-105 active:scale-95"
+                           )}>
+                              {isConfirmed ? t("profConfirmedEntry") : isPending ? t("payUnderReview") : t("profAwaitingPayment")}
+                           </div>
                        </div>
                     );
                  })

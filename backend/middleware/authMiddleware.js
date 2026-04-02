@@ -36,11 +36,11 @@ const protect = async (req, res, next) => {
         });
       }
 
-      // Session Control: Verify multi-login guard
-      const security = SettingsManager.getSetting('Security', {});
-      const multiLoginEnabled = security.multiLoginEnabled === true;
-      if (!multiLoginEnabled && decoded.sessionToken !== user.session_token) {
-        return res.status(401).json({ message: 'Session expired. You logged in from another device.' });
+      // Mandatory Session Control: Verify active session (strictly tied to this token)
+      if (!decoded.sessionToken || decoded.sessionToken !== user.session_token) {
+        return res.status(401).json({ 
+          message: 'Session invalid or expired. Please log in again for security.' 
+        });
       }
 
       req.user = {

@@ -23,16 +23,24 @@ export default function Lottery() {
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8 pb-20">
         {/* Hero Section */}
-        <div className="text-center mb-20 animate-fade-in-up">
-           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-6 border border-primary/20">
-            <Sparkles className="h-3 w-3" /> {t("lotteryTagline")}
-          </div>
-          <h1 className="text-5xl lg:text-7xl font-black text-foreground tracking-tighter leading-[0.9] mb-6">
-            {t("lotteryTitle")}
-          </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-medium leading-relaxed">
-            {t("lotteryDesc")}
-          </p>
+        <div className="relative text-center mb-24 py-24 rounded-[3rem] overflow-hidden shadow-2xl animate-fade-in-up border" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2a1e 50%, #0a1628 100%)', borderColor: 'rgba(61,240,162,0.12)' }}>
+           <div className="absolute inset-0 z-0 pointer-events-none">
+             <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-48 -mt-48" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.20) 0%, transparent 70%)' }} />
+             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[130px] -ml-48 -mb-48" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.13) 0%, transparent 70%)' }} />
+             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(61,240,162,0.07) 0%, transparent 60%)' }} />
+           </div>
+
+           <div className="relative z-10 flex flex-col items-center">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border" style={{ background: 'rgba(61,240,162,0.12)', borderColor: 'rgba(61,240,162,0.30)', color: '#3df0a2' }}>
+                <Sparkles className="h-3 w-3" /> {t("lotteryTagline")}
+              </div>
+              <h1 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-8 uppercase max-w-4xl" style={{ textShadow: '0 4px 40px rgba(0,0,0,0.4)' }}>
+                {t("lotteryTitle")}
+              </h1>
+              <p className="max-w-2xl mx-auto text-lg font-medium leading-relaxed" style={{ color: 'rgba(190,220,210,0.80)' }}>
+                {t("lotteryDesc")}
+              </p>
+           </div>
         </div>
 
         {/* Dynamic Lottery Card */}
@@ -40,7 +48,7 @@ export default function Lottery() {
           <div className="max-w-4xl mx-auto mb-20 aspect-[21/9] rounded-[2.5rem] bg-muted/30 animate-pulse flex items-center justify-center border border-border/40">
              <div className="flex flex-col items-center gap-3">
                 <Loader2 className="h-10 w-10 animate-spin text-primary/20" />
-                <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-50">Syncing with Live Draw...</p>
+                <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-50">{t("l_syncingDraw")}</p>
              </div>
           </div>
         ) : activeLottery ? (
@@ -53,30 +61,28 @@ export default function Lottery() {
             
             <div className="relative bg-card rounded-[2.5rem] overflow-hidden border border-border/60 shadow-2xl flex flex-col lg:flex-row">
                {/* Media/Prize Section */}
-               <div className="lg:w-2/5 relative bg-primary overflow-hidden min-h-[300px]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
+               <div className="lg:w-2/5 relative bg-slate-900 overflow-hidden min-h-[350px]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900" />
                   
-                  {/* Abstract Decoration */}
-                  <div className="absolute inset-0 opacity-10">
-                     <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl -mr-32 -mt-32" />
-                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full blur-3xl -ml-32 -mb-32" />
-                  </div>
+                  {/* Neon Glow */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl opacity-50" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl opacity-50" />
 
-                  <div className="relative z-10 h-full p-10 flex flex-col justify-between text-primary-foreground">
-                     <div className="space-y-1">
-                        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/10 text-[10px] font-black uppercase tracking-tighter">
-                           <Trophy className="h-3 w-3 text-amber-400 fill-amber-400" /> {t("currentDraw")}
+                  <div className="relative z-10 h-full p-12 flex flex-col justify-between text-white">
+                     <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-[#3df0a2]">
+                           <Trophy className="h-3 w-3 fill-[#3df0a2]" /> {t("currentDraw")}
                         </div>
-                        <h2 className="text-3xl font-black tracking-tighter mt-4 leading-none">{t("grandPrize")}</h2>
+                        <h2 className="text-4xl font-black tracking-tighter mt-6 leading-none uppercase">{t("grandPrize")}</h2>
                      </div>
 
-                     <div className="space-y-4">
-                        <div className="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
-                           <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2">Platform Verified</p>
-                           <p className="text-xl font-bold leading-tight">{activeLottery.prize_text || "Premium Vehicle Experience"}</p>
+                     <div className="space-y-6">
+                        <div className="p-6 rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#3df0a2] mb-3">{t("l_platformVerified")}</p>
+                           <p className="text-2xl font-black leading-tight tracking-tight uppercase">{activeLottery.prize_text || t("l_premiumVehicleExp")}</p>
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-bold text-white/60">
-                           <Shield className="h-4 w-4" /> Secure Blockchain Selection
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                           <Shield className="h-4 w-4 text-emerald-500" /> {t("l_secureBlockchain")}
                         </div>
                      </div>
                   </div>
@@ -88,7 +94,7 @@ export default function Lottery() {
                     <div className="space-y-1.5">
                       <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{t("ticketPrice")}</p>
                       <p className="text-4xl font-black text-foreground tabular-nums tracking-tighter">
-                        {ticketPrice.toLocaleString()} <span className="text-xs text-primary">{currency}</span>
+                        {ticketPrice.toLocaleString()} <span className="text-xs text-[#3df0a2]">{currency}</span>
                       </p>
                     </div>
                     
@@ -124,7 +130,7 @@ export default function Lottery() {
                     </Link>
                     <div className="flex items-center gap-3 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                       Active Now
+                       {t("l_activeNow")}
                     </div>
                   </div>
                </div>
@@ -135,8 +141,8 @@ export default function Lottery() {
              <div className="w-16 h-16 rounded-3xl bg-card border border-border/40 flex items-center justify-center mx-auto mb-6 shadow-sm">
                 <AlertCircle className="h-8 w-8 text-muted-foreground opacity-40" />
              </div>
-             <h2 className="text-2xl font-black tracking-tight mb-2">No Active Sweepstakes</h2>
-             <p className="text-muted-foreground font-medium text-sm max-w-xs mx-auto">We're currently preparing our next grand draw. Please check back soon or follow our Telegram updates.</p>
+             <h2 className="text-2xl font-black tracking-tight mb-2">{t("l_noActiveSweepstakes")}</h2>
+             <p className="text-muted-foreground font-medium text-sm max-w-xs mx-auto">{t("l_preparingNextDraw")}</p>
           </div>
         )}
 

@@ -1,7 +1,7 @@
 export const API_BASE = '/api';
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   
   const headers = {
     'Content-Type': 'application/json',
@@ -18,10 +18,10 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   });
 
   if (response.status === 401) {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
     window.location.href = "/auth/login?expired=true";
-    throw new Error("Session expired. Please log in again.");
+    throw new Error("Session expired or invalid. Please log in again.");
   }
 
   if (response.status === 503) {

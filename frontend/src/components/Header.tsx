@@ -55,12 +55,12 @@ export function Header() {
   }, [isHome]);
 
   const headerBg = isHome && !scrolled
-    ? 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 100%)'
-    : 'hsl(152, 35%, 18%)';
-  const mobileBg = 'rgba(15, 40, 25, 0.97)';
+    ? 'linear-gradient(to bottom, rgba(2, 6, 23, 0.5) 0%, transparent 100%)'
+    : 'rgba(2, 6, 23, 0.85)';
+  const mobileBg = 'rgba(2, 6, 23, 0.98)';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-colors duration-300" style={{ background: headerBg }}>
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 backdrop-blur-md border-b border-white/5" style={{ background: headerBg }}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
         <Link to="/" className="flex items-center gap-2 text-white">
           <Car className="h-7 w-7" />
@@ -197,7 +197,7 @@ export function Header() {
                 onClick={() => setMobileOpen(false)}
               >
                 <Ticket className="h-4 w-4" />
-                My Tickets
+                {t("navTickets")}
               </Link>
             )}
 
@@ -212,7 +212,7 @@ export function Header() {
                 onClick={() => setMobileOpen(false)}
               >
                 <Bell className="h-4 w-4" />
-                Notifications
+                {t("notifications")}
               </Link>
             )}
 

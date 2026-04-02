@@ -2,7 +2,8 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, ShoppingCart, Loader2, Sparkles, AlertCircle, Info, ChevronRight, Hash, Ticket, ShieldCheck, Zap } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { ArrowLeft, Check, ShoppingCart, Loader2, Sparkles, AlertCircle, Info, ChevronRight, Hash, Ticket, ShieldCheck, Zap, Lock as LockIcon } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/hooks/useSettings";
 import { useCurrentLottery, useTakenNumbers, useParticipateLottery, useProfileHistory } from "@/hooks/useLottery";
@@ -17,9 +18,11 @@ export default function LotterySelect() {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [confirmed, setConfirmed] = useState(false);
   const [reservedTickets, setReservedTickets] = useState<any[] | null>(null);
-  const { t } = useLanguage();
-  const { toast } = useToast();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { t } = useLanguage();
+  const isAdminOrStaff = user?.role === 'admin' || user?.role === 'lottery_staff';
 
   const lottery = lotteryData?.lottery;
   const takenNumbers = useMemo(() => new Set(takenNumbersList), [takenNumbersList]);
@@ -74,10 +77,10 @@ export default function LotterySelect() {
             </div>
           </div>
           
-          <h1 className="text-4xl font-black text-foreground tracking-tighter mb-4 uppercase">{t("numbersReserved")}</h1>
+          <h1 className="text-4xl font-black text-foreground tracking-tighter mb-4 uppercase">{t("l_numbersReserved")}</h1>
           <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto font-medium">
-            You've successfully reserved numbers: <span className="text-primary font-black tabular-nums">{[...selected].sort((a,b)=>a-b).join(", ")}</span>. 
-            Finalize your entry by submitting your receipt.
+            {t("l_reservedSuccess")} <span className="text-primary font-black tabular-nums">{[...selected].sort((a,b)=>a-b).join(", ")}</span>. 
+            {t("l_finalizeEntry")}
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-md">
@@ -85,7 +88,7 @@ export default function LotterySelect() {
               {t("goToPayment")} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button variant="outline" size="xl" className="rounded-2xl font-bold h-16 flex-1" onClick={() => navigate("/lottery")}>
-              {t("backToLottery")}
+              {t("l_backToLottery")}
             </Button>
           </div>
           
@@ -107,13 +110,13 @@ export default function LotterySelect() {
               <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                 <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
               </div>
-              {t("backToLottery")}
+              {t("l_backToLottery")}
             </Link>
             
             <div className="flex items-center gap-3">
                <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50">Selection Step</span>
-                  <span className="text-xs font-black text-foreground">Pick your lucky path</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50">{t("l_selectionStep")}</span>
+                  <span className="text-xs font-black text-foreground">{t("l_pickLuckyPath")}</span>
                </div>
                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                   <Zap className="h-5 w-5" />
@@ -135,12 +138,25 @@ export default function LotterySelect() {
             {loadingLottery || loadingTaken ? (
               <div className="min-h-[400px] flex flex-col items-center justify-center gap-6 bg-card/50 rounded-[2.5rem] border border-border/40">
                 <Loader2 className="h-12 w-12 animate-spin text-primary opacity-20" />
-                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Syncing Number Board...</p>
+                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">{t("l_syncingBoard")}</p>
+              </div>
+            ) : isAdminOrStaff ? (
+              <div className="bg-card rounded-[2.5rem] p-16 text-center shadow-xl border border-dashed border-primary/20 relative overflow-hidden">
+                <div className="absolute inset-0 bg-primary/5 blur-3xl opacity-20 pointer-events-none" />
+                <div className="relative z-10 flex flex-col items-center">
+                   <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                      <LockIcon className="h-8 w-8 text-primary" />
+                   </div>
+                   <h2 className="text-2xl font-black text-foreground tracking-tight uppercase mb-2">{t("l_restrictedAccess")}</h2>
+                   <p className="text-muted-foreground font-medium max-w-md mx-auto">
+                     {t("l_managementRestriction")}
+                   </p>
+                </div>
               </div>
             ) : !lottery ? (
               <div className="bg-card rounded-[2.5rem] p-20 text-center shadow-xl border border-dashed border-border/60">
                 <AlertCircle className="h-12 w-12 text-muted-foreground opacity-20 mx-auto mb-4" />
-                <p className="text-lg font-black uppercase tracking-tight text-muted-foreground opacity-50">Board Offline</p>
+                <p className="text-lg font-black uppercase tracking-tight text-muted-foreground opacity-50">{t("l_boardOffline")}</p>
               </div>
             ) : (
               <div className="space-y-10">
@@ -273,11 +289,13 @@ export default function LotterySelect() {
 
                 <Button 
                   className="w-full mt-10 rounded-2xl h-16 text-lg font-black shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95 group/submit" 
-                  disabled={selected.size === 0 || participateMutation.isPending} 
+                  disabled={selected.size === 0 || participateMutation.isPending || isAdminOrStaff} 
                   onClick={handleConfirm}
                 >
                   {participateMutation.isPending ? (
                     <><Loader2 className="h-6 w-6 animate-spin mr-2" /> PROCESSING...</>
+                  ) : isAdminOrStaff ? (
+                    <><LockIcon className="h-5 w-5 mr-2" /> RESTRICTED ROLE</>
                   ) : (
                     <>
                       {t("confirmSelection")}

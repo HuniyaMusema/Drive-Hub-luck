@@ -50,18 +50,22 @@ const registerUser = async (req, res) => {
     const { rows } = await pool.query(
       `INSERT INTO users (name, email, password, role)
        VALUES ($1, $2, $3, 'user')
-       RETURNING id, name, email, role, created_at`,
+       RETURNING id, name, email, role, created_at, language`,
       [name, email, hashedPassword]
     );
 
     const user = rows[0];
+
+    const sessionToken = uuidv4();
+    await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
 
     res.status(201).json({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user.id, user.role, null),
+      language: user.language,
+      token: generateToken(user.id, user.role, sessionToken),
     });
   } catch (error) {
     console.error('[registerUser]', error.message);
@@ -77,7 +81,7 @@ const loginUser = async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      'SELECT id, name, email, password, role, session_token FROM users WHERE email = $1',
+      'SELECT id, name, email, password, role, session_token, language FROM users WHERE email = $1',
       [email]
     );
 
@@ -92,20 +96,16 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const security = SettingsManager.getSetting('Security', {});
-    const multiLoginEnabled = security.multiLoginEnabled === true;
-    let sessionToken = user.session_token;
-
-    if (!multiLoginEnabled || !sessionToken) {
-      sessionToken = uuidv4();
-      await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
-    }
+    // Force fresh session token for every login to ensure strict isolation
+    const sessionToken = uuidv4();
+    await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
 
     res.json({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
+      language: user.language,
       token: generateToken(user.id, user.role, sessionToken, mode),
     });
   } catch (error) {
@@ -191,10 +191,29 @@ const getProfileHistory = async (req, res) => {
   }
 };
 
+// @desc    Update user language
+// @route   PATCH /api/auth/language
+// @access  Private
+const updateUserLanguage = async (req, res) => {
+  const { language } = req.body;
+  if (!language || typeof language !== 'string') {
+    return res.status(400).json({ message: 'Invalid language preference' });
+  }
+
+  try {
+    await pool.query('UPDATE users SET language = $1 WHERE id = $2', [language, req.user.id]);
+    res.status(200).json({ message: 'Language updated successfully', language });
+  } catch (error) {
+    console.error('[updateUserLanguage]', error.message);
+    res.status(500).json({ message: 'Server error updating language' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getMe,
   getProfileHistory,
+  updateUserLanguage,
 };
 

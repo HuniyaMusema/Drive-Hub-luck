@@ -36,7 +36,7 @@ export default function Login() {
       const data = await response.json();
       
       if (response.ok) {
-        localStorage.setItem('token', data.token);
+        sessionStorage.setItem('token', data.token);
         const loggedInUser: User = {
           id: data.id,
           name: data.name,
@@ -44,50 +44,51 @@ export default function Login() {
           role: data.role as any,
         };
         setUser(loggedInUser);
-        toast({ title: `Welcome back, ${data.name}!`, description: "Secure session established." });
+        toast({ title: `${t("authWelcomeBackMsg")}, ${data.name}!`, description: t("authSecureSession") });
         if (loggedInUser.role === "admin" || loggedInUser.role === "lottery_staff") {
           navigate("/admin");
         } else {
           navigate("/dashboard");
         }
       } else {
-        toast({ title: "Access Denied", description: data.message || "Invalid credentials", variant: "destructive" });
+        toast({ title: t("authAccessDenied"), description: data.message || t("authCredentialConflict"), variant: "destructive" });
       }
     } catch (error) {
-      toast({ title: "Network Error", description: "Standard secure connection failed.", variant: "destructive" });
+      toast({ title: t("authNetworkError"), description: t("authConnectionFailed"), variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950">
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
       <Header />
       <div className="flex-1 flex flex-col lg:flex-row mt-16">
         {/* Left Side: Cinematic Visuals */}
-        <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-center justify-center overflow-hidden">
-           <img src={heroBg} alt="Luxury Background" className="absolute inset-0 w-full h-full object-cover opacity-50 scale-105 animate-slow-zoom" />
-           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/20" />
+        <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(160deg, #0a1628 0%, #0d2e22 100%)' }}>
+           <img src={heroBg} alt="Luxury Background" className="absolute inset-0 w-full h-full object-cover opacity-55 scale-105" />
+           <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.90) 0%, rgba(10,22,40,0.40) 50%, rgba(10,22,40,0.15) 100%)' }} />
+           <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-32 -mt-32" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.18) 0%, transparent 70%)' }} />
            
            <div className="relative z-10 p-20 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest mb-8 border border-primary/20 backdrop-blur-xl">
-                 <ShieldCheck className="h-3 w-3" /> Encrypted Access Point
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border backdrop-blur-xl" style={{ background: 'rgba(61,240,162,0.12)', borderColor: 'rgba(61,240,162,0.25)', color: '#3df0a2' }}>
+                 <ShieldCheck className="h-3 w-3" /> {t("authEncryptedAccess")}
               </div>
-              <h2 className="text-6xl font-black text-white tracking-tighter leading-none mb-6">
-                 YOUR PREMIUM <br />
-                 <span className="text-primary underline decoration-primary/20 decoration-4 underline-offset-4">JOURNEY</span> STARTS HERE.
+              <h2 className="text-6xl font-black text-white tracking-tighter leading-none mb-6" style={{ textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}>
+                 {t("authPremiumTitle")} <br />
+                 <span style={{ color: '#3df0a2' }}>{t("authJourneyStarts")}</span>
               </h2>
-              <p className="text-slate-400 text-lg font-medium leading-relaxed mb-12">
-                 Log in to access your curated dashboard, participate in elite sweepstakes, and manage your luxury vehicle interests.
+              <p className="text-lg font-medium leading-relaxed mb-12" style={{ color: 'rgba(190,215,205,0.78)' }}>
+                 {t("authLoginDesc")}
               </p>
               
               <div className="grid grid-cols-2 gap-8">
                  {[
-                   { label: "Vetted Assets", icon: ShieldCheck },
-                   { label: "Fair Play", icon: Sparkles }
+                   { label: t("authVettedAssets"), icon: ShieldCheck },
+                   { label: t("authFairPlay"), icon: Sparkles }
                  ].map((feat, i) => (
                    <div key={i} className="flex flex-col gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-primary">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(61,240,162,0.10)', border: '1px solid rgba(61,240,162,0.20)', color: '#3df0a2' }}>
                          <feat.icon className="h-5 w-5" />
                       </div>
                       <span className="text-[10px] font-black text-white uppercase tracking-widest">{feat.label}</span>
@@ -98,56 +99,58 @@ export default function Login() {
         </div>
 
         {/* Right Side: Elegant Form */}
-        <div className="flex-1 flex items-center justify-center p-8 lg:p-24 relative overflow-hidden bg-slate-950">
-           {/* Decorative Orb */}
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="flex-1 flex items-center justify-center p-8 lg:p-24 relative overflow-hidden" style={{ background: 'rgba(10,18,32,0.96)' }}>
+           {/* Ambient glow */}
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.07) 0%, transparent 70%)' }} />
 
            <div className="w-full max-w-md relative z-10 animate-fade-in-up">
               <div className="text-center mb-12">
-                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6 border border-primary/20 group">
-                    <Lock className="h-8 w-8 text-primary group-hover:rotate-12 transition-transform" />
+                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border group" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)' }}>
+                    <Lock className="h-8 w-8 group-hover:rotate-12 transition-transform" style={{ color: '#3df0a2' }} />
                  </div>
-                 <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">Authenticated Access</h1>
-                 <p className="text-slate-500 font-medium">{t("signInToAccount")}</p>
+                 <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">{t("authAuthenticatedAccess")}</h1>
+                 <p className="font-medium" style={{ color: 'rgba(170,200,190,0.70)' }}>{t("signInToAccount")}</p>
               </div>
 
               <form className="space-y-6" onSubmit={handleSubmit}>
                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{t("email")}</Label>
+                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest ml-1" style={{ color: 'rgba(160,200,185,0.75)' }}>{t("email")}</Label>
                     <div className="relative">
                        <Input 
                           id="email" 
                           type="text" 
                           placeholder="identifier@drivehub.com" 
-                          className="h-14 bg-white/5 border-white/10 text-white rounded-2xl px-12 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-700" 
+                          className="h-14 text-white rounded-2xl px-12 transition-all placeholder:text-slate-600" 
+                          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
                           value={email} 
                           onChange={(e) => setEmail(e.target.value)} 
                           required
                        />
-                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-600" />
+                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: 'rgba(61,240,162,0.50)' }} />
                     </div>
                  </div>
 
                  <div className="space-y-2">
                     <div className="flex items-center justify-between ml-1">
-                       <Label htmlFor="password" className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t("password")}</Label>
-                       <Link to="#" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">{t("forgotPassword")}</Link>
+                       <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(160,200,185,0.75)' }}>{t("password")}</Label>
+                       <Link to="#" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: '#3df0a2' }}>{t("forgotPassword")}</Link>
                     </div>
                     <div className="relative">
                        <Input 
                           id="password" 
                           type={showPassword ? "text" : "password"} 
                           placeholder="••••••••" 
-                          className="h-14 bg-white/5 border-white/10 text-white rounded-2xl px-12 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-700 font-mono" 
+                          className="h-14 text-white rounded-2xl px-12 transition-all placeholder:text-slate-600 font-mono" 
+                          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
                           value={password} 
                           onChange={(e) => setPassword(e.target.value)} 
                           required
                        />
-                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-600" />
+                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: 'rgba(61,240,162,0.50)' }} />
                        <button 
                           type="button" 
                           onClick={() => setShowPassword(!showPassword)} 
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-white transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'rgba(150,180,170,0.60)' }}
                        >
                           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                        </button>
@@ -156,17 +159,18 @@ export default function Login() {
 
                  <Button 
                     type="submit" 
-                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50" 
+                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0" 
+                    style={{ background: '#3df0a2', color: '#0a1628', boxShadow: '0 0 40px rgba(61,240,162,0.30), 0 8px 24px rgba(61,240,162,0.18)' }}
                     disabled={isLoading}
                  >
-                    {isLoading ? "ESTABLISHING SESSION..." : t("signIn")}
+                    {isLoading ? t("authEstablishingSession") : t("signIn")}
                  </Button>
               </form>
 
-              <div className="mt-12 pt-8 border-t border-white/5 text-center">
-                 <p className="text-sm text-slate-500 font-medium">
+              <div className="mt-12 pt-8 border-t text-center" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                 <p className="text-sm font-medium" style={{ color: 'rgba(150,180,170,0.65)' }}>
                     {t("noAccount")}{" "}
-                    <Link to="/auth/register" className="text-primary font-black uppercase tracking-widest text-xs hover:underline ml-2">
+                    <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#3df0a2' }}>
                        {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
                     </Link>
                  </p>

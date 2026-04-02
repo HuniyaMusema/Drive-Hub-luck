@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+﻿import { useState, useMemo } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/hooks/useSettings";
 import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -162,66 +163,66 @@ export default function AdminCars() {
   return (
     <AdminLayout>
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner">
-            <CarIcon className="h-6 w-6 text-primary" strokeWidth={2.5} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center border border-amber-100 shadow-sm">
+            <CarIcon className="h-7 w-7 text-amber-600" strokeWidth={2.5} />
           </div>
           <div>
-            <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-1 border border-primary/20">
-              <Sparkles className="h-2.5 w-2.5" /> inventory control
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-[0.2em] mb-2 border border-amber-100 shadow-sm">
+              <Sparkles className="h-3 w-3" /> {t("inventoryControl") || "INVENTORY CONTROL"}
             </div>
-            <h1 className="text-3xl font-extrabold text-foreground tracking-tight">{t("carManagement")}</h1>
-            <p className="text-sm text-muted-foreground font-medium">{t("addEditRemoveVehicles")}</p>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{t("carManagement")}</h1>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5">{t("addEditRemoveVehicles")}</p>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
-           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
+           <div className="relative w-full sm:w-72">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input 
               placeholder={t("searchByName")} 
-              className="pl-9 rounded-xl bg-muted/30 border-border/60 focus-visible:ring-primary/30 h-10 shadow-sm" 
+              className="w-full pl-11 rounded-2xl bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 h-12 text-slate-900 font-bold placeholder:text-slate-400 transition-all shadow-sm" 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
             />
           </div>
           <Button 
-            className="rounded-2xl h-10 px-6 font-extrabold shadow-xl shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2" 
+            className="rounded-2xl bg-[#3df0a2] text-slate-950 hover:bg-[#34ce8b] h-12 px-8 font-black uppercase text-[10px] tracking-widest border-0 transition-all shadow-xl shadow-[#3df0a2]/15 hover:scale-105 active:scale-95" 
             onClick={openAdd}
           >
-            <Plus className="h-5 w-5" /> 
+            <Plus className="h-5 w-5 mr-2" /> 
             <span>{t("addVehicle")}</span>
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            className="h-10 w-10 min-w-10 rounded-2xl border-border/60 hover:border-primary/30 hover:text-primary transition-all shadow-sm"
+            className="h-12 w-12 min-w-12 rounded-2xl border border-slate-200 bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all shadow-sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
 
       {/* Stats Summary Panel */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
         {[
-          { label: "Total Fleet", value: stats.total, color: "text-foreground", bg: "bg-primary/5", icon: CarIcon },
-          { label: "For Sale", value: stats.forSale, color: "text-blue-600", bg: "bg-blue-500/5", icon: Tag },
-          { label: "For Rent", value: stats.forRent, color: "text-purple-600", bg: "bg-purple-500/5", icon: Calendar },
-          { label: "Available", value: stats.available, color: "text-emerald-600", bg: "bg-emerald-500/5", icon: Layers },
-        ].map(({ label, value, color, bg, icon: Icon }) => (
-          <div key={label} className={`rounded-3xl p-5 border border-border/60 bg-card hover:shadow-lg hover:-translate-y-1 transition-all group overflow-hidden relative shadow-sm`}>
-             <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-5 group-hover:opacity-10 transition-opacity blur-2xl ${bg}`} />
+          { label: t("totalFleet") || "Total Fleet", value: stats.total, color: "text-slate-900", bg: "bg-amber-50", icon: CarIcon, borderColor: "border-slate-100" },
+          { label: t("forSale") || "For Sale", value: stats.forSale, color: "text-amber-600", bg: "bg-amber-50", icon: Tag, borderColor: "border-amber-100" },
+          { label: t("forRent") || "For Rent", value: stats.forRent, color: "text-blue-600", bg: "bg-blue-50", icon: Calendar, borderColor: "border-blue-100" },
+          { label: t("available") || "Available", value: stats.available, color: "text-emerald-600", bg: "bg-emerald-50", icon: Layers, borderColor: "border-emerald-100" },
+        ].map(({ label, value, color, bg, icon: Icon, borderColor }) => (
+          <div key={label} className={`rounded-[2rem] p-6 border ${borderColor} bg-white hover:-translate-y-1 transition-all group overflow-hidden relative shadow-xl shadow-slate-200/50`}>
+             <div className={`absolute -right-4 -top-4 w-28 h-28 rounded-full opacity-0 group-hover:opacity-10 transition-opacity blur-3xl ${bg}`} />
              <div className="flex items-center justify-between relative z-10">
                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase font-extrabold tracking-widest mb-1">{label}</p>
-                  <p className={`text-3xl font-black tabular-nums ${color}`}>{value}</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-2">{label}</p>
+                  <p className={`text-4xl font-black tabular-nums tracking-tighter ${color}`}>{value}</p>
                </div>
-               <div className={`w-12 h-12 rounded-2xl ${bg} flex items-center justify-center`}>
-                  <Icon className={`h-6 w-6 ${color}`} />
+               <div className={`w-14 h-14 rounded-2xl ${bg} flex items-center justify-center border border-slate-50 shadow-sm`}>
+                  <Icon className={`h-7 w-7 ${color}`} />
                </div>
              </div>
           </div>
@@ -229,99 +230,96 @@ export default function AdminCars() {
       </div>
 
       {/* Inventory Grid/Table Section */}
-      <div className="bg-card rounded-3xl shadow-2xl shadow-primary/5 border border-border/60 overflow-hidden mb-12">
+      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden mb-12">
         <div className="overflow-x-auto min-h-[400px]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-muted/30 border-b border-border/60 text-left">
-                <th className="px-6 py-5 font-extrabold uppercase tracking-widest text-[10px] text-muted-foreground">{t("vehicleDetails")}</th>
-                <th className="px-6 py-5 font-extrabold uppercase tracking-widest text-[10px] text-muted-foreground">{t("type")}</th>
-                <th className="px-6 py-5 font-extrabold uppercase tracking-widest text-[10px] text-muted-foreground">{t("priceBirr")}</th>
-                <th className="px-6 py-5 font-extrabold uppercase tracking-widest text-[10px] text-muted-foreground">{t("status")}</th>
-                <th className="px-6 py-5 font-extrabold uppercase tracking-widest text-[10px] text-muted-foreground text-right">{t("actions")}</th>
+              <tr className="bg-slate-50 border-b border-slate-100 text-left">
+                <th className="px-8 py-6 font-black uppercase tracking-[0.2em] text-[10px] text-slate-400">{t("vehicleDetails")}</th>
+                <th className="px-8 py-6 font-black uppercase tracking-[0.2em] text-[10px] text-slate-400">{t("type")}</th>
+                <th className="px-8 py-6 font-black uppercase tracking-[0.2em] text-[10px] text-slate-400">{t("priceBirr")}</th>
+                <th className="px-8 py-6 font-black uppercase tracking-[0.2em] text-[10px] text-slate-400">{t("status")}</th>
+                <th className="px-8 py-6 font-black uppercase tracking-[0.2em] text-[10px] text-slate-400 text-right">{t("actions")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/60">
+            <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                   <td colSpan={5} className="py-32 text-center">
-                    <div className="flex flex-col items-center gap-4">
-                      <Loader2 className="h-12 w-12 animate-spin text-primary/30" />
-                      <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">{t("fetchingInventory") || "Connecting to Inventory..."}</p>
+                   <td colSpan={5} className="py-40 text-center">
+                    <div className="flex flex-col items-center gap-6">
+                      <Loader2 className="h-14 w-14 animate-spin text-amber-500/30" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">{t("fetchingInventory") || "Connecting to Inventory..."}</p>
                     </div>
                   </td>
                 </tr>
               ) : filteredCars.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-24 text-center">
-                     <div className="flex flex-col items-center gap-3 opacity-30">
-                        <CarIcon className="h-16 w-16 mb-2" strokeWidth={1} />
-                        <p className="font-black text-xs uppercase tracking-widest">{t("noVehiclesInventory")}</p>
+                  <td colSpan={5} className="py-32 text-center">
+                     <div className="flex flex-col items-center gap-4 opacity-20">
+                        <CarIcon className="h-20 w-20 mb-2 text-slate-300" strokeWidth={1} />
+                        <p className="font-black text-[10px] uppercase tracking-[0.5em] text-slate-300">{t("noVehiclesInventory")}</p>
                      </div>
                   </td>
                 </tr>
               ) : (
                 filteredCars.map((car) => (
-                  <tr key={car.id} className="hover:bg-primary/[0.02] transition-colors group">
-                    <td className="px-6 py-6">
-                      <div className="flex items-center gap-5">
-                        <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg border border-border/60 bg-muted group-hover:scale-105 transition-transform duration-500">
+                  <tr key={car.id} className="hover:bg-slate-50 transition-all group">
+                    <td className="px-8 py-8">
+                      <div className="flex items-center gap-6">
+                        <div className="relative w-20 h-20 rounded-[1.5rem] overflow-hidden flex-shrink-0 shadow-lg border border-slate-100 bg-slate-50 group-hover:scale-110 transition-transform duration-700">
                           <img 
                             src={car.image} 
                             alt={car.name} 
-                            className="w-full h-full object-cover" 
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1549317661-bd32c0e5a809";
                             }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-                             <span className="text-[8px] text-white font-bold uppercase tracking-tighter">View Media</span>
-                          </div>
                         </div>
                         <div>
-                          <p className="font-extrabold text-foreground text-base group-hover:text-primary transition-colors leading-tight">{car.name}</p>
-                          <div className="flex items-center gap-2 mt-1.5 font-bold">
-                             <div className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-md border border-border/40">
-                                <Calendar className="h-2.5 w-2.5" /> {car.year}
+                          <p className="font-black text-slate-900 text-lg group-hover:text-amber-600 transition-colors leading-none mb-2">{car.name}</p>
+                          <div className="flex items-center gap-2 mt-1.5 font-black">
+                             <div className="flex items-center gap-1.5 text-[9px] text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+                                <Calendar className="h-3 w-3" /> {car.year}
                              </div>
-                             <div className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-md border border-border/40 uppercase tracking-tighter">
-                                <Fuel className="h-2.5 w-2.5" /> {car.fuel || "Gas"}
+                             <div className="flex items-center gap-1.5 text-[9px] text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 uppercase tracking-[0.1em]">
+                                <Fuel className="h-3 w-3" /> {car.fuel || "Gas"}
                              </div>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-6">
-                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm transition-all ${
+                    <td className="px-8 py-8">
+                      <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full border shadow-sm transition-all ${
                         car.type === "sale" 
-                          ? "bg-primary/10 text-primary border-primary/20" 
-                          : "bg-purple-500/10 text-purple-600 border-purple-500/20"
+                          ? "bg-amber-50 text-amber-600 border-amber-100" 
+                          : "bg-blue-50 text-blue-600 border-blue-100"
                       }`}>
                         {car.type === "sale" ? t("sale") : t("rental")}
                       </span>
                     </td>
-                    <td className="px-6 py-6 font-black tabular-nums text-foreground text-lg tracking-tight">
-                       {Number(car.price).toLocaleString()} <span className="text-[10px] text-muted-foreground font-extrabold uppercase">{settings?.General?.defaultCurrency || 'ETB'}</span>
+                    <td className="px-8 py-8 font-black tabular-nums text-slate-900 text-xl tracking-tighter">
+                       {Number(car.price).toLocaleString()} <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest ml-1">{settings?.General?.defaultCurrency || 'ETB'}</span>
                     </td>
-                    <td className="px-6 py-6">
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm transition-all ${
+                    <td className="px-8 py-8">
+                      <span className={`inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full border shadow-sm transition-all ${
                         car.available 
-                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" 
-                          : "bg-destructive/10 text-destructive border-destructive/20"
+                          ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                          : "bg-red-50 text-red-600 border-red-100"
                       }`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${car.available ? "bg-emerald-500 animate-pulse" : "bg-destructive"}`} />
+                        <div className={`w-2 h-2 rounded-full ${car.available ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" : "bg-red-500"}`} />
                         {car.available ? t("available") : t("unavailable")}
                       </span>
                     </td>
-                    <td className="px-6 py-6 text-right">
-                      <div className="flex justify-end items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-8 py-8 text-right">
+                      <div className="flex justify-end items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-10 w-10 rounded-2xl bg-card border border-border/60 hover:border-primary/40 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all shadow-sm" 
+                          className="h-12 w-12 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all shadow-sm" 
                           onClick={() => openEdit(car)}
                         >
-                          <Pencil className="h-4.5 w-4.5" />
+                          <Pencil className="h-5 w-5" />
                         </Button>
                         
                         <AlertDialog>
@@ -329,28 +327,28 @@ export default function AdminCars() {
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-10 w-10 rounded-2xl bg-card border border-border/60 hover:border-destructive/40 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all shadow-sm"
+                              className="h-12 w-12 rounded-2xl bg-white border border-slate-200 hover:border-red-400 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all shadow-sm"
                             >
-                              <Trash2 className="h-4.5 w-4.5" />
+                              <Trash2 className="h-5 w-5" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent className="rounded-3xl border-border/60 p-8 shadow-2xl">
+                          <AlertDialogContent className="rounded-[2.5rem] border-slate-100 bg-white shadow-xl p-10 overflow-hidden relative">
                             <AlertDialogHeader>
-                              <div className="w-16 h-16 rounded-3xl bg-destructive/10 flex items-center justify-center text-destructive mb-4">
-                                <AlertTriangle className="h-8 w-8" strokeWidth={2.5} />
+                              <div className="w-20 h-20 rounded-3xl bg-red-50 flex items-center justify-center text-red-600 mb-6 border border-red-100 shadow-sm">
+                                <AlertTriangle className="h-10 w-10" strokeWidth={2.5} />
                               </div>
-                              <AlertDialogTitle className="text-2xl font-black tracking-tight flex items-center gap-2">
+                              <AlertDialogTitle className="text-3xl font-black tracking-tighter text-slate-900 uppercase leading-none">
                                 {t("confirmDeletion")}
                               </AlertDialogTitle>
-                              <AlertDialogDescription className="text-muted-foreground font-medium text-base">
-                                {t("areYouSureDeleteCar")} This vehicle will be permanently removed from the public listings.
+                              <AlertDialogDescription className="text-slate-500 font-bold text-sm tracking-wide mt-4">
+                                {t("areYouSureDeleteCar")} This vehicle will be permanently removed from the public listings. This action cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter className="mt-8 gap-3">
-                              <AlertDialogCancel className="rounded-2xl h-12 px-6 font-bold flex-1">{t("cancel")}</AlertDialogCancel>
+                            <AlertDialogFooter className="mt-10 gap-4">
+                              <AlertDialogCancel className="rounded-2xl h-14 px-8 font-black border-slate-200 bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-50 flex-1 uppercase tracking-widest text-[10px] transition-all">{t("cancel")}</AlertDialogCancel>
                               <AlertDialogAction 
                                 onClick={() => handleDelete(car.id)} 
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-2xl h-12 px-8 font-black flex-1 shadow-xl shadow-destructive/20"
+                                className="bg-red-500 text-white hover:bg-red-600 rounded-2xl h-14 px-10 font-black flex-1 shadow-lg shadow-red-500/20 uppercase tracking-[0.2em] text-[10px] border-0 transition-all hover:scale-105 active:scale-95"
                               >
                                 {t("deleteCar")}
                               </AlertDialogAction>
@@ -365,66 +363,65 @@ export default function AdminCars() {
             </tbody>
           </table>
         </div>
-        <div className="bg-muted/20 px-6 py-4 border-t border-border/60 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+        <div className="bg-slate-50 px-8 py-5 border-t border-slate-100 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
            <span>Showing {filteredCars.length} of {carsData.length} records</span>
-           <span className="flex items-center gap-1"><Info className="h-3 w-3" /> system synchronized</span>
+           <span className="flex items-center gap-2 text-amber-500/50"><Info className="h-3.5 w-3.5" /> system synchronized</span>
         </div>
       </div>
 
       {/* Car Editor Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-3xl rounded-[2.5rem] border-border/60 p-0 overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
-          <div className="bg-primary/5 p-8 border-b border-border/40 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner">
-                  {editingCar ? <Settings2 className="h-6 w-6 text-primary" strokeWidth={2.5} /> : <Plus className="h-6 w-6 text-primary" strokeWidth={2.5} />}
+        <DialogContent className="max-w-4xl rounded-[3rem] border-slate-100 bg-white p-0 overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+          <div className="bg-slate-50 p-10 border-b border-slate-100 flex items-center justify-between relative overflow-hidden">
+            <div className="flex items-center gap-6 relative z-10">
+               <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center shadow-sm border border-amber-100">
+                  {editingCar ? <Settings2 className="h-8 w-8 text-amber-600" strokeWidth={2.5} /> : <Plus className="h-8 w-8 text-amber-600" strokeWidth={2.5} />}
                </div>
                <div>
-                  <h2 className="text-xl font-black text-foreground tracking-tight">{editingCar ? t("editVehicleDetails") : t("addNewVehicle")}</h2>
-                  <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mt-0.5">Configuration Panel v2.0</p>
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{editingCar ? t("editVehicleDetails") : t("addNewVehicle")}</h2>
+                  <p className="text-[10px] uppercase font-black tracking-[0.3em] text-slate-400 mt-2">Vehicle Configuration Module v3.0</p>
                </div>
             </div>
-            <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 text-muted-foreground" onClick={() => setIsOpen(false)}><X className="h-5 w-5" /></Button>
+            <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12 bg-white border border-slate-200 text-slate-400 hover:text-slate-900 transition-all" onClick={() => setIsOpen(false)}><X className="h-6 w-6" /></Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-10 custom-scrollbar space-y-10 group/form">
+          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-12 custom-scrollbar-amber space-y-12 group/form">
             {/* Visual Section */}
-            <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 mb-2">
-                <ImageIcon className="h-3 w-3" /> {t("vehicleShowcaseImage")}
+            <div className="space-y-6">
+              <Label className="text-[11px] font-black uppercase tracking-[0.4em] text-amber-600 flex items-center gap-3 mb-4">
+                <ImageIcon className="h-4 w-4" /> {t("vehicleShowcaseImage")}
               </Label>
               <div className="flex flex-col gap-4">
                 {imagePreview ? (
-                  <div className="relative group w-full aspect-[21/9] rounded-[2rem] overflow-hidden border border-border/40 bg-muted shadow-2xl shadow-primary/5">
+                  <div className="relative group w-full aspect-[21/9] rounded-[2.5rem] overflow-hidden border border-slate-200 bg-slate-50 shadow-sm">
                     <img 
                       src={imagePreview} 
                       alt="Preview" 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1549317661-bd32c0e5a809";
                       }}
                     />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
-                      <Label htmlFor="image-upload" className="cursor-pointer bg-white text-black px-6 py-2.5 rounded-2xl text-xs font-black flex items-center gap-2 transition-all hover:scale-110 active:scale-95 shadow-xl">
+                    <div className="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center gap-6 backdrop-blur-[2px]">
+                      <Label htmlFor="image-upload" className="cursor-pointer bg-amber-500 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all hover:scale-110 active:scale-95 shadow-lg">
                         <Upload className="h-4 w-4" /> {t("changeImage") || "UPDATE IMAGE"}
                       </Label>
-                      <Button type="button" variant="ghost" className="bg-red-500/20 hover:bg-red-500 text-white rounded-2xl h-11 w-11 shadow-xl" onClick={() => { setImageFile(null); setImagePreview(""); setFormData({...formData, image: ""}); }}>
-                        <X className="h-5 w-5" />
+                      <Button type="button" variant="ghost" className="bg-red-500 text-white rounded-2xl h-14 w-14 shadow-lg transition-all" onClick={() => { setImageFile(null); setImagePreview(""); setFormData({...formData, image: ""}); }}>
+                        <X className="h-6 w-6" />
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <Label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full aspect-[21/9] rounded-[2rem] border-2 border-dashed border-border/60 bg-muted/30 hover:bg-primary/5 hover:border-primary/40 transition-all cursor-pointer relative overflow-hidden group">
-                    <div className="flex flex-col items-center gap-3 text-muted-foreground group-hover:text-primary transition-all relative z-10 py-6">
-                      <div className="w-16 h-16 rounded-3xl bg-background flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-                        <Upload className="h-6 w-6" strokeWidth={2.5} />
+                  <Label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full aspect-[21/9] rounded-[3rem] border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-amber-50 hover:border-amber-200 transition-all cursor-pointer relative overflow-hidden group/upload">
+                    <div className="flex flex-col items-center gap-4 text-slate-400 group-hover/upload:text-amber-600 transition-all relative z-10 py-10">
+                      <div className="w-20 h-20 rounded-[2rem] bg-white flex items-center justify-center shadow-sm group-hover/upload:scale-110 group-hover/upload:-rotate-6 transition-all border border-slate-100">
+                        <Upload className="h-8 w-8" strokeWidth={2.5} />
                       </div>
                       <div className="text-center">
-                         <span className="text-xs font-black uppercase tracking-widest block">{t("clickToUploadImage")}</span>
-                         <p className="text-[10px] font-bold mt-1 opacity-60">High-resolution PNG / WEBP recommended</p>
+                         <span className="text-[11px] font-black uppercase tracking-[0.3em] block mb-2">{t("clickToUploadImage")}</span>
+                         <p className="text-[10px] font-black text-slate-400 tracking-widest uppercase">High-resolution PNG / WEBP recommended</p>
                       </div>
                     </div>
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Label>
                 )}
                 <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -432,29 +429,29 @@ export default function AdminCars() {
             </div>
 
             {/* Core Data Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-               <div className="space-y-8">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-1"><CarIcon className="h-3 w-3" /> {t("make")} & {t("model")}</Label>
-                    <div className="flex gap-3">
-                       <Input required value={formData.make} onChange={e => setFormData({...formData, make: e.target.value})} placeholder="Toyota" className="h-12 rounded-2xl font-bold bg-muted/40 border-border/40" />
-                       <Input required value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})} placeholder="Camry SE" className="h-12 rounded-2xl font-bold bg-muted/40 border-border/40" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+               <div className="space-y-10">
+                  <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3 mb-2"><CarIcon className="h-4 w-4" /> {t("make")} & {t("model")}</Label>
+                    <div className="flex gap-4">
+                       <Input required value={formData.make} onChange={e => setFormData({...formData, make: e.target.value})} placeholder="Toyota" className="h-14 rounded-2xl font-black bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-amber-500/20 shadow-sm" />
+                       <Input required value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})} placeholder="Camry SE" className="h-14 rounded-2xl font-black bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-amber-500/20 shadow-sm" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1 block"><Calendar className="h-3 w-3 inline mr-1" /> {t("year")}</Label>
-                        <Input type="number" required value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} placeholder="2024" className="h-11 rounded-xl bg-muted/20 border-border/40 font-black tabular-nums" />
+                  <div className="grid grid-cols-2 gap-6">
+                     <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 block"><Calendar className="h-4 w-4 inline mr-2" /> {t("year")}</Label>
+                        <Input type="number" required value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} placeholder="2024" className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black tabular-nums text-slate-900" />
                      </div>
-                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1 block"><MapPin className="h-3 w-3 inline mr-1" /> {t("location")}</Label>
-                        <Input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} placeholder="Addis Ababa" className="h-11 rounded-xl bg-muted/20 border-border/40 font-bold" />
+                     <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 block"><MapPin className="h-4 w-4 inline mr-2" /> {t("location")}</Label>
+                        <Input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} placeholder="Addis Ababa" className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black text-slate-900" />
                      </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-primary mb-1 flex items-center gap-1"><Tag className="h-3 w-3" /> {t("price")} & {t("dealType")}</Label>
+                  <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-600 mb-2 flex items-center gap-3"><Tag className="h-4 w-4" /> {t("price")} & {t("dealType")}</Label>
                     <div className="flex gap-4">
                        <div className="relative flex-1">
                           <Input 
@@ -464,15 +461,15 @@ export default function AdminCars() {
                               const raw = e.target.value.replace(/[^0-9]/g, "");
                               setFormData({...formData, price: raw ? Number(raw).toLocaleString() : ""});
                             }} 
-                            placeholder="Price" className="h-14 rounded-2xl font-black text-2xl text-primary bg-primary/5 border-primary/20 pl-8 pr-12 focus-visible:ring-primary/20" 
+                            placeholder="Price" className="h-16 rounded-2xl font-black text-3xl text-amber-600 bg-amber-50 border-amber-200 pl-10 pr-16 focus-visible:ring-amber-500/20 shadow-sm" 
                           />
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-black text-primary/40">$</span>
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary/40 uppercase tracking-tighter">{settings?.General?.defaultCurrency || 'ETB'}</span>
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-amber-600/40 tabular-nums"></span>
+                          <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-600/40 uppercase tracking-tighter tabular-nums">{settings?.General?.defaultCurrency || 'ETB'}</span>
                        </div>
-                       <div className="w-[120px]">
+                       <div className="w-[140px]">
                           <Select value={formData.type} onValueChange={v => setFormData({...formData, type: v})}>
-                            <SelectTrigger className="h-14 rounded-2xl bg-card border-border/60 font-black text-xs uppercase tracking-widest shadow-sm"><SelectValue /></SelectTrigger>
-                            <SelectContent className="rounded-2xl border-border/60 shadow-2xl">
+                            <SelectTrigger className="h-16 rounded-2xl bg-white border-slate-200 font-black text-xs uppercase tracking-[0.2em] shadow-sm text-slate-900"><SelectValue /></SelectTrigger>
+                            <SelectContent className="rounded-2xl border-slate-200 bg-white text-slate-900 shadow-xl">
                               <SelectItem value="sale">{t("sale")}</SelectItem>
                               <SelectItem value="rent">{t("rent")}</SelectItem>
                             </SelectContent>
@@ -482,36 +479,36 @@ export default function AdminCars() {
                   </div>
                </div>
 
-               <div className="space-y-8">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-1"><Layers className="h-3 w-3" /> {t("specifications")}</Label>
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-1.5">
-                          <p className="text-[9px] font-black text-muted-foreground/60 uppercase ml-1">Mileage</p>
-                          <Input value={formData.mileage} onChange={e => setFormData({...formData, mileage: e.target.value})} placeholder="0 km" className="h-10 rounded-xl bg-muted/10" />
+                <div className="space-y-10">
+                  <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3 mb-2"><Layers className="h-4 w-4" /> {t("specifications")}</Label>
+                    <div className="grid grid-cols-2 gap-6">
+                       <div className="space-y-2">
+                          <p className="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest leading-none">Mileage</p>
+                          <Input value={formData.mileage} onChange={e => setFormData({...formData, mileage: e.target.value})} placeholder="0 km" className="h-11 rounded-2xl bg-slate-50 border-slate-200 text-slate-900" />
                        </div>
-                       <div className="space-y-1.5">
-                          <p className="text-[9px] font-black text-muted-foreground/60 uppercase ml-1">Seats</p>
-                          <Input type="number" value={formData.seats} onChange={e => setFormData({...formData, seats: e.target.value})} placeholder="5" className="h-10 rounded-xl bg-muted/10 font-black" />
+                       <div className="space-y-2">
+                          <p className="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest leading-none">Seats</p>
+                          <Input type="number" value={formData.seats} onChange={e => setFormData({...formData, seats: e.target.value})} placeholder="5" className="h-11 rounded-2xl bg-slate-50 border-slate-200 text-slate-900 font-black" />
                        </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Fuel System</Label>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 block">Fuel System</Label>
                       <Select value={formData.fuel} onValueChange={v => setFormData({...formData, fuel: v})}>
-                        <SelectTrigger className="h-11 rounded-xl bg-muted/10 border-border/60 font-bold"><SelectValue /></SelectTrigger>
-                        <SelectContent className="rounded-2xl">
+                        <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black text-slate-900 px-6"><SelectValue /></SelectTrigger>
+                        <SelectContent className="rounded-2xl bg-white border-slate-200 text-slate-900 shadow-xl">
                            {["Gasoline", "Diesel", "Electric", "Hybrid"].map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Gearbox</Label>
+                    <div className="space-y-4">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2 block">Gearbox</Label>
                       <Select value={formData.transmission} onValueChange={v => setFormData({...formData, transmission: v})}>
-                        <SelectTrigger className="h-11 rounded-xl bg-muted/10 border-border/60 font-bold"><SelectValue /></SelectTrigger>
-                        <SelectContent className="rounded-2xl">
+                        <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black text-slate-900 px-6"><SelectValue /></SelectTrigger>
+                        <SelectContent className="rounded-2xl bg-white border-slate-200 text-slate-900 shadow-xl">
                           <SelectItem value="Automatic">Auto</SelectItem>
                           <SelectItem value="Manual">Manual</SelectItem>
                         </SelectContent>
@@ -519,11 +516,11 @@ export default function AdminCars() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-1"><Info className="h-3 w-3" /> {t("availability")}</Label>
+                  <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3 mb-2"><Info className="h-4 w-4" /> {t("availability")}</Label>
                     <Select value={formData.status} onValueChange={v => setFormData({...formData, status: v})}>
-                      <SelectTrigger className="h-11 rounded-xl border-border/60 font-black text-xs uppercase tracking-widest bg-card"><SelectValue /></SelectTrigger>
-                      <SelectContent className="rounded-2xl">
+                      <SelectTrigger className="h-14 rounded-2xl border-slate-200 font-black text-[10px] uppercase tracking-[0.2em] bg-slate-50 text-slate-900 px-8"><SelectValue /></SelectTrigger>
+                      <SelectContent className="rounded-2xl bg-white border-slate-200 text-slate-900 shadow-xl">
                         <SelectItem value="available">MARK AS AVAILABLE</SelectItem>
                         <SelectItem value="unavailable">MARK AS SOLD / RENTED</SelectItem>
                       </SelectContent>
@@ -532,26 +529,24 @@ export default function AdminCars() {
                </div>
             </div>
 
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-1"><Info className="h-3 w-3" /> {t("vehicleDescription")}</Label>
-              <Textarea 
-                value={formData.description} 
-                onChange={e => setFormData({...formData, description: e.target.value})} 
-                placeholder="List technical highlights, condition, service history and other unique selling points..." 
-                className="min-h-[160px] rounded-[2rem] border-border/60 bg-muted/5 p-6 text-sm font-medium focus:ring-primary/20 resize-none leading-relaxed shadow-inner" 
-              />
+            <div className="space-y-6">
+              <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3 mb-2"><Info className="h-4 w-4" /> {t("vehicleDescription")}</Label>
+              <div className="relative group/text">
+                <Textarea 
+                  value={formData.description} 
+                  onChange={e => setFormData({...formData, description: e.target.value})} 
+                  placeholder="List technical highlights, condition, service history and other unique selling points..." 
+                  className="min-h-[180px] rounded-[2.5rem] border-slate-200 bg-slate-50 p-8 text-sm font-bold text-slate-900 focus:ring-amber-500/20 resize-none leading-relaxed shadow-sm transition-all" 
+                />
+              </div>
             </div>
           </form>
 
-          <footer className="p-8 border-t border-border/40 bg-card flex justify-between items-center">
-             <div className="flex -space-x-2">
-                {[1, 2, 3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-card bg-primary/20 flex items-center justify-center text-[8px] font-black">AI</div>)}
-                <div className="w-14 h-8 rounded-full bg-muted border-2 border-card flex items-center justify-center text-[8px] font-black text-muted-foreground ml-3 shadow-inner">+99 INVENTORY</div>
-             </div>
-             <div className="flex gap-4">
-                <Button variant="ghost" onClick={() => setIsOpen(false)} className="h-12 px-8 rounded-2xl font-bold hover:bg-muted/50">{t("cancel")}</Button>
-                <Button onClick={handleSubmit} disabled={isPending} className="h-12 px-10 rounded-2xl font-black shadow-2xl shadow-primary/30 transition-all hover:scale-[1.03] active:scale-95">
-                  {isPending ? <><Loader2 className="h-5 w-5 animate-spin mr-2" /> PROCESSING…</> : (editingCar ? t("updateVehicle") : t("addVehicle"))}
+          <footer className="p-10 border-t border-slate-100 bg-slate-50 flex justify-end items-center">
+             <div className="flex gap-6">
+                <Button variant="ghost" onClick={() => setIsOpen(false)} className="h-14 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-slate-900 hover:bg-white transition-all">{t("cancel")}</Button>
+                <Button onClick={handleSubmit} disabled={isPending} className="h-14 px-12 rounded-2xl bg-amber-500 text-white font-black uppercase text-[10px] tracking-widest shadow-xl shadow-[#3df0a2]/15 transition-all hover:scale-[1.05] active:scale-95 border-0">
+                  {isPending ? <><Loader2 className="h-5 w-5 animate-spin mr-3" /> PROCESSINGâ€¦</> : (editingCar ? t("updateVehicle") : t("addVehicle"))}
                 </Button>
              </div>
           </footer>
@@ -560,3 +555,4 @@ export default function AdminCars() {
     </AdminLayout>
   );
 }
+

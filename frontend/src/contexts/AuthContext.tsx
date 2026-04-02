@@ -5,25 +5,22 @@ import type { User, UserRole, AuthContextType } from "@/types/auth";
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Always start unauthenticated on fresh app load — no auto-restore from localStorage.
-  // The JWT token is kept in localStorage only for API calls made during the active session.
-  const [user, setUser] = useState<User | null>(null);
+  // Always start unauthenticated on fresh app load — no auto-restore from persistent storage.
+  // The JWT token is kept in sessionStorage only for API calls made during the active tab session.
+  // Start authenticated if the user exists in sessionStorage for this tab
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = sessionStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const queryClient = useQueryClient();
 
-  // Clear any stale saved user from a previous session on initial mount
-  React.useEffect(() => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   React.useEffect(() => {
     if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
+      sessionStorage.setItem("user", JSON.stringify(user));
     } else {
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+      sessionStorage.removeItem("token");
     }
     queryClient.clear();
   }, [user, queryClient]);

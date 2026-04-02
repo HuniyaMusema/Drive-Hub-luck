@@ -21,8 +21,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Notifications() {
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -111,12 +113,12 @@ export default function Notifications() {
             <div className="p-2 bg-primary/10 rounded-lg">
               <Bell className="h-6 w-6 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t("notifications")}</h1>
           </div>
           {notifications.some(n => !n.is_read) && (
             <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
               <CheckCheck className="h-4 w-4 mr-2" />
-              Mark all as read
+              {t("notifMarkAllAsRead")}
             </Button>
           )}
         </div>
@@ -124,15 +126,15 @@ export default function Notifications() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p className="text-muted-foreground">Loading notifications...</p>
+            <p className="text-muted-foreground">{t("notifLoading")}</p>
           </div>
         ) : notifications.length === 0 ? (
           <div className="bg-card rounded-xl border border-dashed p-12 text-center">
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
               <Bell className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-1">No notifications yet</h3>
-            <p className="text-muted-foreground">When you have updates, they'll appear here.</p>
+            <h3 className="text-lg font-medium text-foreground mb-1">{t("notifNoNotificationsYet")}</h3>
+            <p className="text-muted-foreground">{t("notifWhenUpdatesAppear")}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -170,7 +172,7 @@ export default function Notifications() {
                           onClick={() => handleMarkAsRead(notification.id)}
                           className="text-xs font-medium text-primary hover:underline"
                         >
-                          Mark as read
+                          {t("notifMarkAsRead")}
                         </button>
                       )}
                       <button 
@@ -178,7 +180,7 @@ export default function Notifications() {
                         className="text-xs font-medium text-muted-foreground hover:text-destructive flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <Trash2 className="h-3 w-3" />
-                        Delete
+                        {t("notifDelete")}
                       </button>
                     </div>
                   </div>
