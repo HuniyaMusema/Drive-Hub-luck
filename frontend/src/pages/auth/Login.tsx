@@ -99,7 +99,7 @@ export default function Login() {
         </div>
 
         {/* Right Side: Elegant Form */}
-        <div className="flex-1 flex items-center justify-center p-8 lg:p-24 relative overflow-hidden" style={{ background: 'rgba(10,18,32,0.96)' }}>
+        <div className="flex-1 flex items-center justify-center p-8 lg:p-24 relative overflow-hidden bg-white">
            {/* Ambient glow */}
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.07) 0%, transparent 70%)' }} />
 
@@ -108,49 +108,47 @@ export default function Login() {
                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border group" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)' }}>
                     <Lock className="h-8 w-8 group-hover:rotate-12 transition-transform" style={{ color: '#3df0a2' }} />
                  </div>
-                 <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">{t("authAuthenticatedAccess")}</h1>
-                 <p className="font-medium" style={{ color: 'rgba(170,200,190,0.70)' }}>{t("signInToAccount")}</p>
+                 <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mb-2">{t("authAuthenticatedAccess")}</h1>
+                 <p className="font-medium text-slate-500">{t("signInToAccount")}</p>
               </div>
 
               <form className="space-y-6" onSubmit={handleSubmit}>
                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest ml-1" style={{ color: 'rgba(160,200,185,0.75)' }}>{t("email")}</Label>
+                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest ml-1 text-slate-600">{t("email")}</Label>
                     <div className="relative">
                        <Input 
                           id="email" 
                           type="text" 
                           placeholder="identifier@drivehub.com" 
-                          className="h-14 text-white rounded-2xl px-12 transition-all placeholder:text-slate-600" 
-                          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
                           value={email} 
                           onChange={(e) => setEmail(e.target.value)} 
                           required
                        />
-                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: 'rgba(61,240,162,0.50)' }} />
+                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: 'rgba(61,240,162,0.80)' }} />
                     </div>
                  </div>
 
                  <div className="space-y-2">
                     <div className="flex items-center justify-between ml-1">
-                       <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(160,200,185,0.75)' }}>{t("password")}</Label>
-                       <Link to="#" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: '#3df0a2' }}>{t("forgotPassword")}</Link>
+                       <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-slate-600">{t("password")}</Label>
+                       <Link to="#" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: '#0d2e22' }}>{t("forgotPassword")}</Link>
                     </div>
                     <div className="relative">
                        <Input 
                           id="password" 
                           type={showPassword ? "text" : "password"} 
                           placeholder="••••••••" 
-                          className="h-14 text-white rounded-2xl px-12 transition-all placeholder:text-slate-600 font-mono" 
-                          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200 font-mono" 
                           value={password} 
                           onChange={(e) => setPassword(e.target.value)} 
                           required
                        />
-                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: 'rgba(61,240,162,0.50)' }} />
+                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: 'rgba(61,240,162,0.80)' }} />
                        <button 
                           type="button" 
                           onClick={() => setShowPassword(!showPassword)} 
-                          className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'rgba(150,180,170,0.60)' }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors text-slate-400 hover:text-slate-600"
                        >
                           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                        </button>
@@ -159,18 +157,18 @@ export default function Login() {
 
                  <Button 
                     type="submit" 
-                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0" 
-                    style={{ background: '#3df0a2', color: '#0a1628', boxShadow: '0 0 40px rgba(61,240,162,0.30), 0 8px 24px rgba(61,240,162,0.18)' }}
+                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0 shadow-lg text-white" 
+                    style={{ background: '#0d2e22' }}
                     disabled={isLoading}
                  >
                     {isLoading ? t("authEstablishingSession") : t("signIn")}
                  </Button>
               </form>
 
-              <div className="mt-12 pt-8 border-t text-center" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                 <p className="text-sm font-medium" style={{ color: 'rgba(150,180,170,0.65)' }}>
+              <div className="mt-12 pt-8 border-t border-slate-200 text-center">
+                 <p className="text-sm font-medium text-slate-500">
                     {t("noAccount")}{" "}
-                    <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#3df0a2' }}>
+                    <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#0d2e22' }}>
                        {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
                     </Link>
                  </p>
