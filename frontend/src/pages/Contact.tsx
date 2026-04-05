@@ -30,7 +30,7 @@ export default function Contact() {
             <div className="space-y-4">
               {/* Phone */}
               <a
-                href={`tel:${(settings?.General?.contactPhone || "+251911234567").replace(/\s/g, "")}`}
+                href={`tel:${(settings?.General?.contactPhone || "+251911701849").replace(/\s/g, "")}`}
                 className="flex items-start gap-4 bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group"
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -38,7 +38,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-card-foreground mb-1">{t("phoneLabel")}</h3>
-                  <p className="text-primary font-medium">{settings?.General?.contactPhone || "+251 911 234 567"}</p>
+                  <p className="text-primary font-medium">{settings?.General?.contactPhone || "+251 911 701 849"}</p>
                   <p className="text-xs text-muted-foreground mt-1">{t("phoneTap")}</p>
                 </div>
               </a>
