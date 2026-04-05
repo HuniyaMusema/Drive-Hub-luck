@@ -23,15 +23,15 @@ export default function Lottery() {
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8 pb-20">
         {/* Hero Section */}
-        <div className="relative text-center mb-24 py-24 rounded-[3rem] overflow-hidden shadow-2xl animate-fade-in-up border" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2a1e 50%, #0a1628 100%)', borderColor: 'rgba(61,240,162,0.12)' }}>
+        <div className="relative text-center mb-24 py-24 rounded-[3rem] overflow-hidden shadow-2xl animate-fade-in-up border" style={{ background: 'linear-gradient(135deg, #071018 0%, #0a1929 50%, #071018 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
            <div className="absolute inset-0 z-0 pointer-events-none">
-             <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-48 -mt-48" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.20) 0%, transparent 70%)' }} />
-             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[130px] -ml-48 -mb-48" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.13) 0%, transparent 70%)' }} />
-             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(61,240,162,0.07) 0%, transparent 60%)' }} />
+             <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-48 -mt-48" style={{ background: 'radial-gradient(circle, rgba(76,191,191,0.18) 0%, transparent 70%)' }} />
+             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[130px] -ml-48 -mb-48" style={{ background: 'radial-gradient(circle, rgba(61,143,181,0.14) 0%, transparent 70%)' }} />
+             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(76,191,191,0.06) 0%, transparent 60%)' }} />
            </div>
 
            <div className="relative z-10 flex flex-col items-center">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border" style={{ background: 'rgba(61,240,162,0.12)', borderColor: 'rgba(61,240,162,0.30)', color: '#3df0a2' }}>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border" style={{ background: 'rgba(76,191,191,0.10)', borderColor: 'rgba(76,191,191,0.30)', color: '#4CBFBF' }}>
                 <Sparkles className="h-3 w-3" /> {t("lotteryTagline")}
               </div>
               <h1 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-8 uppercase max-w-4xl" style={{ textShadow: '0 4px 40px rgba(0,0,0,0.4)' }}>

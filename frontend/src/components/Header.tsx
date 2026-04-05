@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Bookmark, Car, Globe, Menu, X, Bell, Ticket } from "lucide-react";
+import { Bookmark, Car, Globe, Menu, X, Bell, Ticket, Search, Key, Plus, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
@@ -55,101 +55,105 @@ export function Header() {
   }, [isHome]);
 
   const headerBg = isHome && !scrolled
-    ? 'linear-gradient(to bottom, rgba(2, 6, 23, 0.5) 0%, transparent 100%)'
-    : 'rgba(2, 6, 23, 0.85)';
-  const mobileBg = 'rgba(2, 6, 23, 0.98)';
+    ? 'linear-gradient(to bottom, rgba(7, 20, 35, 0.55) 0%, transparent 100%)'
+    : 'rgba(7, 16, 28, 0.92)';
+  const mobileBg = 'rgba(7, 16, 28, 0.98)';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 backdrop-blur-md border-b border-white/5" style={{ background: headerBg }}>
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
-        <Link to="/" className="flex items-center gap-2 text-white">
-          <Car className="h-7 w-7" />
-          <span className="text-xl font-bold font-display tracking-tight" style={{ textShadow: '3px 5px 10px rgba(0, 0, 0, 0.2)' }}>
-            {settings?.General?.platformName || "Drive Hub"}
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 backdrop-blur-xl border-b" style={{ background: isHome && !scrolled ? headerBg : 'rgba(10, 25, 41, 0.92)', borderColor: 'rgba(76,191,191,0.15)' }}>
+      <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-8 relative">
+        
+        {/* Left side: Logo */}
+        <Link to="/" className="flex items-center justify-center text-white min-w-max hover:opacity-80 transition-opacity gap-2">
+          <span className="text-[20px] font-display tracking-widest leading-[1.2] capitalize">
+            Gech
+          </span>
+          <span className="text-[16px] font-display leading-[1.2]" style={{ color: '#4CBFBF' }}>
+            (ጌች)
           </span>
         </Link>
 
-        {/* Desktop nav */}
+        {/* Center: Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-1">
           {filteredNavLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                isActive(link.href)
-                  ? "bg-white/20 text-white"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }`}
+              className="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all"
+              style={{
+                color: isActive(link.href) ? '#071018' : 'rgba(255,255,255,0.75)',
+                background: isActive(link.href) ? '#4CBFBF' : 'transparent',
+              }}
+              onMouseEnter={e => { if (!isActive(link.href)) (e.currentTarget as HTMLElement).style.color = '#4CBFBF'; }}
+              onMouseLeave={e => { if (!isActive(link.href)) (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.75)'; }}
             >
               {t(link.key)}
             </Link>
           ))}
         </nav>
-
-        <div className="hidden md:flex items-center gap-3">
-          {/* Language dropdown */}
+        
+        {/* Right side: User actions */}
+        <div className="flex items-center gap-5">
+          {/* Language Selector Desktop */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors px-2 py-1.5 rounded-md">
-                <Globe className="h-4 w-4" />
-                <span>{currentLang?.nativeLabel}</span>
-              </button>
+            <DropdownMenuTrigger className="hidden md:flex items-center gap-1.5 text-white/70 hover:text-white transition-colors outline-none group">
+              <Globe className="h-4 w-4 group-hover:text-[#4CBFBF] transition-colors" />
+              <span className="text-[10px] font-semibold uppercase tracking-widest leading-none" style={{ marginTop: '2px' }}>
+                {currentLang?.code.toUpperCase()}
+              </span>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[160px]">
+            <DropdownMenuContent align="end" className="w-32 bg-[#071018] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
               {languages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
+                  className={`text-xs cursor-pointer rounded-lg px-3 py-2 transition-colors focus:bg-[#4CBFBF]/10 focus:text-white ${language === lang.code ? 'text-[#4CBFBF] font-black tracking-widest uppercase text-[10px]' : 'text-white/70 font-medium'}`}
                   onClick={() => setLanguage(lang.code)}
-                  className={`cursor-pointer ${
-                    language === lang.code
-                      ? "bg-accent text-accent-foreground font-semibold"
-                      : ""
-                  }`}
                 >
                   {lang.nativeLabel}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          
-          <Link to="/saved-cars" className="relative p-2 text-white/70 hover:text-white transition-colors">
-            <Bookmark className={`h-5 w-5 ${savedCarsCount > 0 ? "text-white fill-white/30" : ""}`} />
+
+          {user ? (
+            <Link to="/profile" className="hidden md:flex items-center gap-2 group">
+              <Key className="h-4 w-4 group-hover:text-white transition-colors" strokeWidth={2} style={{ color: '#4CBFBF', transform: 'rotate(-45deg)' }} />
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-white/70 group-hover:text-white transition-colors leading-none">
+                {user.name || "PROFILE"}
+              </span>
+            </Link>
+          ) : (
+            <Link to="/auth/login" className="hidden md:flex items-center gap-2 group">
+              <Key className="h-4 w-4 group-hover:text-white transition-colors" strokeWidth={2} style={{ color: '#4CBFBF', transform: 'rotate(-45deg)' }} />
+              <span className="text-xs font-semibold uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">
+                {t("login")}
+              </span>
+            </Link>
+          )}
+
+          {/* Saved Cars */}
+          <Link to="/saved-cars" className="relative text-white/60 hover:text-white transition-colors">
+            <FileText className="h-5 w-5" strokeWidth={1.5} />
             {savedCarsCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-amber-400 text-black text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+              <span className="absolute -top-1.5 -right-2 text-black text-[9px] font-bold h-3.5 w-3.5 flex items-center justify-center rounded-full" style={{ background: '#4CBFBF' }}>
                 {savedCarsCount}
               </span>
             )}
           </Link>
-          
-          <NotificationBell />
 
-          {user ? (
-            <Link to="/dashboard">
-              <Button className="bg-white/20 text-white hover:bg-white/30 border border-white/30 rounded-full px-6">
-                {t("dashboard")}
-              </Button>
-            </Link>
-          ) : (
-            <Link to="/auth/login">
-              <Button className="bg-white/20 text-white hover:bg-white/30 border border-white/30 rounded-full px-6">
-                {t("login")}
-              </Button>
-            </Link>
-          )}
+          {/* Hamburger for mobile */}
+          <button
+            className="md:hidden text-white/70 hover:text-white transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X className="h-6 w-6" strokeWidth={1.5} /> : <Menu className="h-6 w-6" strokeWidth={1.5} />}
+          </button>
         </div>
-
-        {/* Mobile toggle */}
-        <button
-          className="md:hidden text-white"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden animate-fade-in-up border-t" style={{ background: mobileBg, borderColor: 'rgba(255,255,255,0.1)' }}>
+        <div className="md:hidden animate-fade-in-up border-t" style={{ background: mobileBg, borderColor: 'rgba(76,191,191,0.15)' }}>
           <nav className="container mx-auto flex flex-col gap-1 px-4 py-4">
             {filteredNavLinks.map((link) => (
               <Link
@@ -231,23 +235,24 @@ export function Header() {
             )}
 
             {/* Language selector mobile */}
-            <div className="flex gap-2 pt-3 border-t mt-2" style={{ borderColor: 'hsl(152, 25%, 22%)' }}>
+            <div className="flex gap-2 pt-3 border-t mt-2" style={{ borderColor: 'rgba(76,191,191,0.15)' }}>
               {languages.map((lang) => (
                 <button
                   key={lang.code}
                   onClick={() => setLanguage(lang.code)}
                   className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
                     language === lang.code
-                      ? "bg-white/20 text-white font-semibold"
+                      ? "text-[#071018] font-semibold"
                       : "text-white/60 hover:text-white bg-white/10"
                   }`}
+                  style={language === lang.code ? { background: '#4CBFBF' } : {}}
                 >
                   {lang.nativeLabel}
                 </button>
               ))}
             </div>
 
-            <div className="pt-3 border-t mt-2" style={{ borderColor: 'hsl(152, 25%, 22%)' }}>
+            <div className="pt-3 border-t mt-2" style={{ borderColor: 'rgba(76,191,191,0.15)' }}>
               <Link to="/auth/login" onClick={() => setMobileOpen(false)}>
                 <Button className="w-full bg-white/20 text-white border border-white/30 hover:bg-white/30 rounded-full">
                   {t("login")}

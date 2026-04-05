@@ -15,87 +15,56 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 function HeroSection() {
   const { t } = useLanguage();
-  const { settings } = useSettings();
-  const isLotteryEnabled = true;
-  const isSalesEnabled = true;
-
-  const { data: stats } = useQuery({
-    queryKey: ["publicStats"],
-    queryFn: () => apiFetch("/settings/stats"),
-  });
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 40%, #0a2820 100%)' }}>
-      {/* Background image — more visible */}
+    <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden bg-[#050505]">
+      {/* Background image & Vignette */}
       <div className="absolute inset-0 z-0">
-        <img src={heroBg} alt="" className="w-full h-full object-cover opacity-55" style={{ objectPosition: 'center 30%' }} />
-        {/* Lighter gradient — only covers left side strongly */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(105deg, rgba(10,22,40,0.88) 0%, rgba(10,22,40,0.55) 55%, rgba(10,22,40,0.15) 100%)' }} />
-        {/* Vibrant glowing orbs */}
-        <div className="absolute top-0 right-0 w-[700px] h-[700px] rounded-full blur-[160px] -mr-48 -mt-48" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.18) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full blur-[130px] -mb-48" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.12) 0%, transparent 70%)' }} />
-        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full blur-[100px]" style={{ background: 'radial-gradient(circle, rgba(100,200,255,0.10) 0%, transparent 70%)' }} />
+        <img src={heroBg} alt="Drive Hub" className="w-full h-full object-cover" style={{ objectPosition: 'center center' }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.80) 100%)' }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/90" />
       </div>
 
-      <div className="relative container mx-auto px-4 lg:px-8 py-32 z-10">
-        <div className="max-w-2xl" style={{ animation: "fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both" }}>
-          {/* Tag badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border" style={{ background: 'rgba(61,240,162,0.12)', borderColor: 'rgba(61,240,162,0.3)', color: '#3df0a2' }}>
-            <Sparkles className="h-3 w-3" /> {t("heroTagline")}
-          </div>
-
-          {/* Hero headline */}
-          <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black leading-[0.92] mb-6 tracking-tighter uppercase" style={{ color: '#ffffff', textShadow: '0 4px 40px rgba(0,0,0,0.5)' }}>
-            {t("heroTitle")}
-          </h1>
-
-          {/* Subtext — lighter color for contrast */}
-          <p className="text-lg font-medium leading-relaxed mb-10 max-w-lg" style={{ color: 'rgba(200,220,210,0.85)' }}>
-            {t("heroDesc")}
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-wrap gap-4">
-            {isSalesEnabled && (
-              <Link to="/cars/sale">
-                <Button size="xl" className="h-14 px-8 rounded-2xl font-black uppercase text-sm tracking-wider transition-all hover:scale-105 active:scale-95 border-0" style={{ background: '#3df0a2', color: '#0a1628', boxShadow: '0 0 40px rgba(61,240,162,0.35), 0 8px 32px rgba(61,240,162,0.2)' }}>
-                  {t("browseCars")} <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            )}
-            {isLotteryEnabled && (
-              <Link to="/lottery">
-                <Button size="xl" className="h-14 px-8 rounded-2xl font-black uppercase text-sm tracking-wider transition-all hover:scale-105 active:scale-95 border" style={{ background: 'rgba(255,255,255,0.12)', borderColor: 'rgba(255,255,255,0.35)', color: '#ffffff', backdropFilter: 'blur(12px)' }}>
-                  {t("enterLottery")}
-                </Button>
-              </Link>
-            )}
-          </div>
+      <div className="relative container mx-auto px-4 lg:px-8 z-10 flex flex-col items-center text-center pt-[100px] pb-24 h-full min-h-screen justify-center">
+        
+        {/* Top label */}
+        <div className="text-[#f5b027] text-[11px] font-semibold tracking-[0.4em] uppercase mb-6" style={{ animation: "fadeInUp 0.8s 0.2s both" }}>
+          YOUR PREMIUM CAR DESTINATION
         </div>
+        
+        {/* Main Title */}
+        <h1 className="flex flex-col items-center justify-center gap-1 mb-6 text-white" style={{ animation: "fadeInUp 0.8s 0.4s both", textShadow: '0 8px 40px rgba(0,0,0,0.8)' }}>
+          <span className="text-5xl md:text-7xl lg:text-[7rem] font-display capitalize tracking-widest leading-[0.9]">
+            Gech
+          </span>
+          <span className="text-4xl md:text-6xl lg:text-[5rem] font-display uppercase tracking-[0.05em] leading-[0.9]" style={{ color: '#4CBFBF' }}>
+            (ጌች)
+          </span>
+        </h1>
 
-        {/* Stats */}
-        <div
-          className="mt-24 flex flex-wrap gap-12 max-w-xl"
-          style={{ animation: "fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both" }}
-        >
-          {[
-            { value: stats ? `${stats.vehicles}+` : "240+", label: t("vehicles") },
-            { value: stats ? `${(stats.happyClients / 1000).toFixed(1)}K` : "1.2K", label: t("happyClients") },
-            { value: stats ? stats.lotteryDraws.toString() : "18", label: t("lotteryDraws") },
-          ].map((stat) => (
-            <div key={stat.label} className="group">
-              <div className="text-4xl font-black tabular-nums tracking-tighter mb-1 transition-colors" style={{ color: '#ffffff' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#3df0a2')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#ffffff')}
-              >{stat.value}</div>
-              <div className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(150,200,180,0.7)' }}>{stat.label}</div>
-            </div>
-          ))}
+        {/* Sub description */}
+        <p className="text-white/70 text-sm md:text-base max-w-xl leading-relaxed mb-12" style={{ animation: "fadeInUp 0.8s 0.6s both" }}>
+          Discover, buy, rent, and win premium vehicles — all in one place. Ethiopia's finest car marketplace.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animation: "fadeInUp 0.8s 0.8s both" }}>
+          <Link to="/cars/sale">
+            <Button size="xl" className="h-[52px] px-12 rounded-sm bg-[#f5b027] text-black font-extrabold uppercase text-xs tracking-[0.15em] hover:bg-white hover:text-black transition-all">
+              {t("browseFleet") || "Browse Cars"}
+            </Button>
+          </Link>
+          <Link to="/lottery">
+            <Button variant="outline" size="xl" className="h-[52px] px-12 rounded-sm bg-transparent border-white/40 text-white font-semibold uppercase text-xs tracking-[0.15em] hover:bg-white hover:text-black transition-all">
+              {t("winACar") || "Win a Car"}
+            </Button>
+          </Link>
         </div>
 
         {/* Scroll hint */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40 animate-bounce">
-          <ChevronDown className="h-5 w-5 text-white" />
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-80" style={{ animation: "fadeInUp 0.8s 1.2s both" }}>
+          <span className="text-[9px] text-[#f5f5f5] tracking-[0.2em] uppercase font-bold">SCROLL TO EXPLORE</span>
+          <ChevronDown className="h-5 w-5 text-white animate-bounce mt-1" strokeWidth={1} />
         </div>
       </div>
     </section>
@@ -190,44 +159,44 @@ function LotterySection() {
   ];
 
   return (
-    <section ref={ref} className="py-24 lg:py-32 overflow-hidden relative" style={{ background: 'linear-gradient(160deg, #0d1f35 0%, #0a2e22 50%, #0d1f35 100%)' }}>
+    <section ref={ref} className="py-24 lg:py-32 overflow-hidden relative" style={{ background: 'linear-gradient(180deg, #0a1929 0%, #071018 100%)' }}>
       {/* Ambient light effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[160px]" style={{ background: 'radial-gradient(ellipse, rgba(61,240,162,0.10) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.08) 0%, transparent 70%)' }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[160px]" style={{ background: 'radial-gradient(ellipse, rgba(76,191,191,0.07) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'radial-gradient(circle, rgba(61,143,181,0.06) 0%, transparent 70%)' }} />
       </div>
       
       <div className="relative container mx-auto px-4 lg:px-8 z-10">
         <div className={`text-center mb-20 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
           style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)', color: '#3df0a2' }}>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border" style={{ background: 'rgba(76,191,191,0.06)', borderColor: 'rgba(76,191,191,0.25)', color: '#4CBFBF' }}>
             <Zap className="h-3 w-3" /> {t("howItWorks")}
           </div>
-          <h2 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase mb-6 text-white">{t("winYourNextRide")}</h2>
-          <p className="mt-4 text-lg font-medium max-w-xl mx-auto" style={{ color: 'rgba(180,210,200,0.75)' }}>{t("lotteryLandingDesc")}</p>
+          <h2 className="text-4xl lg:text-5xl font-display text-white tracking-widest uppercase mb-6 leading-tight">{t("winYourNextRide")}</h2>
+          <p className="mt-4 text-sm tracking-wide font-medium max-w-xl mx-auto text-white/50">{t("lotteryLandingDesc")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {lotterySteps.map((step, i) => (
             <div
               key={step.title}
-              className={`group relative rounded-[2.5rem] p-10 border transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className={`group relative rounded-xl p-10 border transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{
                 transitionDelay: `${(i + 1) * 120}ms`,
                 transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-                background: 'rgba(255,255,255,0.05)',
-                borderColor: 'rgba(255,255,255,0.08)',
+                background: 'rgba(76,191,191,0.03)',
+                borderColor: 'rgba(76,191,191,0.1)',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(61,240,162,0.25)'; (e.currentTarget as HTMLElement).style.background = 'rgba(61,240,162,0.05)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.35)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.06)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.1)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.03)'; }}
             >
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform" style={{ background: 'rgba(61,240,162,0.12)' }}>
-                <step.icon className="h-7 w-7" style={{ color: '#3df0a2' }} />
+              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform" style={{ background: 'rgba(245,176,39,0.12)' }}>
+                <step.icon className="h-7 w-7" strokeWidth={1.5} style={{ color: '#f5b027' }} />
               </div>
-              <div className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: '#3df0a2' }}>{t("step")} {i + 1}</div>
-              <h3 className="text-xl font-black tracking-tight mb-3 uppercase text-white">{step.title}</h3>
-              <p className="text-sm leading-relaxed font-medium" style={{ color: 'rgba(180,210,200,0.70)' }}>{step.desc}</p>
-              <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(61,240,162,0.08)' }} />
+              <div className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#f5b027' }}>{t("step")} {i + 1}</div>
+              <h3 className="text-xl font-display tracking-[0.1em] mb-4 uppercase text-white">{step.title}</h3>
+              <p className="text-xs leading-relaxed tracking-wide font-medium text-white/50">{step.desc}</p>
+              <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(245,176,39,0.10)' }} />
             </div>
           ))}
         </div>
@@ -237,8 +206,8 @@ function LotterySection() {
           style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
           <Link to="/lottery">
-            <Button size="xl" className="h-16 px-12 rounded-2xl font-black uppercase text-sm tracking-wider transition-all hover:scale-105 active:scale-95 border-0" style={{ background: '#3df0a2', color: '#0a1628', boxShadow: '0 0 50px rgba(61,240,162,0.40), 0 8px 32px rgba(61,240,162,0.25)' }}>
-              {t("enterTheLottery")} <ArrowRight className="ml-2 h-5 w-5" />
+            <Button size="xl" className="h-[52px] px-12 rounded-sm font-extrabold uppercase text-xs tracking-[0.15em] transition-all border-0 text-white hover:text-[#071018] hover:bg-white" style={{ background: 'linear-gradient(135deg, #3D8FB5, #4CBFBF)', boxShadow: '0 0 40px rgba(76,191,191,0.25)' }}>
+              {t("enterTheLottery")} <ArrowRight className="ml-3 h-4 w-4" />
             </Button>
           </Link>
         </div>
