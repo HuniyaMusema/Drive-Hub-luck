@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -32,7 +32,7 @@
 
     --border: 40 15% 88%;
     --input: 40 15% 85%;
-    --ring: 152 35% 18%;
+    --ring: 180 43% 20%;
 
     --radius: 0.625rem;
 
@@ -58,27 +58,27 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 5%;
     --popover-foreground: 210 40% 98%;
-    --primary: 154 85% 59%;
+    --primary: 180 43% 52%;
     --primary-foreground: 222 47% 4%;
     --secondary: 217 32% 12%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 32% 12%;
     --muted-foreground: 215 20% 65%;
-    --accent: 154 85% 59%;
+    --accent: 180 43% 52%;
     --accent-foreground: 222 47% 4%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
     --border: 217 32% 17%;
     --input: 217 32% 17%;
-    --ring: 154 85% 59%;
+    --ring: 180 43% 52%;
     --sidebar-background: 222 47% 2%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 154 85% 59%;
+    --sidebar-primary: 180 43% 52%;
     --sidebar-primary-foreground: 222 47% 4%;
     --sidebar-accent: 217 32% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217 32% 17%;
-    --sidebar-ring: 154 85% 59%;
+    --sidebar-ring: 180 43% 52%;
   }
 }
 
@@ -89,11 +89,13 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  h1, h2, h3 {
+  h1, h2, h3, h4, h5, h6 {
     text-wrap: balance;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Space Grotesk', sans-serif;
+    @apply font-bold tracking-tight;
   }
 
   p {

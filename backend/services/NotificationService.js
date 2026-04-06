@@ -1,44 +1,50 @@
 const pool = require('../config/pgPool');
 
-class NotificationService {
-  /**
-   * Create a notification for a specific user
-   * @param {string} userId - UUID of the user
-   * @param {string} title - Notification title
-   * @param {string} message - Notification details
-   * @param {string} type - 'info', 'success', 'warning', 'error'
-   */
-  async createNotification(userId, title, message, type = 'info') {
-    try {
-      await pool.query(
-        'INSERT INTO notifications (user_id, title, message, type) VALUES ($1, $2, $3, $4)',
-        [userId, title, message, type]
-      );
-      return true;
-    } catch (error) {
-      console.error('[NotificationService] Failed to create notification:', error.message);
-      return false;
-    }
+/**
+ * Create a new notification for a specific user.
+ * @param {string} userId - UUID of the user to notify.
+ * @param {string} title - Brief title of the notification.
+ * @param {string} message - Detailed notification message.
+ * @param {string} type - Type of notification (info, success, warning, error).
+ * @param {object} client - Optional database client for transaction support.
+ */
+const createNotification = async (userId, title, message, type = 'info', client = null) => {
+  const db = client || pool;
+  try {
+    await db.query(
+      `INSERT INTO notifications (user_id, title, message, type)
+       VALUES ($1, $2, $3, $4)`,
+      [userId, title, message, type]
+    );
+  } catch (error) {
+    console.error('[NotificationService.createNotification]', error.message);
+    // We don't throw here to avoid failing the main action if notification fails
   }
+};
 
-  /**
-   * Notify all admins
-   * @param {string} title 
-   * @param {string} message 
-   * @param {string} type 
-   */
-  async notifyAdmins(title, message, type = 'info') {
-    try {
-      const { rows: admins } = await pool.query("SELECT id FROM users WHERE role = 'admin'");
-      for (const admin of admins) {
-        await this.createNotification(admin.id, title, message, type);
-      }
-      return true;
-    } catch (error) {
-      console.error('[NotificationService] Failed to notify admins:', error.message);
-      return false;
+/**
+ * Notify all admin and lottery staff users.
+ * @param {string} title - Brief title of the notification.
+ * @param {string} message - Detailed notification message.
+ * @param {string} type - Type of notification.
+ * @param {object} client - Optional database client.
+ */
+const notifyAdminsAndStaff = async (title, message, type = 'info', client = null) => {
+  const db = client || pool;
+  try {
+    const { rows: admins } = await db.query(
+      "SELECT id FROM users WHERE role IN ('admin', 'lottery_staff')"
+    );
+
+    for (const admin of admins) {
+      await createNotification(admin.id, title, message, type, db);
     }
+  } catch (error) {
+    console.error('[NotificationService.notifyAdminsAndStaff]', error.message);
   }
-}
+};
 
-module.exports = new NotificationService();
+module.exports = {
+  createNotification,
+  notifyAdminsAndStaff,
+};

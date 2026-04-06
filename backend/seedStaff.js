@@ -1,13 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'car_platform_db',
-  password: '171927',
-  port: 5432
-});
+const pool = require('./config/pgPool');
 
 async function seed() {
   try {

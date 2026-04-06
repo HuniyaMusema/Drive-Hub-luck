@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Bookmark, Car, Globe, Menu, X, Bell, Ticket, Search, Key, Plus, FileText } from "lucide-react";
+import { Bookmark, Car, Globe, Menu, X, Bell, Ticket, Search, Key, Plus, FileText, ChevronDown, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
@@ -27,7 +27,7 @@ export function Header() {
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
   const { savedCarsCount } = useSavedCars();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { settings } = useSettings();
 
   const operational = settings?.Operational || {};
@@ -116,12 +116,37 @@ export function Header() {
           </DropdownMenu>
 
           {user ? (
-            <Link to="/profile" className="hidden md:flex items-center gap-2 group">
-              <Key className="h-4 w-4 group-hover:text-white transition-colors" strokeWidth={2} style={{ color: '#4CBFBF', transform: 'rotate(-45deg)' }} />
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-white/70 group-hover:text-white transition-colors leading-none">
-                {user.name || "PROFILE"}
-              </span>
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 group outline-none">
+                  <div className="w-8 h-8 rounded-xl bg-[#4CBFBF]/10 flex items-center justify-center text-[#4CBFBF] font-black text-xs border border-[#4CBFBF]/20 shadow-sm transition-transform group-hover:scale-105">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="hidden md:block text-[10px] font-semibold uppercase tracking-widest text-white/70 group-hover:text-white transition-colors leading-none">
+                    {user.name}
+                  </span>
+                  <ChevronDown className="h-3 w-3 text-white/40 group-hover:text-[#4CBFBF] transition-colors" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 mt-2 bg-[#071018] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
+                <DropdownMenuItem asChild className="text-xs cursor-pointer rounded-lg px-3 py-2 transition-colors focus:bg-[#4CBFBF]/10 focus:text-white font-medium">
+                  <Link to="/profile" className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    {t("profile")}
+                  </Link>
+                </DropdownMenuItem>
+                <div className="h-px bg-white/5 my-1" />
+                <DropdownMenuItem 
+                  className="text-xs cursor-pointer rounded-lg px-3 py-2 transition-colors focus:bg-red-500/10 focus:text-red-400 font-medium text-red-500/80"
+                  onClick={() => setUser && setUser(null)}
+                >
+                  <div className="flex items-center gap-2">
+                    <LogOut className="h-4 w-4" />
+                    {t("navTerminateSession")}
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Link to="/auth/login" className="hidden md:flex items-center gap-2 group">
               <Key className="h-4 w-4 group-hover:text-white transition-colors" strokeWidth={2} style={{ color: '#4CBFBF', transform: 'rotate(-45deg)' }} />

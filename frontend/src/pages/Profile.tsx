@@ -49,11 +49,11 @@ export default function Profile() {
   };
 
   const getEntryStatusCfg = (l: any) => {
-    if (l.status === 'win') return { icon: Trophy, className: "text-primary border-primary/20 bg-primary/5 shadow-lg shadow-primary/10" };
-    if (l.payment_status === 'approved' || l.status === 'confirmed') return { icon: CheckCircle2, className: "text-emerald-600 border-emerald-500/20 bg-emerald-500/5" };
+    if (l.status === 'win') return { icon: Trophy, className: "text-[#4CBFBF] border-[#4CBFBF]/20 bg-[#4CBFBF]/5 shadow-lg shadow-[#4CBFBF]/10" };
+    if (l.payment_status === 'approved' || l.status === 'confirmed') return { icon: CheckCircle2, className: "text-[#4CBFBF] border-[#4CBFBF]/20 bg-[#4CBFBF]/5" };
     if (l.payment_status === 'rejected') return { icon: XCircle, className: "text-destructive border-destructive/20 bg-destructive/5" };
-    if (l.payment_status === 'pending') return { icon: Clock, className: "text-blue-600 border-blue-500/20 bg-blue-500/5" };
-    return { icon: Clock, className: "text-amber-600 border-amber-500/20 bg-amber-500/5" };
+    if (l.payment_status === 'pending') return { icon: Clock, className: "text-[#f5b027] border-amber-500/20 bg-amber-500/5" };
+    return { icon: Clock, className: "text-slate-500 border-white/10 bg-white/5" };
   };
 
   return (
@@ -84,10 +84,10 @@ export default function Profile() {
                     </p>
                     <div className="flex gap-4 pt-2">
                        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/40">
-                          <Ticket className="h-3 w-3 text-primary" /> {stats.totalLotteries} {t("profEntries")}
+                          <Ticket className="h-3 w-3 text-[#4CBFBF]" /> {stats.totalLotteries} {t("profEntries")}
                        </div>
                        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/40">
-                          <Car className="h-3.5 w-3.5 text-emerald-400" /> {stats.activeRentals} {t("profRentals")}
+                          <Car className="h-3.5 w-3.5 text-[#4CBFBF]" /> {stats.activeRentals} {t("profRentals")}
                        </div>
                     </div>
                  </div>
@@ -96,9 +96,6 @@ export default function Profile() {
               <div className="flex items-center gap-3">
                  <Button variant="outline" className="rounded-2xl h-14 px-8 border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold transition-all" onClick={() => setEditing(!editing)}>
                     {editing ? <><CheckCircle2 className="h-5 w-5 mr-2" />{t("profSave")}</> : <><Settings2 className="h-5 w-5 mr-2" />{t("profEdit")}</>}
-                 </Button>
-                 <Button variant="ghost" className="rounded-2xl h-14 w-14 border border-white/10 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 transition-all" onClick={handleLogout}>
-                    <LogOut className="h-6 w-6" />
                  </Button>
               </div>
            </div>
@@ -188,10 +185,10 @@ export default function Profile() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between px-2">
                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-6 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary),0.5)]" />
-                      <h2 className="text-2xl font-black !text-slate-950 tracking-tight uppercase font-sans !opacity-100">{t("profRecentActivity")}</h2>
+                      <div className="w-1.5 h-6 bg-[#4CBFBF] rounded-full shadow-[0_0_8px_rgba(76,191,191,0.5)]" />
+                      <h2 className="text-2xl font-black text-white tracking-tight uppercase font-sans">{t("profRecentActivity")}</h2>
                    </div>
-                   <div className="text-[10px] font-black !text-slate-600 uppercase border border-border/60 rounded-full px-4 py-1.5 bg-card/50 backdrop-blur-sm !opacity-100">{t("profSynchronizedLedger")}</div>
+                   <div className="text-[10px] font-black text-[#4CBFBF] uppercase border border-[#4CBFBF]/20 rounded-full px-4 py-1.5 bg-[#4CBFBF]/5 backdrop-blur-sm">{t("profSynchronizedLedger")}</div>
                 </div>
 
                 <div className="bg-card rounded-[3rem] border border-border/60 p-10 shadow-2xl shadow-primary/5 min-h-[500px]">
@@ -242,7 +239,7 @@ export default function Profile() {
                                      {l.status === 'win' && <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-amber-500 animate-bounce" />}
                                   </div>
                                   <div className="space-y-1.5 text-center sm:text-left">
-                                     <p className="text-sm font-black !text-slate-900 uppercase tracking-tight leading-none font-sans !opacity-100">{t("profStandardEntry")} • <span className="text-primary">#{l.number}</span></p>
+                                     <p className="text-sm font-black text-white uppercase tracking-tight leading-none font-sans group-hover:text-[#4CBFBF] transition-colors">{t("profStandardEntry")} • <span className="text-[#4CBFBF]">#{l.number}</span></p>
                                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
                                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase opacity-60">
                                            <Calendar className="h-3.5 w-3.5" /> {new Date(l.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
@@ -281,16 +278,16 @@ export default function Profile() {
               {/* Active Rentals Section */}
               <div className="bg-surface-warm rounded-[2.5rem] border border-border/40 p-8 flex items-center justify-between group overflow-hidden relative">
                  <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-16 h-16 rounded-[1.25rem] bg-background border border-border/60 flex items-center justify-center text-emerald-500 shadow-xl group-hover:rotate-3 transition-transform">
+                    <div className="w-16 h-16 rounded-[1.25rem] bg-background border border-border/60 flex items-center justify-center text-[#4CBFBF] shadow-xl group-hover:rotate-3 transition-transform">
                        <Car className="h-8 w-8" strokeWidth={2.5} />
                     </div>
                     <div>
                        <h4 className="text-lg font-black text-foreground uppercase tracking-tight">{t("profFleetAccess")}</h4>
-                       <p className="text-xs font-bold text-muted-foreground opacity-60">{t("profActiveRentalContracts")} <span className="text-emerald-600">{stats.activeRentals}</span></p>
+                       <p className="text-xs font-bold text-muted-foreground opacity-60">{t("profActiveRentalContracts")} <span className="text-[#4CBFBF]">{stats.activeRentals}</span></p>
                     </div>
                  </div>
                  <div className="relative z-10">
-                    <Button variant="outline" className="rounded-xl font-black text-[10px] uppercase tracking-widest border-border/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all">
+                    <Button variant="outline" className="rounded-xl font-black text-[10px] uppercase tracking-widest border-border/60 hover:bg-[#4CBFBF] hover:text-white hover:border-[#4CBFBF] transition-all">
                        {t("profManageFleet")}
                     </Button>
                  </div>

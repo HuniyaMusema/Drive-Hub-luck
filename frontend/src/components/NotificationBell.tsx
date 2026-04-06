@@ -24,23 +24,26 @@ const NotificationBell = () => {
 
     fetchUnreadCount();
     
-    // Refresh every minute
-    const interval = setInterval(fetchUnreadCount, 60000);
+    // Refresh every 15 seconds for a more "real-time" feel
+    const interval = setInterval(fetchUnreadCount, 15000);
     return () => clearInterval(interval);
   }, [user]);
 
   if (!user) return null;
 
   return (
-    <Link to="/notifications" className="relative p-2 text-foreground/70 hover:text-foreground transition-colors">
-      <Bell className="h-5 w-5" />
+    <Link to="/notifications" className="relative p-2.5 text-slate-400 hover:text-[#4CBFBF] transition-all bg-slate-50 hover:bg-[#4CBFBF]/5 rounded-xl border border-slate-100 group">
+      <Bell className="h-5 w-5 group-hover:rotate-12 transition-transform" />
       {unreadCount > 0 && (
-        <Badge 
-          variant="destructive" 
-          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] rounded-full border-2 border-background"
-        >
-          {unreadCount > 9 ? '9+' : unreadCount}
-        </Badge>
+        <span className="absolute -top-1 -right-1 flex h-5 w-5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <Badge 
+            variant="destructive" 
+            className="relative h-5 w-5 flex items-center justify-center p-0 text-[10px] font-black rounded-full border-2 border-white shadow-sm"
+          >
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </Badge>
+        </span>
       )}
     </Link>
   );

@@ -123,6 +123,31 @@ const submitLotteryPayment = async (req, res) => {
       [req.user.id, lotteryNumberId, receiptUrl, method]
     );
 
+    // 3. Notify Admin/Staff
+    const { rows: ticketInfo } = await client.query(
+      'SELECT number FROM lottery_numbers WHERE id = $1',
+      [lotteryNumberId]
+    );
+    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
+    const notificationService = require('../services/notificationService');
+    
+    // Notify Admin/Staff
+    await notificationService.notifyAdminsAndStaff(
+      'New Payment Pending',
+      `User ${req.user.name} uploaded a receipt for ticket #${ticketNumber}.`,
+      'info',
+      client
+    );
+
+    // Notify User
+    await notificationService.createNotification(
+      req.user.id,
+      'Payment Under Review',
+      `Your payment for ticket #${ticketNumber} has been received and is under review.`,
+      'info',
+      client
+    );
+
     await client.query('COMMIT');
     res.status(201).json({ message: 'Payment receipt submitted successfully. Waiting for admin approval.' });
   } catch (error) {
