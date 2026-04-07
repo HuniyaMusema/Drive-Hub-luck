@@ -16,7 +16,7 @@ export default function Lottery() {
 
   const activeLottery = lotteryData?.lottery;
   const stats = lotteryData?.number_stats;
-  const ticketPrice = settings?.Lottery?.ticketPrice || 0;
+  const ticketPrice = parseFloat(activeLottery?.ticket_price as any) || settings?.Lottery?.ticketPrice || 0;
   const currency = settings?.General?.defaultCurrency || 'ETB';
 
   return (

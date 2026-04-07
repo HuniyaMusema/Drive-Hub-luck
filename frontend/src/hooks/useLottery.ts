@@ -7,6 +7,7 @@ export interface Lottery {
   end_number: number;
   prize_text: string | null;
   prize_car_id: string | null;
+  ticket_price: number | string;
   status: 'active' | 'closed';
   created_at: string;
   prize_car_name?: string;
@@ -151,7 +152,7 @@ export const useRentCar = () => {
 export const useCreateLottery = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { start_number: number; end_number: number; prize_text: string }) =>
+    mutationFn: (data: { start_number: number; end_number: number; prize_text: string; ticket_price: number }) =>
       apiFetch('/admin/lottery', {
         method: 'POST',
         body: JSON.stringify(data),

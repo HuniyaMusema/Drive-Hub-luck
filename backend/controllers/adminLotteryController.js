@@ -32,7 +32,7 @@ const createAuditLog = async (client, action_type, performed_by, target_id, deta
 // @access  Private / Admin
 // ─────────────────────────────────────────────────────────────────────────────
 const createLottery = async (req, res) => {
-  const { start_number, end_number, prize_text, prize_car_id } = req.body;
+  const { start_number, end_number, prize_text, prize_car_id, ticket_price } = req.body;
 
   // ── Validation ─────────────────────────────────────────────────────────────
   if (start_number === undefined || end_number === undefined) {
@@ -81,10 +81,10 @@ const createLottery = async (req, res) => {
     // ── Insert lottery_settings row ────────────────────────────────────────
     const lotteryResult = await client.query(
       `INSERT INTO lottery_settings
-         (start_number, end_number, prize_text, prize_car_id, status)
-       VALUES ($1, $2, $3, $4, 'active')
+         (start_number, end_number, prize_text, prize_car_id, ticket_price, status)
+       VALUES ($1, $2, $3, $4, $5, 'active')
        RETURNING *`,
-      [start, end, prize_text || null, prize_car_id || null]
+      [start, end, prize_text || null, prize_car_id || null, parseFloat(ticket_price) || 0]
     );
     const lottery = lotteryResult.rows[0];
 
