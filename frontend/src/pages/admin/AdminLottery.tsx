@@ -45,7 +45,7 @@ export default function AdminLottery() {
       setTicketPrice("");
       setEndNumber("100");
     } catch (err: any) {
-      toast({ title: "Start Failed", description: err.message, variant: "destructive" });
+      toast({ title: t("startFailed"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -53,7 +53,7 @@ export default function AdminLottery() {
     if (!lottery) return;
     try {
       await apiFetch(`/admin/lottery/${lottery.id}/stop`, { method: 'PUT' });
-      toast({ title: "Lottery Stopped", description: "The current draw has been closed." });
+      toast({ title: t("lotteryStopped"), description: t("alDrawClosed") });
       queryClient.invalidateQueries({ queryKey: ['lottery'] });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -66,13 +66,13 @@ export default function AdminLottery() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       const winner = await pickWinnerMutation.mutateAsync();
       toast({ 
-        title: "Winner Drawn!", 
-        description: `Ticket #${winner.number} has won the ${lottery?.prize_car_name || lottery?.prize_text}!`,
+        title: t("alWinnerDrawn"), 
+        description: `${t("adminLotteryTicket")} #${winner.number} ${t("alHasWonThe")} ${lottery?.prize_car_name || lottery?.prize_text}!`,
         duration: 8000
       });
       queryClient.invalidateQueries({ queryKey: ['lottery'] });
     } catch (err: any) {
-      toast({ title: "Draw Failed", description: err.message, variant: "destructive" });
+      toast({ title: t("drawFailed"), description: err.message, variant: "destructive" });
     } finally {
       setIsDrawing(false);
     }
@@ -82,6 +82,7 @@ export default function AdminLottery() {
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">{t("alGenerateNumbers")}</h1>
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">{t("alGenerateNumbers")}</h1>
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1.5">{t("alSetRangeAndPrize")}</p>
         </div>
@@ -206,6 +207,7 @@ export default function AdminLottery() {
            </div>
            
            <div className="max-w-md z-10">
+             <h3 className="text-5xl font-black tracking-tighter text-slate-900 uppercase leading-[0.9] mb-6">{t("prepareForDraw")}</h3>
              <h3 className="text-5xl font-black tracking-tighter text-slate-900 uppercase leading-[0.9] mb-6">{t("prepareForDraw")}</h3>
              <p className="text-slate-500 font-bold leading-relaxed uppercase tracking-widest text-[10px] px-8">
                {lottery?.prize_car_name || lottery?.prize_text 

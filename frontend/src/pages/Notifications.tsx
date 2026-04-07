@@ -22,12 +22,17 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from '@/contexts/AuthContext';
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function Notifications() {
+  const { user } = useAuth();
   const { t } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  const isAdminOrStaff = user?.role === 'admin' || user?.role === 'lottery_staff';
 
   const fetchNotifications = async () => {
     try {
@@ -98,98 +103,109 @@ export default function Notifications() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckCircle2 className="h-5 w-5 text-green-500" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case 'success': return <CheckCircle2 className="h-5 w-5 text-[#4CBFBF]" />;
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-[#f5b027]" />;
       case 'error': return <XCircle className="h-5 w-5 text-destructive" />;
-      default: return <Info className="h-5 w-5 text-blue-500" />;
+      default: return <Info className="h-5 w-5 text-[#4CBFBF]" />;
     }
   };
 
-  return (
-    <PageShell>
-      <div className="container mx-auto px-4 lg:px-8 max-w-3xl animate-fade-in-up">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Bell className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">{t("notifications")}</h1>
+  const content = (
+    <div className={cn(
+      "container mx-auto px-4 lg:px-8 max-w-3xl animate-fade-in-up",
+      isAdminOrStaff && "py-6"
+    )}>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Bell className="h-6 w-6 text-primary" />
           </div>
-          {notifications.some(n => !n.is_read) && (
-            <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
-              <CheckCheck className="h-4 w-4 mr-2" />
-              {t("notifMarkAllAsRead")}
-            </Button>
-          )}
+          <h1 className="text-3xl font-bold text-foreground">{t("notifications")}</h1>
         </div>
+        {notifications.some(n => !n.is_read) && (
+          <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
+            <CheckCheck className="h-4 w-4 mr-2" />
+            {t("notifMarkAllAsRead")}
+          </Button>
+        )}
+      </div>
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p className="text-muted-foreground">{t("notifLoading")}</p>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">{t("notifLoading")}</p>
+        </div>
+      ) : notifications.length === 0 ? (
+        <div className="bg-card rounded-xl border border-dashed p-12 text-center">
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+            <Bell className="h-8 w-8 text-muted-foreground" />
           </div>
-        ) : notifications.length === 0 ? (
-          <div className="bg-card rounded-xl border border-dashed p-12 text-center">
-            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-              <Bell className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-medium text-foreground mb-1">{t("notifNoNotificationsYet")}</h3>
-            <p className="text-muted-foreground">{t("notifWhenUpdatesAppear")}</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {notifications.map((notification) => (
-              <div 
-                key={notification.id}
-                className={cn(
-                  "group relative bg-card rounded-xl border p-4 transition-all hover:shadow-md",
-                  !notification.is_read && "border-primary/30 bg-primary/5"
-                )}
-              >
-                <div className="flex gap-4">
-                  <div className="mt-1">
-                    {getIcon(notification.type)}
+          <h3 className="text-lg font-medium text-foreground mb-1">{t("notifNoNotificationsYet")}</h3>
+          <p className="text-muted-foreground">{t("notifWhenUpdatesAppear")}</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {notifications.map((notification) => (
+            <div 
+              key={notification.id}
+              className={cn(
+                "group relative bg-card rounded-xl border p-4 transition-all hover:shadow-md",
+                !notification.is_read && "border-primary/30 bg-primary/5"
+              )}
+            >
+              <div className="flex gap-4">
+                <div className="mt-1">
+                  {getIcon(notification.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className={cn(
+                      "font-semibold text-foreground leading-tight",
+                      !notification.is_read && "text-primary"
+                    )}>
+                      {notification.title}
+                    </h3>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                    </span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className={cn(
-                        "font-semibold text-foreground leading-tight",
-                        !notification.is_read && "text-primary"
-                      )}>
-                        {notification.title}
-                      </h3>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {notification.message}
-                    </p>
-                    <div className="flex items-center gap-3 mt-3">
-                      {!notification.is_read && (
-                        <button 
-                          onClick={() => handleMarkAsRead(notification.id)}
-                          className="text-xs font-medium text-primary hover:underline"
-                        >
-                          {t("notifMarkAsRead")}
-                        </button>
-                      )}
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {notification.message}
+                  </p>
+                  <div className="flex items-center gap-3 mt-3">
+                    {!notification.is_read && (
                       <button 
-                        onClick={() => handleDelete(notification.id)}
-                        className="text-xs font-medium text-muted-foreground hover:text-destructive flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleMarkAsRead(notification.id)}
+                        className="text-xs font-medium text-primary hover:underline"
                       >
-                        <Trash2 className="h-3 w-3" />
-                        {t("notifDelete")}
+                        {t("notifMarkAsRead")}
                       </button>
-                    </div>
+                    )}
+                    <button 
+                      onClick={() => handleDelete(notification.id)}
+                      className="text-xs font-medium text-muted-foreground hover:text-destructive flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      {t("notifDelete")}
+                    </button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  if (isAdminOrStaff) {
+    return <AdminLayout>{content}</AdminLayout>;
+  }
+
+  return (
+    <PageShell>
+      {content}
     </PageShell>
   );
 }

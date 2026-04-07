@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Car } from "@/hooks/useCars";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -71,7 +71,7 @@ export function CarCard({ car, view = "grid", isVisible = true, delay = 0 }: Car
             onClick={handleToggleSave}
             className={`absolute top-4 right-4 p-2.5 rounded-2xl backdrop-blur-md transition-all ${saved ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" : "bg-black/20 text-white hover:bg-black/40 border border-white/10"}`}
           >
-            <Heart className={`h-4.5 w-4.5 ${saved ? "fill-current" : ""}`} />
+            <FileText className={`h-4.5 w-4.5 ${saved ? "fill-current" : ""}`} />
           </button>
         </div>
         <div className="p-8 flex flex-col justify-between flex-1 relative overflow-hidden group/card shadow-inner">
@@ -154,7 +154,7 @@ export function CarCard({ car, view = "grid", isVisible = true, delay = 0 }: Car
           onClick={handleToggleSave}
           className={`absolute top-4 right-4 p-2.5 rounded-2xl backdrop-blur-md transition-all ${saved ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110" : "bg-black/20 text-white hover:bg-black/40 border border-white/10 hover:scale-105"}`}
         >
-          <Heart className={`h-4.5 w-4.5 ${saved ? "fill-current" : ""}`} strokeWidth={saved ? 0 : 2} />
+          <FileText className={`h-4.5 w-4.5 ${saved ? "fill-current" : ""}`} strokeWidth={saved ? 0 : 2} />
         </button>
       </div>
       <div className="p-8">

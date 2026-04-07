@@ -10,6 +10,7 @@ CREATE TYPE payment_method AS ENUM ('CBE', 'Telebirr');
 CREATE TYPE payment_status AS ENUM ('pending', 'approved', 'rejected');
 CREATE TYPE car_status AS ENUM ('available', 'sold', 'rented', 'maintenance');
 CREATE TYPE rental_request_status AS ENUM ('pending', 'approved', 'rejected', 'completed');
+CREATE TYPE user_status AS ENUM ('active', 'suspended');
 
 -- TRIGGER FUNCTION FOR UPDATED_AT
 CREATE OR REPLACE FUNCTION update_timestamp_columns() 
@@ -29,6 +30,9 @@ CREATE TABLE users (
     role user_role NOT NULL DEFAULT 'user',
     session_token VARCHAR(512),
     mode VARCHAR(50) DEFAULT 'car_mode',
+    status user_status NOT NULL DEFAULT 'active',
+    language VARCHAR(50) DEFAULT 'en',
+    suspension_reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

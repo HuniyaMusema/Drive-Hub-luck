@@ -28,23 +28,25 @@ function HeroSection() {
       <div className="relative container mx-auto px-4 lg:px-8 z-10 flex flex-col items-center text-center pt-[100px] pb-24 h-full min-h-screen justify-center">
         
         {/* Top label */}
-        <div className="text-[#f5b027] text-[11px] font-semibold tracking-[0.4em] uppercase mb-6" style={{ animation: "fadeInUp 0.8s 0.2s both" }}>
-          YOUR PREMIUM CAR DESTINATION
+        <div className="text-[#f5b027] text-[11px] font-semibold tracking-[0.4em] uppercase mb-6 text-center" style={{ animation: "fadeInUp 0.8s 0.2s both" }}>
+          {t("heroTagline")}
         </div>
         
         {/* Main Title */}
-        <h1 className="flex flex-col items-center justify-center gap-1 mb-6 text-white" style={{ animation: "fadeInUp 0.8s 0.4s both", textShadow: '0 8px 40px rgba(0,0,0,0.8)' }}>
+        <h1 className="flex flex-col items-center justify-center gap-1 mb-6 text-white text-center" style={{ animation: "fadeInUp 0.8s 0.4s both", textShadow: '0 8px 40px rgba(0,0,0,0.8)' }}>
           <span className="text-5xl md:text-7xl lg:text-[7rem] font-display capitalize tracking-widest leading-[0.9]">
-            Gech
+            {t("heroTitle")}
           </span>
-          <span className="text-4xl md:text-6xl lg:text-[5rem] font-display uppercase tracking-[0.05em] leading-[0.9]" style={{ color: '#4CBFBF' }}>
-            (ጌች)
-          </span>
+          {t("heroTitleSub") && (
+            <span className="text-4xl md:text-6xl lg:text-[5rem] font-display uppercase tracking-[0.05em] leading-[0.9]" style={{ color: '#4CBFBF' }}>
+              {t("heroTitleSub")}
+            </span>
+          )}
         </h1>
 
         {/* Sub description */}
-        <p className="text-white/70 text-sm md:text-base max-w-xl leading-relaxed mb-12" style={{ animation: "fadeInUp 0.8s 0.6s both" }}>
-          Discover, buy, rent, and win premium vehicles — all in one place. Ethiopia's finest car marketplace.
+        <p className="text-white/70 text-sm md:text-base max-w-xl leading-relaxed mb-12 text-center" style={{ animation: "fadeInUp 0.8s 0.6s both" }}>
+          {t("heroDesc")}
         </p>
 
         {/* Buttons */}
@@ -63,7 +65,7 @@ function HeroSection() {
 
         {/* Scroll hint */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-80" style={{ animation: "fadeInUp 0.8s 1.2s both" }}>
-          <span className="text-[9px] text-[#f5f5f5] tracking-[0.2em] uppercase font-bold">SCROLL TO EXPLORE</span>
+          <span className="text-[9px] text-[#f5f5f5] tracking-[0.2em] uppercase font-bold">{t("scrollToExplore")}</span>
           <ChevronDown className="h-5 w-5 text-white animate-bounce mt-1" strokeWidth={1} />
         </div>
       </div>

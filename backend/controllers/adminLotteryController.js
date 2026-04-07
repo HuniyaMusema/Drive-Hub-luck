@@ -359,6 +359,21 @@ const verifyPayment = async (req, res) => {
       [payment.user_id, payment.lottery_number_id]
     );
 
+    // 3. Notify the user
+    const { rows: ticketInfo } = await client.query(
+      'SELECT number FROM lottery_numbers WHERE id = $1',
+      [payment.lottery_number_id]
+    );
+    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
+    const notificationService = require('../services/notificationService');
+    await notificationService.createNotification(
+      payment.user_id,
+      'Payment Approved!',
+      `Your payment for ticket #${ticketNumber} has been approved. Your lottery number is now confirmed!`,
+      'success',
+      client
+    );
+
     await createAuditLog(client, 'PAYMENT_VERIFIED', req.user.id, id, { status: 'approved', lottery_number_id: payment.lottery_number_id });
 
     await client.query('COMMIT');
@@ -413,6 +428,21 @@ const rejectPayment = async (req, res) => {
        SET status = 'available', user_id = NULL, updated_at = NOW()
        WHERE id = $1`,
       [payment.lottery_number_id]
+    );
+
+    // 3. Notify the user
+    const { rows: ticketInfo } = await client.query(
+      'SELECT number FROM lottery_numbers WHERE id = $1',
+      [payment.lottery_number_id]
+    );
+    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
+    const notificationService = require('../services/notificationService');
+    await notificationService.createNotification(
+      payment.user_id,
+      'Payment Rejected',
+      `Your payment for ticket #${ticketNumber} was rejected. Reason: ${rejection_reason}. Please try again.`,
+      'error',
+      client
     );
 
     await createAuditLog(client, 'PAYMENT_REJECTED', req.user.id, id, { reason: rejection_reason, lottery_number_id: payment.lottery_number_id });
