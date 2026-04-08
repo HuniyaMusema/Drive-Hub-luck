@@ -17,6 +17,7 @@ export default function AdminLottery() {
   
   const [startNumber, setStartNumber] = useState("1");
   const [endNumber, setEndNumber] = useState("100");
+  const [ticketPrice, setTicketPrice] = useState("100");
   const [prizeText, setPrizeText] = useState("");
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -37,6 +38,7 @@ export default function AdminLottery() {
         start_number: Number(startNumber),
         end_number: Number(endNumber),
         prize_text: prizeText,
+        ticket_price: Number(ticketPrice),
       });
       toast({ title: t("lotteryStarted"), description: `${t("alSuccessfullyGenerated")} ${startNumber} to ${endNumber}.` });
       setPrizeText("");
@@ -61,10 +63,10 @@ export default function AdminLottery() {
     try {
       // Small simulated delay for visual tension
       await new Promise(resolve => setTimeout(resolve, 1500));
-      const winner = await pickWinnerMutation.mutateAsync();
+      const data = await pickWinnerMutation.mutateAsync();
       toast({ 
         title: t("alWinnerDrawn"), 
-        description: `${t("adminLotteryTicket")} #${winner.number} ${t("alHasWonThe")} ${lottery?.prize_car_name || lottery?.prize_text}!`,
+        description: `${t("adminLotteryTicket")} #${data.winner.number} ${t("alHasWonThe")} ${lottery?.prize_car_name || lottery?.prize_text}!`,
         duration: 8000
       });
       queryClient.invalidateQueries({ queryKey: ['lottery'] });
@@ -120,18 +122,18 @@ export default function AdminLottery() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-2">
-                <div className="text-center p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
-                  <p className="text-[8px] text-amber-500 font-black uppercase tracking-widest mb-1.5">{t("lotteryConfirmed")}</p>
-                  <p className="text-xl font-black text-slate-900 tabular-nums tracking-tighter">{stats?.confirmed || 0}</p>
+              <div className="flex flex-wrap gap-2 lg:gap-3">
+                <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-center">
+                  <p className="text-[8px] lg:text-[10px] text-amber-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryConfirmed")}</p>
+                  <p className="text-xl lg:text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{stats?.confirmed || 0}</p>
                 </div>
-                <div className="text-center p-4 rounded-2xl bg-slate-100 border border-slate-200">
-                  <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1.5">{t("lotteryPending")}</p>
-                  <p className="text-xl font-black text-amber-500 tabular-nums tracking-tighter">{stats?.pending || 0}</p>
+                <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col justify-center">
+                  <p className="text-[8px] lg:text-[10px] text-slate-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryPending")}</p>
+                  <p className="text-xl lg:text-3xl font-black text-amber-500 tabular-nums tracking-tighter">{stats?.pending || 0}</p>
                 </div>
-                <div className="text-center p-4 rounded-2xl bg-slate-50 border border-slate-100 opacity-40">
-                  <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-1.5">{t("lotteryFree")}</p>
-                  <p className="text-xl font-black text-slate-400 tabular-nums tracking-tighter">{stats?.available || 0}</p>
+                <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-slate-50 border border-slate-100 opacity-40 flex flex-col justify-center">
+                  <p className="text-[8px] lg:text-[10px] text-slate-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryFree")}</p>
+                  <p className="text-xl lg:text-3xl font-black text-slate-400 tabular-nums tracking-tighter">{stats?.available || 0}</p>
                 </div>
               </div>
 
@@ -143,18 +145,27 @@ export default function AdminLottery() {
             <form className="space-y-8" onSubmit={handleStart}>
               <div className="space-y-4">
                 <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 ml-1">{t("numberRangeLabel")}</Label>
-                <div className="flex gap-4">
-                  <Input type="number" min={1} value={startNumber} onChange={(e) => setStartNumber(e.target.value)} required placeholder="1" className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
-                  <span className="self-center text-slate-300 font-black">→</span>
-                  <Input type="number" min={2} value={endNumber} onChange={(e) => setEndNumber(e.target.value)} required placeholder="100" className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
+                <div className="flex gap-4 items-center">
+                  <Input type="number" min={1} value={startNumber} onChange={(e) => setStartNumber(e.target.value)} required placeholder="1" className="flex-1 h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
+                  <span className="text-slate-300 font-black">→</span>
+                  <Input type="number" min={2} value={endNumber} onChange={(e) => setEndNumber(e.target.value)} required placeholder="100" className="flex-1 h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between items-center ml-1">
                    <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">{t("alMainPrize")}</Label>
-                   <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest">{t("alTicketPriceSettings")}</span>
                 </div>
                 <Input value={prizeText} onChange={(e) => setPrizeText(e.target.value)} required placeholder={t("alPrizeExample")} className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 text-slate-900 font-black rounded-[1.25rem] px-6 shadow-inner" />
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex justify-between items-center ml-1">
+                   <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">{t("ticketPrice")}</Label>
+                </div>
+                <div className="relative">
+                   <Input type="number" min={0} value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} required placeholder="100" className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 text-slate-900 font-black rounded-[1.25rem] pl-6 pr-12 shadow-inner" />
+                   <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-widest">ETB</span>
+                </div>
               </div>
               <Button disabled={createMutation.isPending} className="w-full h-16 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.25em] shadow-xl shadow-[#4CBFBF]/10 bg-[#4CBFBF] text-white hover:bg-[#3fb0b0] border-0 transition-all active:scale-95 disabled:opacity-50 mt-4">
                 {createMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Play className="h-5 w-5 mr-3 fill-current" />} 

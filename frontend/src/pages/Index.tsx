@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { ArrowRight, Car, Key, Ticket, Shield, Clock, Star, Sparkles, Zap, ChevronDown } from "lucide-react";
+import { ArrowRight, Car, Key, Ticket, Shield, Clock, Star, Sparkles, Zap, ChevronDown, Gift, CheckCircle2, ChevronRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -11,63 +11,240 @@ import { useCars } from "@/hooks/useCars";
 import { useSettings } from "@/hooks/useSettings";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/services/api";
-import heroBg from "@/assets/hero-bg.jpg";
+import carGiftBow from "@/assets/car-gift-bow.png";
+import heroBg from "@/assets/hero-bg.jpg"; // Using existing background for left side
+
+/* ─── Flashcard Stack – right panel ─── */
+const mockListings = [
+  { name: "Mercedes-AMG GT 63", year: 2024, price: "4,200,000 Birr", tag: "Available", color: "#22c55e" },
+  { name: "BMW M8 Competition",  year: 2023, price: "3,750,000 Birr", tag: "Available", color: "#22c55e" },
+  { name: "Porsche 911 Turbo S", year: 2024, price: "5,100,000 Birr", tag: "New In",    color: "#f5b027" },
+  { name: "Lamborghini Urus SE", year: 2024, price: "8,900,000 Birr", tag: "Available", color: "#22c55e" },
+];
+
+function FlashcardStack() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      className="relative w-full max-w-[420px] mx-auto"
+      style={{ height: 460, perspective: 1200 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* ── Card 2: Listings (bottom) ── */}
+      <div
+        className="absolute inset-x-0 bottom-0"
+        style={{
+          transform: hovered
+            ? "translateY(32px) rotate(4deg) translateX(18px)"
+            : "translateY(18px) rotate(-3deg) translateX(12px)",
+          transition: "transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          zIndex: 1,
+        }}
+      >
+        <div
+          className="rounded-3xl overflow-hidden"
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            boxShadow: "0 32px 64px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04) inset",
+          }}
+        >
+          {/* Card header */}
+          <div className="px-6 pt-5 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Drive Hub Fleet</p>
+              <p className="text-sm font-bold text-white mt-0.5">Cars For Sale</p>
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full" style={{ background: "rgba(245,176,39,0.15)", color: "#f5b027", border: "1px solid rgba(245,176,39,0.25)" }}>
+              {mockListings.length} Listed
+            </span>
+          </div>
+          {/* Listing rows */}
+          <ul className="divide-y divide-white/[0.05]">
+            {mockListings.map((car, i) => (
+              <li key={i} className="px-6 py-3 flex items-center justify-between group/item hover:bg-white/[0.03] transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(76,191,191,0.1)" }}>
+                    <Car className="h-3.5 w-3.5 text-[#4CBFBF]" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold text-white leading-none">{car.name}</p>
+                    <p className="text-[9px] text-white/35 mt-0.5 font-semibold">{car.year}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <p className="text-[10px] font-black text-white/70 tabular-nums hidden sm:block">{car.price}</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: `${car.color}20`, color: car.color, border: `1px solid ${car.color}40` }}>
+                    {car.tag}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="px-6 py-4">
+            <Link to="/cars/sale" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+              View All Listings <ChevronRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Card 1: Gift Hero (top) ── */}
+      <div
+        className="absolute inset-x-0 top-0"
+        style={{
+          transform: hovered
+            ? "translateY(-16px) rotate(-1deg) translateX(-8px)"
+            : "translateY(0) rotate(0deg)",
+          transition: "transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          zIndex: 2,
+        }}
+      >
+        <div
+          className="rounded-3xl overflow-hidden"
+          style={{
+            background: "rgba(10,15,30,0.75)",
+            backdropFilter: "blur(30px)",
+            WebkitBackdropFilter: "blur(30px)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            boxShadow: "0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset",
+            height: 310,
+          }}
+        >
+          {/* Image area */}
+          <div className="relative h-[220px] overflow-hidden">
+            <img
+              src={carGiftBow}
+              alt="The Ultimate Gift – Luxury Car"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: "center 40%" }}
+            />
+            {/* Overlay */}
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,15,30,0.85) 0%, transparent 60%)" }} />
+            {/* Pill badge */}
+            <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest" style={{ background: "rgba(245,176,39,0.18)", border: "1px solid rgba(245,176,39,0.35)", color: "#f5b027", backdropFilter: "blur(8px)" }}>
+              <Gift className="h-2.5 w-2.5" /> The Ultimate Gift
+            </div>
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest" style={{ background: "rgba(34,197,94,0.18)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e", backdropFilter: "blur(8px)" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" /> Live
+            </div>
+          </div>
+          {/* Card footer */}
+          <div className="px-5 py-4 flex items-center justify-between">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/35">Featured Offer</p>
+              <p className="text-sm font-bold text-white mt-0.5 leading-none">Premium Luxury Fleet</p>
+            </div>
+            <Link to="/cars/sale">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#f5b027,#e09a10)", boxShadow: "0 4px 16px rgba(245,176,39,0.4)" }}>
+                <ArrowRight className="h-4 w-4 text-black" />
+              </div>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Glow behind the stack */}
+      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full blur-3xl pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(76,191,191,0.18) 0%, transparent 70%)" }} />
+    </div>
+  );
+}
 
 function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden bg-[#050505]">
-      {/* Background image & Vignette */}
-      <div className="absolute inset-0 z-0">
-        <img src={heroBg} alt="Drive Hub" className="w-full h-full object-cover" style={{ objectPosition: 'center center' }} />
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.80) 100%)' }} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/90" />
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-primary">
+
+      {/* ── Splitted Background ── */}
+      <div className="absolute inset-0 z-0 border-b border-primary-foreground/5">
+        <div className="absolute inset-0 flex">
+          {/* Background image fading into the primary background color */}
+          <div className="w-full h-full relative" style={{ 
+            maskImage: "linear-gradient(to right, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 85%)",
+            WebkitMaskImage: "linear-gradient(to right, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 85%)"
+          }}>
+            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left opacity-90" />
+            {/* Removed deep black overlays as requested */}
+          </div>
+        </div>
       </div>
 
-      <div className="relative container mx-auto px-4 lg:px-8 z-10 flex flex-col items-center text-center pt-[100px] pb-24 h-full min-h-screen justify-center">
-        
-        {/* Top label */}
-        <div className="text-[#f5b027] text-[11px] font-semibold tracking-[0.4em] uppercase mb-6 text-center" style={{ animation: "fadeInUp 0.8s 0.2s both" }}>
-          {t("heroTagline")}
-        </div>
-        
-        {/* Main Title */}
-        <h1 className="flex flex-col items-center justify-center gap-1 mb-6 text-white text-center" style={{ animation: "fadeInUp 0.8s 0.4s both", textShadow: '0 8px 40px rgba(0,0,0,0.8)' }}>
-          <span className="text-5xl md:text-7xl lg:text-[7rem] font-display capitalize tracking-widest leading-[0.9]">
-            {t("heroTitle")}
-          </span>
-          {t("heroTitleSub") && (
-            <span className="text-4xl md:text-6xl lg:text-[5rem] font-display uppercase tracking-[0.05em] leading-[0.9]" style={{ color: '#4CBFBF' }}>
-              {t("heroTitleSub")}
-            </span>
-          )}
-        </h1>
+      {/* Optional accent glow for visual depth */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[500px] h-[500px] rounded-full blur-[140px] opacity-30" style={{ background: "radial-gradient(circle, rgba(245,176,39,0.1) 0%, transparent 70%)" }} />
+      </div>
 
-        {/* Sub description */}
-        <p className="text-white/70 text-sm md:text-base max-w-xl leading-relaxed mb-12 text-center" style={{ animation: "fadeInUp 0.8s 0.6s both" }}>
-          {t("heroDesc")}
-        </p>
+      <div className="relative container mx-auto px-6 lg:px-12 pt-28 pb-20 z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animation: "fadeInUp 0.8s 0.8s both" }}>
-          <Link to="/cars/sale">
-            <Button size="xl" className="h-[52px] px-12 rounded-sm bg-[#f5b027] text-black font-extrabold uppercase text-xs tracking-[0.15em] hover:bg-white hover:text-black transition-all">
-              {t("browseFleet") || "Browse Cars"}
-            </Button>
-          </Link>
-          <Link to="/lottery">
-            <Button variant="outline" size="xl" className="h-[52px] px-12 rounded-sm bg-transparent border-white/40 text-white font-semibold uppercase text-xs tracking-[0.15em] hover:bg-white hover:text-black transition-all">
-              {t("winACar") || "Win a Car"}
-            </Button>
-          </Link>
-        </div>
+          {/* ── LEFT: Copy ── */}
+          <div className="max-w-[620px]" style={{ animation: "slideInLeft 0.9s 0.1s both" }}>
 
-        {/* Scroll hint */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-80" style={{ animation: "fadeInUp 0.8s 1.2s both" }}>
-          <span className="text-[9px] text-[#f5f5f5] tracking-[0.2em] uppercase font-bold">{t("scrollToExplore")}</span>
-          <ChevronDown className="h-5 w-5 text-white animate-bounce mt-1" strokeWidth={1} />
+            {/* Top eyebrow */}
+            <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full backdrop-blur-sm" style={{ background: "rgba(245,176,39,0.15)", border: "1px solid rgba(245,176,39,0.3)" }}>
+              <Sparkles className="h-3 w-3 text-[#f5b027]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.35em] text-[#f5b027]">Drive Hub — Ethiopia's #1 Car Platform</span>
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="mb-6 text-white leading-[0.95]" style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800 }}>
+              <span className="block text-5xl md:text-6xl lg:text-[5.5rem] tracking-tight">THE ULTIMATE</span>
+              <span className="block text-5xl md:text-6xl lg:text-[5.5rem] tracking-tight" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.4)", color: "transparent" }}>GIFT</span>
+              <span className="block text-4xl md:text-5xl lg:text-[4rem] tracking-tight mt-2" style={{ color: "white" }}>
+                A LUXURY CAR.
+              </span>
+            </h1>
+
+            {/* Description */}
+            <p className="text-white/70 text-base lg:text-lg leading-relaxed mb-10 max-w-[480px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>
+              Browse Ethiopia's most curated luxury fleet. Buy outright, rent by the day, or win your dream car through our exclusive lottery — all in one place.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <Link to="/cars/sale">
+                <button
+                  className="relative h-[54px] px-10 rounded-xl font-black uppercase text-xs tracking-[0.15em] text-black overflow-hidden group/btn"
+                  style={{ background: "linear-gradient(135deg,#f5b027 0%,#e09a10 100%)", boxShadow: "0 8px 32px rgba(245,176,39,0.4)" }}
+                >
+                  <span className="relative z-10 flex items-center gap-2">EXPLORE COLLECTIONS <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" /></span>
+                </button>
+              </Link>
+            </div>
+
+            {/* Social proof bar */}
+            <div className="mt-12 flex items-center gap-4">
+              <div className="flex -space-x-2.5">
+                {["#f5b027","#4CBFBF","#3D8FB5","#e05555","#a855f7"].map((c, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[9px] font-black text-white" style={{ borderColor: "rgba(15, 23, 42, 1)", background: c }}>
+                    {String.fromCharCode(65 + i)}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-white">1,200+ Happy Customers</div>
+                <div className="text-[9px] text-white/50 font-semibold uppercase tracking-widest mt-0.5">This month alone</div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── RIGHT: Flashcard Stack ── */}
+          <div className="hidden lg:block w-full max-w-[420px] ml-auto relative z-10" style={{ animation: "slideInRight 0.9s 0.25s both" }}>
+            <FlashcardStack />
+          </div>
+
         </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60" style={{ animation: "fadeInUp 0.8s 1.2s both" }}>
+        <span className="text-[9px] text-white tracking-[0.2em] uppercase font-bold">Scroll</span>
+        <ChevronDown className="h-5 w-5 text-white animate-bounce mt-1" strokeWidth={1} />
       </div>
     </section>
   );

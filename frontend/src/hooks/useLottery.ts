@@ -151,7 +151,7 @@ export const useRentCar = () => {
 export const useCreateLottery = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { start_number: number; end_number: number; prize_text: string }) =>
+    mutationFn: (data: { start_number: number; end_number: number; prize_text: string; ticket_price: number }) =>
       apiFetch('/admin/lottery', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -167,9 +167,9 @@ export const usePickWinner = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () =>
-      apiFetch('/lottery/pick-winner', { method: 'PUT' }),
+      apiFetch('/admin/lottery/pick-winner', { method: 'PUT' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lottery'] });
+      queryClient.invalidateQueries({ queryKey: ['lottery', 'current'] });
     },
   });
 };

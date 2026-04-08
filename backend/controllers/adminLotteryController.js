@@ -32,7 +32,7 @@ const createAuditLog = async (client, action_type, performed_by, target_id, deta
 // @access  Private / Admin
 // ─────────────────────────────────────────────────────────────────────────────
 const createLottery = async (req, res) => {
-  const { start_number, end_number, prize_text, prize_car_id } = req.body;
+  const { start_number, end_number, prize_text, prize_car_id, ticket_price } = req.body;
 
   // ── Validation ─────────────────────────────────────────────────────────────
   if (start_number === undefined || end_number === undefined) {
@@ -81,10 +81,10 @@ const createLottery = async (req, res) => {
     // ── Insert lottery_settings row ────────────────────────────────────────
     const lotteryResult = await client.query(
       `INSERT INTO lottery_settings
-         (start_number, end_number, prize_text, prize_car_id, status)
-       VALUES ($1, $2, $3, $4, 'active')
+         (start_number, end_number, prize_text, prize_car_id, ticket_price, status)
+       VALUES ($1, $2, $3, $4, $5, 'active')
        RETURNING *`,
-      [start, end, prize_text || null, prize_car_id || null]
+      [start, end, prize_text || null, prize_car_id || null, parseFloat(ticket_price || 0)]
     );
     const lottery = lotteryResult.rows[0];
 
@@ -477,6 +477,65 @@ const getLotteryNumbers = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const pickWinner = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // 1. Find the active lottery
+    const { rows: lotteryRows } = await client.query(
+      "SELECT id FROM lottery_settings WHERE status = 'active' LIMIT 1 FOR UPDATE"
+    );
+
+    if (lotteryRows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'No active lottery found' });
+    }
+
+    const lotteryId = lotteryRows[0].id;
+
+    // 2. Pick a random confirmed number from that lottery
+    const { rows: winnerRows } = await client.query(
+      `SELECT ln.*, u.name as user_name, u.email as user_email
+       FROM lottery_numbers ln
+       JOIN users u ON ln.user_id = u.id
+       WHERE ln.lottery_id = $1 AND ln.status = 'confirmed'
+       ORDER BY RANDOM()
+       LIMIT 1`,
+      [lotteryId]
+    );
+
+    if (winnerRows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'No participants found for this lottery' });
+    }
+
+    const winner = winnerRows[0];
+
+    // 3. Update lottery status to closed AND persist winner info
+    await client.query(
+      "UPDATE lottery_settings SET status = 'closed', winner_id = $1, winning_number = $2, updated_at = NOW() WHERE id = $3",
+      [winner.user_id, winner.number, lotteryId]
+    );
+
+    await client.query('COMMIT');
+
+    res.status(200).json({
+      message: 'Winner picked successfully and lottery closed.',
+      winner: {
+        number: winner.number,
+        name: winner.user_name,
+        email: winner.user_email
+      }
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('[pickWinner]', error.message);
+    res.status(500).json({ message: error.message });
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   createLottery,
@@ -488,4 +547,5 @@ module.exports = {
   verifyPayment,
   rejectPayment,
   getLotteryNumbers,
+  pickWinner,
 };

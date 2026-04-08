@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '.env'), override: true });
 
 const express = require('express');
@@ -10,6 +11,13 @@ const app = express();
 
 // Load settings on startup
 SettingsManager.loadSettings();
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)){
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('Created uploads directory');
+}
 
 // Middleware
 app.use(cors());
@@ -40,6 +48,6 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, '127.0.0.1', () => {
+  console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });

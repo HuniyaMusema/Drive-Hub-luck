@@ -11,6 +11,7 @@ const {
   verifyPayment,
   rejectPayment,
   getLotteryNumbers,
+  pickWinner,
 } = require('../controllers/adminLotteryController');
 
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -25,6 +26,7 @@ router.get('/', getAllLotteries);
 router.get('/current', getCurrentLottery);
 router.put('/:id/start', startLottery);
 router.put('/:id/stop', stopLottery);
+router.put('/pick-winner', pickWinner);
 
 // ── Advanced Features with Module/Permission Guards ─────────────────────────
 router.get('/payments', requireModule('lotteryModuleEnabled'), requirePermission('staffPaymentVerification'), getLotteryPayments);

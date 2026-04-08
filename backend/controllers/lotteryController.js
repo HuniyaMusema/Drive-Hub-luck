@@ -72,27 +72,7 @@ const participateLottery = async (req, res) => {
   }
 };
 
-const getTakenNumbers = async (req, res) => {
-  try {
-    const { rows: lotteryRows } = await pool.query(
-      "SELECT id FROM lottery_settings WHERE status = 'active' LIMIT 1"
-    );
 
-    if (lotteryRows.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    const { rows } = await pool.query(
-      "SELECT number FROM lottery_numbers WHERE lottery_id = $1 AND status != 'available'",
-      [lotteryRows[0].id]
-    );
-
-    res.json(rows.map(r => r.number));
-  } catch (error) {
-    console.error('[getTakenNumbers]', error.message);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
 
 const submitLotteryPayment = async (req, res) => {
   const { lotteryNumberId, receiptUrl, method } = req.body;
@@ -188,68 +168,28 @@ const getLotteryEntries = async (req, res) => {
   }
 };
 
-// @desc    Pick a winner (Admin only)
-// @route   PUT /api/lottery/pick-winner
-// @access  Private/Admin
-const pickWinner = async (req, res) => {
-  const client = await pool.connect();
+
+// @desc    Get all taken numbers for the active lottery
+// @route   GET /api/lottery/taken
+// @access  Public
+const getTakenNumbers = async (req, res) => {
   try {
-    await client.query('BEGIN');
-
-    // 1. Find the active lottery
-    const { rows: lotteryRows } = await client.query(
-      "SELECT id FROM lottery_settings WHERE status = 'active' LIMIT 1 FOR UPDATE"
+    const { rows: lotteryRows } = await pool.query(
+      "SELECT id FROM lottery_settings WHERE status = 'active' LIMIT 1"
     );
-
-    if (lotteryRows.length === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ message: 'No active lottery found' });
-    }
-
-    const lotteryId = lotteryRows[0].id;
-
-    // 2. Pick a random confirmed number from that lottery
-    const { rows: winnerRows } = await client.query(
-      `SELECT ln.*, u.name as user_name, u.email as user_email
-       FROM lottery_numbers ln
-       JOIN users u ON ln.user_id = u.id
-       WHERE ln.lottery_id = $1 AND ln.status = 'confirmed'
-       ORDER BY RANDOM()
-       LIMIT 1`,
-      [lotteryId]
+    if (lotteryRows.length === 0) return res.status(200).json([]);
+    
+    const { rows } = await pool.query(
+      "SELECT number FROM lottery_numbers WHERE lottery_id = $1 AND status != 'available'",
+      [lotteryRows[0].id]
     );
-
-    if (winnerRows.length === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ message: 'No participants found for this lottery' });
-    }
-
-    const winner = winnerRows[0];
-
-    // 3. Update lottery status to closed
-    await client.query(
-      "UPDATE lottery_settings SET status = 'closed', updated_at = NOW() WHERE id = $1",
-      [lotteryId]
-    );
-
-    await client.query('COMMIT');
-
-    res.status(200).json({
-      message: 'Winner picked successfully and lottery closed.',
-      winner: {
-        number: winner.number,
-        name: winner.user_name,
-        email: winner.user_email
-      }
-    });
+    res.status(200).json(rows.map(r => r.number));
   } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('[pickWinner]', error.message);
+    console.error('[getTakenNumbers]', error.message);
     res.status(500).json({ message: error.message });
-  } finally {
-    client.release();
   }
 };
+
 
 // @desc    Get the current active lottery with summary stats
 // @route   GET /api/lottery/current
@@ -293,7 +233,6 @@ const getCurrentLottery = async (req, res) => {
 module.exports = {
   participateLottery,
   getLotteryEntries,
-  pickWinner,
   getTakenNumbers,
   submitLotteryPayment,
   getCurrentLottery,

@@ -9,6 +9,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useCurrentLottery, useTakenNumbers, useParticipateLottery, useProfileHistory } from "@/hooks/useLottery";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 export default function LotterySelect() {
   const { data: lotteryData, isLoading: loadingLottery } = useCurrentLottery();
@@ -18,6 +19,8 @@ export default function LotterySelect() {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [confirmed, setConfirmed] = useState(false);
   const [reservedTickets, setReservedTickets] = useState<any[] | null>(null);
+  const [visibleCount, setVisibleCount] = useState(200);
+  const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -160,8 +163,29 @@ export default function LotterySelect() {
               </div>
             ) : (
               <div className="space-y-10">
+                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-2">
+                   <div className="relative w-full sm:w-64">
+                      <Input 
+                        type="number" 
+                        placeholder={t("l_searchNumberPlaceholder") || "Search number..."}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="h-12 pl-10 rounded-2xl bg-muted/20 border-border/40 focus:ring-primary/20 font-bold"
+                      />
+                      <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                   </div>
+                   <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 bg-muted/30 px-4 py-2 rounded-full border border-border/40 shrink-0">
+                      Rendering {Math.min(visibleCount, lottery.end_number - lottery.start_number + 1)} of {lottery.end_number - lottery.start_number + 1}
+                   </div>
+                </div>
+
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
-                  {Array.from({ length: lottery.end_number - lottery.start_number + 1 }, (_, i) => i + lottery.start_number).map((n) => {
+                  {Array.from({ length: Math.max(0, Math.min(visibleCount, (lottery?.end_number ?? 0) - (lottery?.start_number ?? 0) + 1)) }, (_, i) => i + (lottery?.start_number ?? 1))
+                    .filter(n => {
+                      if (searchTerm === "") return true;
+                      return n.toString().includes(searchTerm);
+                    })
+                    .map((n) => {
                     const taken = takenNumbers.has(n);
                     const selectedItem = selected.has(n);
                     const isUserPending = userPendingNumbers.has(n);
@@ -200,6 +224,19 @@ export default function LotterySelect() {
                     );
                   })}
                 </div>
+
+                {visibleCount < (lottery.end_number - lottery.start_number + 1) && searchTerm === "" && (
+                  <div className="flex justify-center pt-6">
+                    <Button 
+                      variant="outline" 
+                      className="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest border-primary/20 hover:bg-primary/5 transition-all group"
+                      onClick={() => setVisibleCount(prev => prev + 500)}
+                    >
+                      {t("l_loadMoreNumbers") || "Load More Numbers"}
+                      <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform rotate-90" />
+                    </Button>
+                  </div>
+                )}
 
                 <div className="flex flex-wrap items-center gap-6 p-6 rounded-3xl bg-muted/20 border border-border/40">
                   <div className="flex items-center gap-2">
