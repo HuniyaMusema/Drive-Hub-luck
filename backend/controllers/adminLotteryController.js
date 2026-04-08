@@ -84,7 +84,7 @@ const createLottery = async (req, res) => {
          (start_number, end_number, prize_text, prize_car_id, ticket_price, status)
        VALUES ($1, $2, $3, $4, $5, 'active')
        RETURNING *`,
-      [start, end, prize_text || null, prize_car_id || null, parseFloat(ticket_price || 0)]
+      [start, end, prize_text || null, prize_car_id || null, parseFloat(ticket_price) || 0]
     );
     const lottery = lotteryResult.rows[0];
 

@@ -1,4 +1,4 @@
-import { useProfileHistory, useSubmitLotteryPayment } from "@/hooks/useLottery";
+import { useProfileHistory, useSubmitLotteryPayment, useCurrentLottery } from "@/hooks/useLottery";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useRef, useMemo, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 export default function Payment() {
   const { t } = useLanguage();
   const { data: history, isLoading } = useProfileHistory();
+  const { data: lotteryData } = useCurrentLottery();
   const submitMutation = useSubmitLotteryPayment();
   const { settings } = useSettings();
   const { toast } = useToast();
@@ -30,7 +31,7 @@ export default function Payment() {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const ticketPrice = settings?.Lottery?.ticketPrice || 0;
+  const ticketPrice = parseFloat(lotteryData?.lottery?.ticket_price as any) || settings?.Lottery?.ticketPrice || 0;
   const currency = settings?.General?.defaultCurrency || 'ETB';
 
   const passedTickets = location.state?.tickets || [];

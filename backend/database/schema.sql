@@ -62,6 +62,7 @@ CREATE TABLE lottery_settings (
     end_number INTEGER NOT NULL,
     prize_car_id UUID REFERENCES cars(id) ON DELETE SET NULL,
     prize_text VARCHAR(255),
+    ticket_price NUMERIC(10, 2) NOT NULL DEFAULT 0,
     status lottery_status NOT NULL DEFAULT 'active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

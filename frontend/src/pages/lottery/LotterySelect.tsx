@@ -39,7 +39,7 @@ export default function LotterySelect() {
   }, [userPendingTickets]);
 
   const { settings } = useSettings();
-  const ticketPrice = settings?.Lottery?.ticketPrice || 0;
+  const ticketPrice = parseFloat(lottery?.ticket_price as any) || settings?.Lottery?.ticketPrice || 0;
   const currency = settings?.General?.defaultCurrency || 'ETB';
 
   const toggle = (n: number) => {
