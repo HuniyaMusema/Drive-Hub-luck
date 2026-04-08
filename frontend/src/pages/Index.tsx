@@ -46,39 +46,39 @@ function FlashcardStack() {
         <div
           className="rounded-3xl overflow-hidden"
           style={{
-            background: "rgba(255,255,255,0.06)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
+            background: "rgba(10, 20, 30, 0.45)",
+            backdropFilter: "blur(32px)",
+            WebkitBackdropFilter: "blur(32px)",
             border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: "0 32px 64px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04) inset",
+            boxShadow: "0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset",
           }}
         >
           {/* Card header */}
-          <div className="px-6 pt-5 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="px-6 pt-5 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Drive Hub Fleet</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/45">Drive Hub Fleet</p>
               <p className="text-sm font-bold text-white mt-0.5">Cars For Sale</p>
             </div>
-            <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full" style={{ background: "rgba(245,176,39,0.15)", color: "#f5b027", border: "1px solid rgba(245,176,39,0.25)" }}>
+            <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full" style={{ background: "rgba(245,176,39,0.18)", color: "#f5b027", border: "1px solid rgba(245,176,39,0.3)" }}>
               {mockListings.length} Listed
             </span>
           </div>
           {/* Listing rows */}
-          <ul className="divide-y divide-white/[0.05]">
+          <ul className="divide-y divide-white/[0.06]">
             {mockListings.map((car, i) => (
-              <li key={i} className="px-6 py-3 flex items-center justify-between group/item hover:bg-white/[0.03] transition-colors">
+              <li key={i} className="px-6 py-3 flex items-center justify-between group/item hover:bg-white/[0.04] transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(76,191,191,0.1)" }}>
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(76,191,191,0.12)" }}>
                     <Car className="h-3.5 w-3.5 text-[#4CBFBF]" />
                   </div>
                   <div>
                     <p className="text-[11px] font-bold text-white leading-none">{car.name}</p>
-                    <p className="text-[9px] text-white/35 mt-0.5 font-semibold">{car.year}</p>
+                    <p className="text-[9px] text-white/40 mt-0.5 font-semibold">{car.year}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <p className="text-[10px] font-black text-white/70 tabular-nums hidden sm:block">{car.price}</p>
-                  <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: `${car.color}20`, color: car.color, border: `1px solid ${car.color}40` }}>
+                  <p className="text-[10px] font-black text-white/75 tabular-nums hidden sm:block">{car.price}</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: `${car.color}25`, color: car.color, border: `1px solid ${car.color}45` }}>
                     {car.tag}
                   </span>
                 </div>
@@ -86,7 +86,7 @@ function FlashcardStack() {
             ))}
           </ul>
           <div className="px-6 py-4">
-            <Link to="/cars/sale" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+            <Link to="/cars/sale" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/70 hover:text-white transition-colors" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
               View All Listings <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
@@ -107,11 +107,11 @@ function FlashcardStack() {
         <div
           className="rounded-3xl overflow-hidden"
           style={{
-            background: "rgba(10,15,30,0.75)",
-            backdropFilter: "blur(30px)",
-            WebkitBackdropFilter: "blur(30px)",
-            border: "1px solid rgba(255,255,255,0.14)",
-            boxShadow: "0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset",
+            background: "rgba(8, 12, 24, 0.8)",
+            backdropFilter: "blur(40px)",
+            WebkitBackdropFilter: "blur(40px)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            boxShadow: "0 40px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06) inset",
             height: 310,
           }}
         >
@@ -124,23 +124,23 @@ function FlashcardStack() {
               style={{ objectPosition: "center 40%" }}
             />
             {/* Overlay */}
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,15,30,0.85) 0%, transparent 60%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,12,24,0.9) 0%, transparent 70%)" }} />
             {/* Pill badge */}
-            <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest" style={{ background: "rgba(245,176,39,0.18)", border: "1px solid rgba(245,176,39,0.35)", color: "#f5b027", backdropFilter: "blur(8px)" }}>
+            <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl" style={{ background: "rgba(245,176,39,0.22)", border: "1px solid rgba(245,176,39,0.4)", color: "#f5b027", backdropFilter: "blur(12px)" }}>
               <Gift className="h-2.5 w-2.5" /> The Ultimate Gift
             </div>
-            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest" style={{ background: "rgba(34,197,94,0.18)", border: "1px solid rgba(34,197,94,0.35)", color: "#22c55e", backdropFilter: "blur(8px)" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" /> Live
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl" style={{ background: "rgba(34,197,94,0.22)", border: "1px solid rgba(34,197,94,0.4)", color: "#22c55e", backdropFilter: "blur(12px)" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" /> Live
             </div>
           </div>
           {/* Card footer */}
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/35">Featured Offer</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/40">Featured Offer</p>
               <p className="text-sm font-bold text-white mt-0.5 leading-none">Premium Luxury Fleet</p>
             </div>
             <Link to="/cars/sale">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#f5b027,#e09a10)", boxShadow: "0 4px 16px rgba(245,176,39,0.4)" }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#f5b027,#e09a10)", boxShadow: "0 4px 20px rgba(245,176,39,0.45)" }}>
                 <ArrowRight className="h-4 w-4 text-black" />
               </div>
             </Link>
@@ -149,7 +149,7 @@ function FlashcardStack() {
       </div>
 
       {/* Glow behind the stack */}
-      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full blur-3xl pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(76,191,191,0.18) 0%, transparent 70%)" }} />
+      <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-80 h-40 rounded-full blur-[100px] pointer-events-none opacity-40" style={{ background: "radial-gradient(ellipse, rgba(76,191,191,0.2) 0%, transparent 70%)" }} />
     </div>
   );
 }
@@ -165,18 +165,19 @@ function HeroSection() {
         <div className="absolute inset-0 flex">
           {/* Background image fading into the primary background color */}
           <div className="w-full h-full relative" style={{ 
-            maskImage: "linear-gradient(to right, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 85%)",
-            WebkitMaskImage: "linear-gradient(to right, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 85%)"
+            maskImage: "linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%)",
+            WebkitMaskImage: "linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%)"
           }}>
-            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left opacity-90" />
-            {/* Removed deep black overlays as requested */}
+            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" />
+            {/* Overlay colors removed for clarity, letting it fade into the section bg-primary */}
           </div>
         </div>
       </div>
 
-      {/* Optional accent glow for visual depth */}
+      {/* Ambient glows for depth */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[500px] h-[500px] rounded-full blur-[140px] opacity-30" style={{ background: "radial-gradient(circle, rgba(245,176,39,0.1) 0%, transparent 70%)" }} />
+        <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] rounded-full blur-[160px] opacity-25" style={{ background: "radial-gradient(circle, rgba(245,176,39,0.12) 0%, transparent 70%)" }} />
+        <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] rounded-full blur-[140px] opacity-20" style={{ background: "radial-gradient(circle, rgba(76,191,191,0.1) 0%, transparent 70%)" }} />
       </div>
 
       <div className="relative container mx-auto px-6 lg:px-12 pt-28 pb-20 z-10">
@@ -210,7 +211,7 @@ function HeroSection() {
               <Link to="/cars/sale">
                 <button
                   className="relative h-[54px] px-10 rounded-xl font-black uppercase text-xs tracking-[0.15em] text-black overflow-hidden group/btn"
-                  style={{ background: "linear-gradient(135deg,#f5b027 0%,#e09a10 100%)", boxShadow: "0 8px 32px rgba(245,176,39,0.4)" }}
+                  style={{ background: "linear-gradient(135deg,#f5b027 0%,#e09a10 100%)", boxShadow: "0 8px 32px rgba(245,176,39,0.35)" }}
                 >
                   <span className="relative z-10 flex items-center gap-2">EXPLORE COLLECTIONS <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" /></span>
                 </button>
@@ -221,7 +222,7 @@ function HeroSection() {
             <div className="mt-12 flex items-center gap-4">
               <div className="flex -space-x-2.5">
                 {["#f5b027","#4CBFBF","#3D8FB5","#e05555","#a855f7"].map((c, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[9px] font-black text-white" style={{ borderColor: "rgba(15, 23, 42, 1)", background: c }}>
+                  <div key={i} className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[9px] font-black text-white" style={{ borderColor: "rgba(10, 20, 30, 1)", background: c }}>
                     {String.fromCharCode(65 + i)}
                   </div>
                 ))}
@@ -243,8 +244,8 @@ function HeroSection() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60" style={{ animation: "fadeInUp 0.8s 1.2s both" }}>
-        <span className="text-[9px] text-white tracking-[0.2em] uppercase font-bold">Scroll</span>
-        <ChevronDown className="h-5 w-5 text-white animate-bounce mt-1" strokeWidth={1} />
+        <span className="text-[9px] text-white/70 tracking-[0.2em] uppercase font-bold">Scroll</span>
+        <ChevronDown className="h-5 w-5 text-white/60 animate-bounce mt-1" strokeWidth={1} />
       </div>
     </section>
   );
