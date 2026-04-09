@@ -24,6 +24,7 @@ const mockListings = [
 
 function FlashcardStack() {
   const [hovered, setHovered] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <div
@@ -46,11 +47,11 @@ function FlashcardStack() {
         <div
           className="rounded-3xl overflow-hidden"
           style={{
-            background: "rgba(10, 20, 30, 0.45)",
-            backdropFilter: "blur(32px)",
-            WebkitBackdropFilter: "blur(32px)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: "0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset",
+            background: "rgba(10, 20, 30, 0.35)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            boxShadow: "none",
           }}
         >
           {/* Card header */}
@@ -107,11 +108,11 @@ function FlashcardStack() {
         <div
           className="rounded-3xl overflow-hidden"
           style={{
-            background: "rgba(8, 12, 24, 0.8)",
-            backdropFilter: "blur(40px)",
-            WebkitBackdropFilter: "blur(40px)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            boxShadow: "0 40px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06) inset",
+            background: "rgba(8, 14, 28, 0.55)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            border: "1px solid rgba(255,255,255,0.18)",
+            boxShadow: "none",
             height: 310,
           }}
         >
@@ -124,22 +125,22 @@ function FlashcardStack() {
               style={{ objectPosition: "center 40%" }}
             />
             {/* Overlay */}
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,12,24,0.9) 0%, transparent 70%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,12,24,0.65) 0%, transparent 60%)" }} />
             {/* Pill badge */}
             <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl" style={{ background: "rgba(245,176,39,0.22)", border: "1px solid rgba(245,176,39,0.4)", color: "#f5b027", backdropFilter: "blur(12px)" }}>
-              <Gift className="h-2.5 w-2.5" /> The Ultimate Gift
+              <Gift className="h-2.5 w-2.5" /> {t("heroGiftBadge")}
             </div>
             <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl" style={{ background: "rgba(34,197,94,0.22)", border: "1px solid rgba(34,197,94,0.4)", color: "#22c55e", backdropFilter: "blur(12px)" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" /> Live
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" /> {t("heroLiveBadge")}
             </div>
           </div>
           {/* Card footer */}
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/40">Featured Offer</p>
-              <p className="text-sm font-bold text-white mt-0.5 leading-none">Premium Luxury Fleet</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/60">{t("heroFeaturedOffer")}</p>
+              <p className="text-sm font-bold text-white mt-0.5 leading-none">{t("heroPremiumFleet")}</p>
             </div>
-            <Link to="/cars/sale">
+            <Link to="/lottery">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#f5b027,#e09a10)", boxShadow: "0 4px 20px rgba(245,176,39,0.45)" }}>
                 <ArrowRight className="h-4 w-4 text-black" />
               </div>
@@ -161,17 +162,21 @@ function HeroSection() {
     <section className="relative min-h-screen flex items-center overflow-hidden bg-primary">
 
       {/* ── Splitted Background ── */}
-      <div className="absolute inset-0 z-0 border-b border-primary-foreground/5">
+      <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 flex">
-          {/* Background image fading into the primary background color */}
-          <div className="w-full h-full relative" style={{ 
-            maskImage: "linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%)",
-            WebkitMaskImage: "linear-gradient(to right, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%)"
-          }}>
-            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" />
-            {/* Overlay colors removed for clarity, letting it fade into the section bg-primary */}
+          {/* Background image */}
+          <div className="w-full h-full relative">
+            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" style={{ filter: "blur(1px) brightness(0.7)" }} />
           </div>
         </div>
+        {/* Directional overlay: dark on left (text), fades out toward right (cards) */}
+        <div className="absolute inset-0" style={{
+          background: "linear-gradient(to right, rgba(5,10,20,0.82) 0%, rgba(5,10,20,0.65) 40%, rgba(5,10,20,0.15) 70%, transparent 100%)"
+        }} />
+        {/* Bottom fade for polish */}
+        <div className="absolute inset-0" style={{
+          background: "linear-gradient(to top, rgba(5,10,20,0.4) 0%, transparent 30%)"
+        }} />
       </div>
 
       {/* Right edge fade into footer color */}
@@ -190,33 +195,41 @@ function HeroSection() {
           <div className="max-w-[620px]" style={{ animation: "slideInLeft 0.9s 0.1s both" }}>
 
             {/* Top eyebrow */}
-            <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full backdrop-blur-sm" style={{ background: "rgba(245,176,39,0.15)", border: "1px solid rgba(245,176,39,0.3)" }}>
-              <Sparkles className="h-3 w-3 text-[#f5b027]" />
-              <span className="text-[10px] font-black uppercase tracking-[0.35em] text-[#f5b027]">Drive Hub — Ethiopia's #1 Car Platform</span>
+            <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full backdrop-blur-sm" style={{ background: "rgba(76,191,191,0.12)", border: "1px solid rgba(76,191,191,0.3)" }}>
+              <Sparkles className="h-3 w-3 text-[#4CBFBF]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.35em] text-[#4CBFBF]">{t("heroEyebrow")}</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="mb-6 text-white leading-[0.95]" style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800 }}>
-              <span className="block text-5xl md:text-6xl lg:text-[5.5rem] tracking-tight">THE ULTIMATE</span>
-              <span className="block text-5xl md:text-6xl lg:text-[5.5rem] tracking-tight" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.4)", color: "transparent" }}>GIFT</span>
-              <span className="block text-4xl md:text-5xl lg:text-[4rem] tracking-tight mt-2" style={{ color: "white" }}>
-                A LUXURY CAR.
+            <h1 className="mb-6 leading-[0.95]" style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800 }}>
+              <span className="block text-5xl md:text-6xl lg:text-[5.5rem] tracking-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("heroLine1")}</span>
+              <span className="block text-5xl md:text-6xl lg:text-[5.5rem] tracking-tight" style={{ color: "#4CBFBF", textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>{t("heroLine2")}</span>
+              <span className="block text-4xl md:text-5xl lg:text-[4rem] tracking-tight mt-2 text-white/95" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.4)" }}>
+                {t("heroLine3")}
               </span>
             </h1>
 
             {/* Description */}
-            <p className="text-white/70 text-base lg:text-lg leading-relaxed mb-10 max-w-[480px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>
-              Browse Ethiopia's most curated luxury fleet. Buy outright, rent by the day, or win your dream car through our exclusive lottery — all in one place.
+            <p className="text-white text-base lg:text-lg leading-relaxed mb-10 max-w-[480px]" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}>
+              {t("heroDesc")}
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <Link to="/cars/sale">
                 <button
-                  className="relative h-[54px] px-10 rounded-xl font-black uppercase text-xs tracking-[0.15em] text-black overflow-hidden group/btn"
-                  style={{ background: "linear-gradient(135deg,#f5b027 0%,#e09a10 100%)", boxShadow: "0 8px 32px rgba(245,176,39,0.35)" }}
+                  className="relative h-[54px] px-10 rounded-xl font-black uppercase text-xs tracking-[0.15em] text-[#071018] overflow-hidden group/btn"
+                  style={{ background: "linear-gradient(135deg,#4CBFBF 0%,#3D8FB5 100%)", boxShadow: "0 8px 32px rgba(76,191,191,0.35)" }}
                 >
-                  <span className="relative z-10 flex items-center gap-2">EXPLORE COLLECTIONS <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" /></span>
+                  <span className="relative z-10 flex items-center gap-2">{t("heroCtaExplore")} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" /></span>
+                </button>
+              </Link>
+              <Link to="/lottery">
+                <button
+                  className="h-[54px] px-10 rounded-xl font-black uppercase text-xs tracking-[0.15em] text-white group/btn"
+                  style={{ background: "rgba(245,176,39,0.22)", border: "1.5px solid rgba(245,176,39,0.7)", boxShadow: "0 0 16px rgba(245,176,39,0.2)" }}
+                >
+                  <span className="flex items-center gap-2">{t("winACar")} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" /></span>
                 </button>
               </Link>
             </div>
@@ -231,8 +244,8 @@ function HeroSection() {
                 ))}
               </div>
               <div>
-                <div className="text-[11px] font-bold text-white">1,200+ Happy Customers</div>
-                <div className="text-[9px] text-white/50 font-semibold uppercase tracking-widest mt-0.5">This month alone</div>
+                <div className="text-[11px] font-bold text-white">{t("heroSocialProof")}</div>
+                <div className="text-[9px] text-white/65 font-semibold uppercase tracking-widest mt-0.5">{t("heroSocialProofSub")}</div>
               </div>
             </div>
           </div>

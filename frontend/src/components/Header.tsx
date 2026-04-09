@@ -60,7 +60,7 @@ export function Header() {
   const mobileBg = 'rgba(7, 16, 28, 0.98)';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 backdrop-blur-xl border-b" style={{ background: isHome && !scrolled ? headerBg : 'rgba(10, 25, 41, 0.92)', borderColor: 'rgba(76,191,191,0.15)' }}>
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500" style={{ background: isHome && !scrolled ? 'transparent' : 'rgba(10, 25, 41, 0.95)', backdropFilter: isHome && !scrolled ? 'none' : 'blur(20px)' }}>
       <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-8 relative">
         
         {/* Left side: Logo */}

@@ -2,22 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
-import { 
-  Car, 
-  Ticket, 
-  CreditCard, 
-  User, 
-  ArrowRight, 
-  Heart, 
-  Sparkles, 
-  ShieldCheck, 
-  Trophy, 
-  Zap, 
-  Clock, 
-  History,
-  Settings,
-  Bell
-} from "lucide-react";
+import { Car, Ticket, CreditCard, User, ArrowRight, Heart, Trophy, Clock, History, Settings } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,7 +16,6 @@ export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { savedCarsCount } = useSavedCars();
-
   const { data: history, isLoading } = useProfileHistory();
 
   useEffect(() => {
@@ -44,242 +28,170 @@ export default function Dashboard() {
     const lotteries = history?.lotteries || [];
     const pending = lotteries.filter(l => l.status === 'pending' || l.payment_status === 'pending').length;
     const confirmed = lotteries.filter(l => l.status === 'confirmed' || l.payment_status === 'approved').length;
-    
     return [
-      { 
-        icon: Ticket, 
-        label: t("activeEntries") || "Active Entries", 
-        value: confirmed.toString(), 
-        sub: t("verifiedTickets") || "Verified Tickets",
-        color: "text-primary", 
-        bg: "bg-primary/10",
-        progress: confirmed > 0 ? 100 : 0,
-        to: "/profile?tab=history"
-      },
-      { 
-        icon: CreditCard, 
-        label: t("pendingPayments") || "Pending Action", 
-        value: pending.toString(), 
-        sub: t("awaitingVerification") || "Awaiting Verification",
-        color: "text-amber-500", 
-        bg: "bg-amber-500/10",
-        progress: pending > 0 ? 50 : 0,
-        to: "/profile?tab=history"
-      },
-      { 
-        icon: Heart, 
-        label: t("savedVehicles") || "Saved Assets", 
-        value: savedCarsCount.toString(), 
-        sub: t("watchingStatus") || "Watching Status",
-        color: "text-rose-500", 
-        bg: "bg-rose-500/10",
-        progress: savedCarsCount > 0 ? 100 : 0,
-        to: "/saved-cars"
-      },
+      { icon: Ticket,   label: t("activeEntries"),   value: confirmed.toString(),      color: "text-[#4CBFBF]", bg: "bg-[#4CBFBF]/10", to: "/profile?tab=history" },
+      { icon: CreditCard, label: t("pendingPayments"), value: pending.toString(),       color: "text-amber-500", bg: "bg-amber-500/10",  to: "/profile?tab=history" },
+      { icon: Heart,    label: t("savedVehicles"),    value: savedCarsCount.toString(), color: "text-rose-500",  bg: "bg-rose-500/10",   to: "/saved-cars" },
     ];
   }, [history, t, savedCarsCount]);
 
   const quickLinks = [
-    { icon: Car, label: t("browseCarsForSale"), to: "/cars/sale", desc: "Find your next masterpiece", color: "bg-blue-500" },
-    { icon: Ticket, label: t("enterLotteryAction"), to: "/lottery", desc: "Win a premium vehicle", color: "bg-primary" },
-    { icon: CreditCard, label: t("payment"), to: "/payment", desc: "Submit your draw receipts", color: "bg-amber-500" },
-    { icon: User, label: t("myProfile"), to: "/profile", desc: "Security and preferences", color: "bg-slate-700" },
-    { icon: History, label: t("activityHistory") || "Activity Ledger", to: "/profile?tab=history", desc: "Your full transaction log", color: "bg-indigo-500" },
+    { icon: Car,       label: t("browseCarsForSale"),              to: "/cars/sale",           desc: t("buyACarDesc").slice(0, 40) + "…", color: "bg-blue-500" },
+    { icon: Ticket,    label: t("enterLotteryAction"),             to: "/lottery",             desc: t("carLotteryDesc").slice(0, 40) + "…", color: "bg-[#4CBFBF]" },
+    { icon: CreditCard,label: t("payment"),                        to: "/payment",             desc: t("paymentPageDesc").slice(0, 40) + "…", color: "bg-amber-500" },
+    { icon: User,      label: t("myProfile"),                      to: "/profile",             desc: t("profProfileConfiguration"),       color: "bg-slate-600" },
+    { icon: History,   label: t("activityHistory") || "History",   to: "/profile?tab=history", desc: t("profFinancialHistory"),           color: "bg-indigo-500" },
   ];
 
   return (
     <PageShell>
-      <div className="container mx-auto px-4 lg:px-8 py-12">
-        {/* Cinematic Welcome Header */}
-        <div className="relative mb-16 rounded-[3rem] overflow-hidden p-12 lg:p-20 shadow-2xl animate-fade-in-up" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2a1e 50%, #0a1e30 100%)' }}>
-           {/* Ambient glow orbs */}
-           <div className="absolute inset-0 z-0 pointer-events-none">
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-32 -mt-32" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.18) 0%, transparent 70%)' }} />
-              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[120px] -ml-20 -mb-20" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.10) 0%, transparent 70%)' }} />
-              <div className="absolute top-0 right-0 p-10 opacity-5 rotate-12">
-                 <ShieldCheck className="w-64 h-64 text-white" />
-              </div>
-           </div>
-           
-           <div className="relative z-10 flex flex-col md:flex-row items-end justify-between gap-8">
-              <div className="max-w-2xl">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border" style={{ background: 'rgba(61,240,162,0.12)', borderColor: 'rgba(61,240,162,0.28)', color: '#3df0a2' }}>
-                     <Sparkles className="h-3 w-3" /> {t("userAccountTier")}
-                  </div>
-                 <h1 className="text-5xl lg:text-7xl font-black text-white tracking-tighter leading-none mb-4 uppercase" style={{ textShadow: '0 4px 40px rgba(0,0,0,0.4)' }}>
-                    {t("welcomeBack")}, <br />
-                    <span style={{ color: '#3df0a2' }}>
-                       {user?.name?.split(' ')[0] || "User"}
-                    </span>
-                 </h1>
-                 <p className="text-lg font-medium leading-relaxed max-w-md" style={{ color: 'rgba(190,220,210,0.80)' }}>
-                    {t("dashboardSubtitle")}
-                 </p>
-              </div>
-              <div className="flex gap-4">
-                 <Link to="/profile">
-                   <Button variant="ghost" className="h-14 px-8 rounded-2xl font-black uppercase text-xs tracking-widest transition-all border" style={{ background: 'rgba(255,255,255,0.08)', color: 'white', borderColor: 'rgba(255,255,255,0.15)' }}>
-                      <Settings className="mr-2 h-4 w-4" /> Manage Profile
-                   </Button>
-                 </Link>
-                 <Link to="/lottery">
-                   <Button className="h-14 px-8 rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all border-0" style={{ background: '#3df0a2', color: '#0a1628', boxShadow: '0 0 30px rgba(61,240,162,0.30)' }}>
-                      <Trophy className="mr-2 h-4 w-4" /> New Draw
-                   </Button>
-                 </Link>
-              </div>
-           </div>
-        </div>
+      <div className="bg-[#f0f2f5] min-h-screen">
+        <div className="container mx-auto px-4 lg:px-8 py-10 max-w-5xl">
 
-        {/* Dynamic Stats Board */}
-        <div ref={ref} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {stats.map((s, i) => (
-            <div
-              key={s.label}
-              onClick={() => navigate(s.to)}
-              className={cn(
-                "group relative bg-card rounded-[2.5rem] p-10 border border-slate-100 shadow-2xl shadow-slate-200/50 hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-700 overflow-hidden cursor-pointer",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-              )}
-              style={{ transitionDelay: `${i * 150}ms` }}
-            >
-              <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-10 transition-transform group-hover:scale-110", s.bg, s.color)}>
-                <s.icon className="h-7 w-7" strokeWidth={2.5} />
-              </div>
-              <div className="flex items-end justify-between mb-4">
-                 <div>
-                    <p className="text-4xl font-black text-slate-900 tabular-nums tracking-tighter leading-none">{s.value}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{s.label}</p>
-                 </div>
-                 <div className="text-right">
-                    <p className={cn("text-xs font-black uppercase tracking-widest", s.color)}>{s.sub}</p>
-                 </div>
-              </div>
-              {/* Progress bar visual */}
-              <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                 <div 
-                    className={cn("h-full transition-all duration-1000 delay-500", s.color.replace('text-', 'bg-'))} 
-                    style={{ width: isVisible ? `${s.progress}%` : '0%' }}
-                 />
-              </div>
-              
-              {/* Abstract hover bg */}
-              <div className={cn("absolute -right-10 -bottom-10 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity", s.bg)} />
+          {/* Welcome Header */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-400 font-medium mb-1">{t("userAccountTier")}</p>
+              <h1 className="text-2xl font-bold text-slate-800">
+                {t("welcomeBack")}, <span className="text-[#4CBFBF]">{user?.name?.split(' ')[0] || "User"}</span> 👋
+              </h1>
+              <p className="text-sm text-slate-500 mt-1">{t("dashboardSubtitle")}</p>
             </div>
-          ))}
-        </div>
-
-        {/* Global Action Grid */}
-        <div className="mb-20">
-          <div className="flex items-center justify-between mb-10">
-             <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{t("quickActions")}</h2>
-             <div className="h-px bg-slate-100 flex-1 mx-8 hidden md:block" />
-             <div className="flex gap-2">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400"><Clock className="h-4 w-4" /></div>
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400"><Bell className="h-4 w-4" /></div>
-             </div>
+            <div className="flex items-center gap-2">
+              <Link to="/profile">
+                <Button variant="ghost" size="sm" className="rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 text-xs font-medium">
+                  <Settings className="h-4 w-4 mr-1.5" /> {t("myProfile")}
+                </Button>
+              </Link>
+              <Link to="/lottery">
+                <Button size="sm" className="rounded-xl bg-[#4CBFBF] hover:bg-[#3fb0b0] text-white border-0 text-xs font-semibold shadow-sm">
+                  <Trophy className="h-4 w-4 mr-1.5" /> {t("enterLotteryAction")}
+                </Button>
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {quickLinks.map((link, i) => (
-              <Link
-                key={link.to}
-                to={link.to}
+
+          {/* Stat Cards */}
+          <div ref={ref} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            {stats.map((s, i) => (
+              <div
+                key={s.label}
+                onClick={() => navigate(s.to)}
                 className={cn(
-                  "group flex items-center justify-between bg-card rounded-[2rem] p-6 border border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-primary/5 hover:border-primary/20 transition-all duration-500",
-                  isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12"
+                  "bg-white rounded-2xl border border-slate-200 shadow-sm p-5 cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all group",
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                 )}
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <div className="flex items-center gap-5">
-                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg transition-all group-hover:rotate-12", link.color)}>
-                     <link.icon className="h-6 w-6" strokeWidth={2.5} />
+                <div className="flex items-start justify-between mb-4">
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", s.bg)}>
+                    <s.icon className={cn("h-5 w-5", s.color)} />
                   </div>
-                  <div>
-                    <span className="block font-black text-slate-900 text-lg tracking-tighter uppercase leading-none mb-1 group-hover:text-primary transition-colors">{link.label}</span>
-                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{link.desc}</span>
-                  </div>
+                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#4CBFBF] transition-colors" />
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all transform group-hover:translate-x-1">
-                  <ArrowRight className="h-5 w-5" strokeWidth={3} />
-                </div>
-              </Link>
+                <p className="text-3xl font-bold text-slate-800 tabular-nums mb-1">{s.value}</p>
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">{s.label}</p>
+              </div>
             ))}
           </div>
-        </div>
 
-        {/* Recent Drawing Stream */}
-        <div className={cn("animate-fade-in-up space-y-8 pb-32", isVisible ? "opacity-100" : "opacity-0")}>
-            <div className="flex items-center justify-between mb-2 px-4">
-               <div className="flex items-center gap-3">
-                  <div className="w-1.5 h-6 bg-primary rounded-full" />
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">{t("profRecentActivity")}</h2>
-               </div>
-               <Link to="/profile?tab=history" className="text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:underline px-4 py-1.5 border border-primary/20 rounded-full bg-primary/5 transition-all">{t("profSynchronizedLedger")} →</Link>
+          {/* Quick Actions */}
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-5 bg-[#4CBFBF] rounded-full" />
+              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">{t("quickActions")}</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {quickLinks.map((link, i) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={cn(
+                    "bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all group",
+                    isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-6"
+                  )}
+                  style={{ transitionDelay: `${i * 80}ms` }}
+                >
+                  <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0", link.color)}>
+                    <link.icon className="h-4 w-4" strokeWidth={2.5} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block text-sm font-semibold text-slate-700 group-hover:text-[#4CBFBF] transition-colors truncate">{link.label}</span>
+                    <span className="block text-xs text-slate-400 truncate">{link.desc}</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#4CBFBF] shrink-0 transition-colors" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className={cn("space-y-4 pb-10", isVisible ? "opacity-100" : "opacity-0")}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-5 bg-[#4CBFBF] rounded-full" />
+                <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">{t("profRecentActivity")}</h2>
+              </div>
+              <Link to="/profile?tab=history" className="text-xs text-[#4CBFBF] hover:underline font-medium">{t("profSynchronizedLedger")} →</Link>
             </div>
 
-           <div className="grid grid-cols-1 gap-4">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               {isLoading ? (
-                 Array(2).fill(0).map((_, i) => (
-                    <div key={i} className="h-28 rounded-[2rem] bg-slate-50 border border-slate-100 animate-pulse" />
-                 ))
+                Array(2).fill(0).map((_, i) => (
+                  <div key={i} className="px-5 py-4 flex items-center gap-3 animate-pulse border-b border-slate-50 last:border-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 bg-slate-100 rounded w-1/2" />
+                      <div className="h-2.5 bg-slate-100 rounded w-1/3" />
+                    </div>
+                  </div>
+                ))
               ) : (history?.lotteries?.length ?? 0) === 0 ? (
-                 <div className="bg-slate-900/40 backdrop-blur-xl rounded-[3rem] p-20 text-center border border-white/5 shadow-2xl relative overflow-hidden group">
-                     <History className="h-16 w-16 text-slate-700 mx-auto mb-6" />
-                     <h3 className="text-xl font-black text-white tracking-tighter mb-2 uppercase">{t("profNoActiveHistory")}</h3>
-                     <p className="text-slate-400 text-sm font-medium mb-8 max-w-xs mx-auto text-center">
-                        {t("profStartJourney")}
-                     </p>
-                     <Link to="/lottery">
-                        <Button className="rounded-full h-14 px-8 font-black uppercase tracking-widest text-xs">{t("enterLotteryAction")}</Button>
-                     </Link>
-                 </div>
+                <div className="py-16 text-center">
+                  <History className="h-10 w-10 text-slate-200 mx-auto mb-3" />
+                  <p className="text-sm font-semibold text-slate-500 mb-1">{t("profNoActiveHistory")}</p>
+                  <p className="text-xs text-slate-400 mb-4">{t("profStartJourney")}</p>
+                  <Link to="/lottery">
+                    <Button size="sm" className="rounded-xl bg-[#4CBFBF] hover:bg-[#3fb0b0] text-white border-0 text-xs">{t("enterLotteryAction")}</Button>
+                  </Link>
+                </div>
               ) : (
-                 history?.lotteries?.slice(0, 3).map((l: any) => {
+                <div className="divide-y divide-slate-50">
+                  {history?.lotteries?.slice(0, 5).map((l: any) => {
                     const isConfirmed = l.status === 'confirmed' || l.payment_status === 'approved';
                     const isPending = l.payment_status === 'pending';
                     const isAwaiting = !isConfirmed && !isPending;
-
                     return (
-                       <div 
-                         key={l.id} 
-                         onClick={() => {
-                           if (isAwaiting) {
-                             navigate("/payment", { state: { tickets: [l] } });
-                           }
-                         }}
-                         className={cn(
-                           "group relative bg-slate-900/40 backdrop-blur-xl rounded-[2rem] border border-white/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 hover:shadow-2xl hover:border-primary/20 hover:-translate-y-1 transition-all overflow-hidden shadow-xl",
-                           isAwaiting && "cursor-pointer"
-                         )}
-                       >
-                          <div className="flex items-center gap-6">
-                             <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:bg-primary/5 transition-all text-white font-black text-2xl tabular-nums">
-                                #{l.number.toString().padStart(2, '0')}
-                             </div>
-                              <div className="space-y-1.5 text-center sm:text-left">
-                                 <p className="text-sm font-black text-white uppercase tracking-tight leading-none group-hover:text-primary transition-colors">{t("profStandardEntry")}</p>
-                                 <div className="flex items-center justify-center sm:justify-start gap-3 opacity-40">
-                                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-300">
-                                       <Clock className="h-3.5 w-3.5" /> {new Date(l.date || l.created_at).toLocaleDateString()}
-                                    </div>
-                                    <div className="w-1 h-1 rounded-full bg-slate-700" />
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-primary">ID: {l.id.slice(0,8)}</div>
-                                 </div>
-                              </div>
-                          </div>
-                          <div className={cn(
-                              "px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg min-w-[160px] text-center transition-all",
-                              isConfirmed ? "bg-emerald-500 text-white shadow-emerald-500/20" : 
-                              isPending ? "bg-blue-600 text-white shadow-blue-500/20 animate-pulse" : 
-                              "bg-amber-500 text-white shadow-amber-500/20 hover:scale-105 active:scale-95"
-                           )}>
-                              {isConfirmed ? t("profConfirmedEntry") : isPending ? t("payUnderReview") : t("profAwaitingPayment")}
-                           </div>
-                       </div>
+                      <div
+                        key={l.id}
+                        onClick={() => isAwaiting && navigate("/payment", { state: { tickets: [l] } })}
+                        className={cn("flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group", isAwaiting && "cursor-pointer")}
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-600 text-sm tabular-nums shrink-0">
+                          #{l.number.toString().padStart(2, '0')}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-700 group-hover:text-[#4CBFBF] transition-colors truncate">{t("profStandardEntry")}</p>
+                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                            <Clock className="h-3 w-3" /> {new Date(l.date || l.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className={cn(
+                          "text-[10px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full shrink-0 border",
+                          isConfirmed ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
+                          isPending   ? "bg-blue-50   text-blue-600   border-blue-200"    :
+                                        "bg-amber-50  text-amber-600  border-amber-200"
+                        )}>
+                          {isConfirmed ? t("profConfirmedEntry") : isPending ? t("payUnderReview") : t("profAwaitingPayment")}
+                        </span>
+                      </div>
                     );
-                 })
+                  })}
+                </div>
               )}
-           </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </PageShell>
