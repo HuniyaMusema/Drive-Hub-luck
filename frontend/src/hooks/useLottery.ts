@@ -7,6 +7,7 @@ export interface Lottery {
   end_number: number;
   prize_text: string | null;
   prize_car_id: string | null;
+  ticket_price: number | string;
   status: 'active' | 'closed';
   created_at: string;
   prize_car_name?: string;

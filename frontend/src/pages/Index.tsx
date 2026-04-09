@@ -174,6 +174,9 @@ function HeroSection() {
         </div>
       </div>
 
+      {/* Right edge fade into footer color */}
+      <div className="absolute inset-y-0 right-0 w-1/3 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, transparent, #0d1e2e)" }} />
+
       {/* Ambient glows for depth */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] rounded-full blur-[160px] opacity-25" style={{ background: "radial-gradient(circle, rgba(245,176,39,0.12) 0%, transparent 70%)" }} />
@@ -235,7 +238,7 @@ function HeroSection() {
           </div>
 
           {/* ── RIGHT: Flashcard Stack ── */}
-          <div className="hidden lg:block w-full max-w-[420px] ml-auto relative z-10" style={{ animation: "slideInRight 0.9s 0.25s both" }}>
+          <div className="hidden lg:block w-full max-w-[420px] ml-auto relative z-20" style={{ animation: "slideInRight 0.9s 0.25s both" }}>
             <FlashcardStack />
           </div>
 

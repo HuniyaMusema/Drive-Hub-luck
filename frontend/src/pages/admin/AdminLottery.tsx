@@ -15,10 +15,10 @@ export default function AdminLottery() {
   const createMutation = useCreateLottery();
   const pickWinnerMutation = usePickWinner();
 
+  const [startNumber, setStartNumber] = useState("1");
   const [endNumber, setEndNumber] = useState("100");
   const [ticketPrice, setTicketPrice] = useState("100");
   const [prizeText, setPrizeText] = useState("");
-  const [ticketPrice, setTicketPrice] = useState("");
   const [isDrawing, setIsDrawing] = useState(false);
 
   const { toast } = useToast();
@@ -31,21 +31,21 @@ export default function AdminLottery() {
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prizeText.trim()) return toast({ title: "Validation Error", description: "Prize text is required.", variant: "destructive" });
-    if (Number(endNumber) < 2) return toast({ title: "Validation Error", description: "End number must be greater than 1.", variant: "destructive" });
+    if (Number(endNumber) <= Number(startNumber)) return toast({ title: "Validation Error", description: "End number must be greater than start number.", variant: "destructive" });
     if (!ticketPrice || Number(ticketPrice) <= 0) return toast({ title: "Validation Error", description: "Ticket price must be greater than 0.", variant: "destructive" });
 
     try {
       await createMutation.mutateAsync({
-        start_number: 1,
+        start_number: Number(startNumber),
         end_number: Number(endNumber),
         prize_text: prizeText,
         ticket_price: Number(ticketPrice),
-        ticket_price: Number(ticketPrice),
       });
-      toast({ title: "Lottery Started", description: `Successfully generated numbers 1 to ${endNumber}.` });
+      toast({ title: "Lottery Started", description: `Successfully generated numbers ${startNumber} to ${endNumber}.` });
       setPrizeText("");
-      setTicketPrice("");
+      setTicketPrice("100");
       setEndNumber("100");
+      setStartNumber("1");
     } catch (err: any) {
       toast({ title: t("startFailed"), description: err.message, variant: "destructive" });
     }
@@ -123,80 +123,81 @@ export default function AdminLottery() {
                 <Loader2 className="h-8 w-8 animate-spin text-[#4CBFBF] opacity-40" />
               </div>
             ) : lottery ? (
-              <div className="space-y-6">
-                {/* Active Prize Card */}
-                <div className="p-6 rounded-[1.5rem] bg-gradient-to-br from-[#4CBFBF]/5 to-[#4CBFBF]/10 border border-[#4CBFBF]/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#4CBFBF]/10 rounded-full blur-2xl -mr-8 -mt-8" />
-                  <p className="text-[9px] font-black text-[#4CBFBF] mb-2 uppercase tracking-[0.2em]">{t("activePrize")}</p>
-                  <p className="text-lg font-black text-slate-900 uppercase tracking-tight leading-tight">{lottery.prize_car_name || lottery.prize_text}</p>
-                  <div className="mt-5 grid grid-cols-3 gap-3">
-                    <div className="bg-white/70 rounded-xl p-3 border border-white/80">
-                      <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("range")}</p>
-                      <p className="text-xs font-black text-slate-800 tabular-nums">{lottery.start_number}–{lottery.end_number}</p>
-                    </div>
-                    <div className="bg-white/70 rounded-xl p-3 border border-white/80">
-                      <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("status")}</p>
-                      <p className="text-xs font-black uppercase text-amber-500">{lottery.status}</p>
-                    </div>
-                    <div className="bg-white/70 rounded-xl p-3 border border-white/80">
-                      <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">Price</p>
-                      <p className="text-xs font-black text-slate-800 tabular-nums">ETB {Number(lottery.ticket_price).toLocaleString()}</p>
+              <>
+                <div className="space-y-6">
+                  {/* Active Prize Card */}
+                  <div className="p-6 rounded-[1.5rem] bg-gradient-to-br from-[#4CBFBF]/5 to-[#4CBFBF]/10 border border-[#4CBFBF]/20 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#4CBFBF]/10 rounded-full blur-2xl -mr-8 -mt-8" />
+                    <p className="text-[9px] font-black text-[#4CBFBF] mb-2 uppercase tracking-[0.2em]">{t("activePrize")}</p>
+                    <p className="text-lg font-black text-slate-900 uppercase tracking-tight leading-tight">{lottery.prize_car_name || lottery.prize_text}</p>
+                    <div className="mt-5 grid grid-cols-3 gap-3">
+                      <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("range")}</p>
+                        <p className="text-xs font-black text-slate-800 tabular-nums">{lottery.start_number}–{lottery.end_number}</p>
+                      </div>
+                      <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("status")}</p>
+                        <p className="text-xs font-black uppercase text-amber-500">{lottery.status}</p>
+                      </div>
+                      <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">Price</p>
+                        <p className="text-xs font-black text-slate-800 tabular-nums">ETB {Number(lottery.ticket_price).toLocaleString()}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 lg:gap-3">
-                <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-center">
-                  <p className="text-[8px] lg:text-[10px] text-amber-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryConfirmed")}</p>
-                  <p className="text-xl lg:text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{stats?.confirmed || 0}</p>
+                
+                <div className="flex flex-wrap gap-2 lg:gap-3 mt-6">
+                  <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-center">
+                    <p className="text-[8px] lg:text-[10px] text-amber-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryConfirmed")}</p>
+                    <p className="text-xl lg:text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{stats?.confirmed || 0}</p>
+                  </div>
+                  <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col justify-center">
+                    <p className="text-[8px] lg:text-[10px] text-slate-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryPending")}</p>
+                    <p className="text-xl lg:text-3xl font-black text-amber-500 tabular-nums tracking-tighter">{stats?.pending || 0}</p>
+                  </div>
+                  <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-slate-50 border border-slate-100 opacity-40 flex flex-col justify-center">
+                    <p className="text-[8px] lg:text-[10px] text-slate-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryFree")}</p>
+                    <p className="text-xl lg:text-3xl font-black text-slate-400 tabular-nums tracking-tighter">{stats?.available || 0}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col justify-center">
-                  <p className="text-[8px] lg:text-[10px] text-slate-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryPending")}</p>
-                  <p className="text-xl lg:text-3xl font-black text-amber-500 tabular-nums tracking-tighter">{stats?.pending || 0}</p>
-                </div>
-                <div className="flex-1 min-w-[80px] text-center p-3 lg:p-4 rounded-2xl bg-slate-50 border border-slate-100 opacity-40 flex flex-col justify-center">
-                  <p className="text-[8px] lg:text-[10px] text-slate-500 font-extrabold uppercase tracking-tight lg:tracking-widest mb-1 leading-none">{t("lotteryFree")}</p>
-                  <p className="text-xl lg:text-3xl font-black text-slate-400 tabular-nums tracking-tighter">{stats?.available || 0}</p>
-                </div>
-              </div>
 
-              <Button variant="ghost" className="w-full h-14 rounded-2xl shadow-sm font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20" onClick={handleStop}>
-                <Square className="h-4 w-4 mr-2" /> {t("stopLottery")}
-              </Button>
-            </div>
-          ) : (
-            <form className="space-y-8" onSubmit={handleStart}>
-              <div className="space-y-4">
-                <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 ml-1">{t("numberRangeLabel")}</Label>
-                <div className="flex gap-4 items-center">
-                  <Input type="number" min={1} value={startNumber} onChange={(e) => setStartNumber(e.target.value)} required placeholder="1" className="flex-1 h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
-                  <span className="text-slate-300 font-black">→</span>
-                  <Input type="number" min={2} value={endNumber} onChange={(e) => setEndNumber(e.target.value)} required placeholder="100" className="flex-1 h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
+                <Button variant="ghost" className="w-full h-14 rounded-2xl shadow-sm font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20 mt-6" onClick={handleStop}>
+                  <Square className="h-4 w-4 mr-2" /> {t("stopLottery")}
+                </Button>
+              </>
+            ) : (
+              <form className="space-y-8" onSubmit={handleStart}>
+                <div className="space-y-4">
+                  <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 ml-1">{t("numberRangeLabel")}</Label>
+                  <div className="flex gap-4 items-center">
+                    <Input type="number" min={1} value={startNumber} onChange={(e) => setStartNumber(e.target.value)} required placeholder="1" className="flex-1 h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
+                    <span className="text-slate-300 font-black">→</span>
+                    <Input type="number" min={2} value={endNumber} onChange={(e) => setEndNumber(e.target.value)} required placeholder="100" className="flex-1 h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 font-black text-slate-900 tabular-nums rounded-[1.25rem] px-6 shadow-inner" />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center ml-1">
-                   <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">{t("alMainPrize")}</Label>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center ml-1">
+                     <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">{t("alMainPrize")}</Label>
+                  </div>
+                  <Input value={prizeText} onChange={(e) => setPrizeText(e.target.value)} required placeholder={t("alPrizeExample")} className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 text-slate-900 font-black rounded-[1.25rem] px-6 shadow-inner" />
                 </div>
-                <Input value={prizeText} onChange={(e) => setPrizeText(e.target.value)} required placeholder={t("alPrizeExample")} className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 text-slate-900 font-black rounded-[1.25rem] px-6 shadow-inner" />
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex justify-between items-center ml-1">
-                   <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">{t("ticketPrice")}</Label>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center ml-1">
+                     <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">{t("ticketPrice")}</Label>
+                  </div>
+                  <div className="relative">
+                     <Input type="number" min={0} value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} required placeholder="100" className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 text-slate-900 font-black rounded-[1.25rem] pl-6 pr-12 shadow-inner" />
+                     <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-widest">ETB</span>
+                  </div>
                 </div>
-                <div className="relative">
-                   <Input type="number" min={0} value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} required placeholder="100" className="h-16 bg-slate-50 border-slate-200 focus-visible:ring-amber-500/20 text-slate-900 font-black rounded-[1.25rem] pl-6 pr-12 shadow-inner" />
-                   <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-widest">ETB</span>
-                </div>
-              </div>
-              <Button disabled={createMutation.isPending} className="w-full h-16 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.25em] shadow-xl shadow-[#4CBFBF]/10 bg-[#4CBFBF] text-white hover:bg-[#3fb0b0] border-0 transition-all active:scale-95 disabled:opacity-50 mt-4">
-                {createMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Play className="h-5 w-5 mr-3 fill-current" />} 
-                {createMutation.isPending ? t("alInitializing") : t("initializeNewDraw")}
-              </Button>
-            </form>
-          )}
+                <Button disabled={createMutation.isPending} className="w-full h-16 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.25em] shadow-xl shadow-[#4CBFBF]/10 bg-[#4CBFBF] text-white hover:bg-[#3fb0b0] border-0 transition-all active:scale-95 disabled:opacity-50 mt-4">
+                  {createMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Play className="h-5 w-5 mr-3 fill-current" />} 
+                  {createMutation.isPending ? t("alInitializing") : t("initializeNewDraw")}
+                </Button>
+              </form>
+            )}
+          </div>
         </div>
 
         {/* Draw Action Panel */}
