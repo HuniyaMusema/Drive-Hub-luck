@@ -52,10 +52,46 @@ export interface ProfileHistory {
 }
 
 export const useCurrentLottery = () => {
-  return useQuery<{ lottery: Lottery; number_stats: LotteryStats }>({
+  return useQuery<{ lottery: Lottery; number_stats: LotteryStats } | null>({
     queryKey: ['lottery', 'current'],
-    queryFn: () => apiFetch('/lottery/current').catch(() => null), // Gracefully handle no lottery
+    queryFn: async () => {
+      console.log('[useCurrentLottery] Starting fetch...');
+      
+      const url = '/api/lottery/current';
+      console.log('[useCurrentLottery] Fetching from:', url);
+      
+      try {
+        const res = await fetch(url, {
+          cache: 'no-cache', // Force fresh data
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
+        console.log('[useCurrentLottery] Response received:', res.status, res.statusText);
+        
+        if (res.status === 404) {
+          console.log('[useCurrentLottery] No active lottery');
+          return null;
+        }
+        
+        if (!res.ok) {
+          console.error('[useCurrentLottery] Bad response:', res.status);
+          return null;
+        }
+        
+        const data = await res.json();
+        console.log('[useCurrentLottery] Data received:', data);
+        return data;
+      } catch (err: any) {
+        console.error('[useCurrentLottery] Error:', err);
+        return null; // Return null instead of throwing
+      }
+    },
     retry: false,
+    staleTime: 0, // Always stale
+    gcTime: 0, // Don't cache
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
   });
 };
 

@@ -20,10 +20,19 @@ if (!fs.existsSync(uploadsDir)){
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:8080',
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
 
 // Master Platform Toggle
 app.use(maintenanceGuard);

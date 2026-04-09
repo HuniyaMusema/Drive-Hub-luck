@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import React from "react";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -8,16 +9,75 @@ import { useCurrentLottery } from "@/hooks/useLottery";
 import { useSettings } from "@/hooks/useSettings";
 
 export default function Lottery() {
+  console.log('========== LOTTERY COMPONENT RENDERING ==========');
+  
   const { ref: stepsRef, isVisible: stepsVisible } = useScrollReveal();
   const { ref: detailsRef, isVisible: detailsVisible } = useScrollReveal();
   const { t } = useLanguage();
-  const { data: lotteryData, isLoading: lotteryLoading } = useCurrentLottery();
+  
+  // TEMPORARY: Use simple state instead of React Query
+  const [lotteryData, setLotteryData] = React.useState<any>(null);
+  const [lotteryLoading, setLotteryLoading] = React.useState(true);
+  const [error, setError] = React.useState<any>(null);
+  
+  React.useEffect(() => {
+    console.log('[Lottery] Fetching lottery data...');
+    fetch('/api/lottery/current')
+      .then(res => {
+        console.log('[Lottery] Response:', res.status);
+        if (res.status === 404) return null;
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(data => {
+        console.log('[Lottery] Raw data from API:', JSON.stringify(data, null, 2));
+        console.log('[Lottery] data.lottery:', data?.lottery);
+        console.log('[Lottery] data.number_stats:', data?.number_stats);
+        setLotteryData(data);
+        setLotteryLoading(false);
+      })
+      .catch(err => {
+        console.error('[Lottery] Error:', err);
+        setError(err);
+        setLotteryLoading(false);
+      });
+  }, []);
+  
   const { settings } = useSettings();
 
   const activeLottery = lotteryData?.lottery;
   const stats = lotteryData?.number_stats;
+  
+  console.log('[Lottery] activeLottery details:', {
+    activeLottery,
+    type: typeof activeLottery,
+    isObject: typeof activeLottery === 'object',
+    isNull: activeLottery === null,
+    isUndefined: activeLottery === undefined,
+    hasId: activeLottery?.id,
+    hasPrizeText: activeLottery?.prize_text,
+    keys: activeLottery ? Object.keys(activeLottery) : 'N/A'
+  });
+  
   const ticketPrice = parseFloat(activeLottery?.ticket_price as any) || settings?.Lottery?.ticketPrice || 0;
   const currency = settings?.General?.defaultCurrency || 'ETB';
+
+  // Debug logging
+  console.log('[Lottery] State:', { 
+    lotteryData, 
+    activeLottery, 
+    isLoading: lotteryLoading, 
+    error,
+    hasData: !!lotteryData,
+    hasLottery: !!activeLottery
+  });
+  
+  console.log('[Lottery] Will render:', {
+    showLoading: lotteryLoading && !lotteryData,
+    showError: !!error,
+    showLottery: !!activeLottery,
+    showEmpty: !lotteryLoading && !error && !activeLottery
+  });
 
   return (
     <PageShell>
@@ -44,12 +104,23 @@ export default function Lottery() {
         </div>
 
         {/* Dynamic Lottery Card */}
-        {lotteryLoading ? (
+        {lotteryLoading && !lotteryData ? (
           <div className="max-w-4xl mx-auto mb-20 aspect-[21/9] rounded-[2.5rem] bg-muted/30 animate-pulse flex items-center justify-center border border-border/40">
              <div className="flex flex-col items-center gap-3">
                 <Loader2 className="h-10 w-10 animate-spin text-primary/20" />
                 <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-50">{t("l_syncingDraw")}</p>
              </div>
+          </div>
+        ) : error ? (
+          <div className="max-w-3xl mx-auto mb-24 p-12 rounded-[2.5rem] bg-red-50 border border-red-200 text-center">
+             <div className="w-16 h-16 rounded-3xl bg-red-100 border border-red-200 flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="h-8 w-8 text-red-500" />
+             </div>
+             <h2 className="text-2xl font-black tracking-tight mb-2 text-red-900">Connection Error</h2>
+             <p className="text-red-600 font-medium text-sm max-w-xs mx-auto mb-4">{(error as Error)?.message || 'Failed to load lottery'}</p>
+             <Button onClick={() => window.location.reload()} variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
+               Retry
+             </Button>
           </div>
         ) : activeLottery ? (
           <div
@@ -97,32 +168,29 @@ export default function Lottery() {
                         {ticketPrice.toLocaleString()} <span className="text-xs text-[#3df0a2]">{currency}</span>
                       </p>
                     </div>
-                    
                     <div className="space-y-1.5">
                       <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{t("numberRange")}</p>
                       <p className="text-4xl font-black text-foreground tabular-nums tracking-tighter">
                         {activeLottery.start_number}<span className="mx-1 opacity-20">–</span>{activeLottery.end_number}
                       </p>
                     </div>
-
                     <div className="col-span-2 space-y-4 mt-4">
                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
                           <span className="text-muted-foreground">{t("ticketsLeft")}</span>
                           <span className="text-primary">{stats?.available ?? 0} {t("available")}</span>
                        </div>
                        <div className="h-3 w-full bg-muted rounded-full overflow-hidden border border-border/40 p-0.5">
-                          <div 
-                            className="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                          <div
+                            className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
                             style={{ width: `${Math.max(10, ((stats?.available ?? 0) / (activeLottery.end_number - activeLottery.start_number + 1)) * 100)}%` }}
                           />
                        </div>
                     </div>
                   </div>
-
                   <div className="mt-12 flex flex-col sm:flex-row items-center gap-6">
                     <Link to="/lottery/select" className="w-full sm:w-auto overflow-hidden rounded-2xl group/btn">
                       <Button className="h-16 px-10 rounded-2xl font-black text-lg shadow-2xl shadow-primary/30 transition-all hover:scale-[1.03] active:scale-95 flex items-center gap-3 w-full">
-                        {t("selectYourNumbers")} 
+                        {t("selectYourNumbers")}
                         <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center group-hover/btn:translate-x-1 transition-transform">
                            <ArrowRight className="h-5 w-5" />
                         </div>

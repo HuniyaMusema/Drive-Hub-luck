@@ -18,6 +18,7 @@ export default function AdminLottery() {
   const [startNumber, setStartNumber] = useState("1");
   const [endNumber, setEndNumber] = useState("100");
   const [prizeText, setPrizeText] = useState("");
+  const [ticketPrice, setTicketPrice] = useState("100");
   const [isDrawing, setIsDrawing] = useState(false);
 
   const { toast } = useToast();
