@@ -12,8 +12,8 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
 export default function LotterySelect() {
-  const { data: lotteryData, isLoading: loadingLottery } = useCurrentLottery();
-  const { data: takenNumbersList = [], isLoading: loadingTaken } = useTakenNumbers();
+  const { data: lotteryData, isLoading: loadingLottery, error: lotteryError } = useCurrentLottery();
+  const { data: takenNumbersList = [], isLoading: loadingTaken, error: takenError } = useTakenNumbers();
   const { data: history } = useProfileHistory();
   const participateMutation = useParticipateLottery();
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -105,6 +105,8 @@ export default function LotterySelect() {
     );
   }
 
+  const hasError = lotteryError || takenError;
+
   return (
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8 pb-32">
@@ -142,6 +144,15 @@ export default function LotterySelect() {
               <div className="min-h-[400px] flex flex-col items-center justify-center gap-6 bg-card/50 rounded-[2.5rem] border border-border/40">
                 <Loader2 className="h-12 w-12 animate-spin text-primary opacity-20" />
                 <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">{t("l_syncingBoard")}</p>
+              </div>
+            ) : hasError ? (
+              <div className="bg-destructive/10 rounded-[2.5rem] p-16 text-center shadow-xl border border-destructive/20">
+                <AlertCircle className="h-12 w-12 text-destructive opacity-50 mx-auto mb-4" />
+                <h2 className="text-2xl font-black text-destructive tracking-tight mb-2">Connection Error</h2>
+                <p className="text-destructive font-medium mb-6">Failed to sync with the drawing board. Please check your connection.</p>
+                <Button onClick={() => window.location.reload()} variant="outline" className="border-destructive/40 text-destructive hover:bg-destructive/10">
+                  Try Again
+                </Button>
               </div>
             ) : isAdminOrStaff ? (
               <div className="bg-card rounded-[2.5rem] p-16 text-center shadow-xl border border-dashed border-primary/20 relative overflow-hidden">

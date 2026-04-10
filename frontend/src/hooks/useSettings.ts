@@ -11,7 +11,8 @@ export const useSettings = () => {
   const { data: settings = {}, isLoading, error } = useQuery<SystemSettings, Error>({
     queryKey: ["settings"],
     queryFn: () => apiFetch("/settings"),
-    retry: false, // Don't retry on 503 so we show maintenance immediately
+    staleTime: 30000, 
+    retry: 1,
   });
 
   const updateSetting = useMutation({

@@ -55,42 +55,30 @@ export const useCurrentLottery = () => {
   return useQuery<{ lottery: Lottery; number_stats: LotteryStats } | null>({
     queryKey: ['lottery', 'current'],
     queryFn: async () => {
-      console.log('[useCurrentLottery] Starting fetch...');
-      
       const url = '/api/lottery/current';
-      console.log('[useCurrentLottery] Fetching from:', url);
       
-      try {
-        const res = await fetch(url, {
-          cache: 'no-cache', // Force fresh data
-          headers: {
-            'Cache-Control': 'no-cache',
-          },
-        });
-        console.log('[useCurrentLottery] Response received:', res.status, res.statusText);
-        
-        if (res.status === 404) {
-          console.log('[useCurrentLottery] No active lottery');
-          return null;
-        }
-        
-        if (!res.ok) {
-          console.error('[useCurrentLottery] Bad response:', res.status);
-          return null;
-        }
-        
-        const data = await res.json();
-        console.log('[useCurrentLottery] Data received:', data);
-        return data;
-      } catch (err: any) {
-        console.error('[useCurrentLottery] Error:', err);
-        return null; // Return null instead of throwing
+      const res = await fetch(url, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      });
+      
+      if (res.status === 404) {
+        return null;
       }
+      
+      if (!res.ok) {
+        throw new Error(`Failed to fetch lottery: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      return data;
     },
-    retry: false,
-    staleTime: 0, // Always stale
-    gcTime: 0, // Don't cache
-    refetchOnMount: 'always',
+    retry: 1,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
 };

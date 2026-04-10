@@ -9,103 +9,44 @@ import { useCurrentLottery } from "@/hooks/useLottery";
 import { useSettings } from "@/hooks/useSettings";
 
 export default function Lottery() {
-  console.log('========== LOTTERY COMPONENT RENDERING ==========');
-  
   const { ref: stepsRef, isVisible: stepsVisible } = useScrollReveal();
   const { ref: detailsRef, isVisible: detailsVisible } = useScrollReveal();
   const { t } = useLanguage();
-  
-  // TEMPORARY: Use simple state instead of React Query
-  const [lotteryData, setLotteryData] = React.useState<any>(null);
-  const [lotteryLoading, setLotteryLoading] = React.useState(true);
-  const [error, setError] = React.useState<any>(null);
-  
-  React.useEffect(() => {
-    console.log('[Lottery] Fetching lottery data...');
-    fetch('/api/lottery/current')
-      .then(res => {
-        console.log('[Lottery] Response:', res.status);
-        if (res.status === 404) return null;
-        if (!res.ok) throw new Error('Failed to fetch');
-        return res.json();
-      })
-      .then(data => {
-        console.log('[Lottery] Raw data from API:', JSON.stringify(data, null, 2));
-        console.log('[Lottery] data.lottery:', data?.lottery);
-        console.log('[Lottery] data.number_stats:', data?.number_stats);
-        setLotteryData(data);
-        setLotteryLoading(false);
-      })
-      .catch(err => {
-        console.error('[Lottery] Error:', err);
-        setError(err);
-        setLotteryLoading(false);
-      });
-  }, []);
-  
+  const { data: lotteryData, isLoading: lotteryLoading, error } = useCurrentLottery();
   const { settings } = useSettings();
 
   const activeLottery = lotteryData?.lottery;
   const stats = lotteryData?.number_stats;
-  
-  console.log('[Lottery] activeLottery details:', {
-    activeLottery,
-    type: typeof activeLottery,
-    isObject: typeof activeLottery === 'object',
-    isNull: activeLottery === null,
-    isUndefined: activeLottery === undefined,
-    hasId: activeLottery?.id,
-    hasPrizeText: activeLottery?.prize_text,
-    keys: activeLottery ? Object.keys(activeLottery) : 'N/A'
-  });
-  
   const ticketPrice = parseFloat(activeLottery?.ticket_price as any) || settings?.Lottery?.ticketPrice || 0;
   const currency = settings?.General?.defaultCurrency || 'ETB';
-
-  // Debug logging
-  console.log('[Lottery] State:', { 
-    lotteryData, 
-    activeLottery, 
-    isLoading: lotteryLoading, 
-    error,
-    hasData: !!lotteryData,
-    hasLottery: !!activeLottery
-  });
-  
-  console.log('[Lottery] Will render:', {
-    showLoading: lotteryLoading && !lotteryData,
-    showError: !!error,
-    showLottery: !!activeLottery,
-    showEmpty: !lotteryLoading && !error && !activeLottery
-  });
 
   return (
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8 pb-20">
         {/* Hero Section */}
-        <div className="relative text-center mb-24 py-24 rounded-[3rem] overflow-hidden shadow-2xl animate-fade-in-up border" style={{ background: 'linear-gradient(135deg, #071018 0%, #0a1929 50%, #071018 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
+        <div className="relative text-center mb-12 sm:mb-24 py-12 sm:py-24 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl animate-fade-in-up border" style={{ background: 'linear-gradient(135deg, #071018 0%, #0a1929 50%, #071018 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
            <div className="absolute inset-0 z-0 pointer-events-none">
              <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-48 -mt-48" style={{ background: 'radial-gradient(circle, rgba(76,191,191,0.18) 0%, transparent 70%)' }} />
              <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[130px] -ml-48 -mb-48" style={{ background: 'radial-gradient(circle, rgba(61,143,181,0.14) 0%, transparent 70%)' }} />
              <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(76,191,191,0.06) 0%, transparent 60%)' }} />
            </div>
 
-           <div className="relative z-10 flex flex-col items-center">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border" style={{ background: 'rgba(76,191,191,0.10)', borderColor: 'rgba(76,191,191,0.30)', color: '#4CBFBF' }}>
+           <div className="relative z-10 flex flex-col items-center px-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-6 sm:mb-8 border" style={{ background: 'rgba(76,191,191,0.10)', borderColor: 'rgba(76,191,191,0.30)', color: '#4CBFBF' }}>
                 <Sparkles className="h-3 w-3" /> {t("lotteryTagline")}
               </div>
-              <h1 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-8 uppercase max-w-4xl" style={{ textShadow: '0 4px 40px rgba(0,0,0,0.4)' }}>
+              <h1 className="text-3xl sm:text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.95] mb-6 sm:mb-8 uppercase max-w-4xl" style={{ textShadow: '0 4px 40px rgba(0,0,0,0.4)' }}>
                 {t("lotteryTitle")}
               </h1>
-              <p className="max-w-2xl mx-auto text-lg font-medium leading-relaxed" style={{ color: 'rgba(190,220,210,0.80)' }}>
+              <p className="max-w-xl mx-auto text-sm sm:text-lg font-medium leading-relaxed opacity-80" style={{ color: 'rgba(190,220,210,0.80)' }}>
                 {t("lotteryDesc")}
               </p>
            </div>
         </div>
 
         {/* Dynamic Lottery Card */}
-        {lotteryLoading && !lotteryData ? (
-          <div className="max-w-4xl mx-auto mb-20 aspect-[21/9] rounded-[2.5rem] bg-muted/30 animate-pulse flex items-center justify-center border border-border/40">
+        {lotteryLoading ? (
+          <div className="max-w-4xl mx-auto mb-20 aspect-[16/10] sm:aspect-[21/9] rounded-[2.5rem] bg-muted/30 animate-pulse flex items-center justify-center border border-border/40">
              <div className="flex flex-col items-center gap-3">
                 <Loader2 className="h-10 w-10 animate-spin text-primary/20" />
                 <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-50">{t("l_syncingDraw")}</p>

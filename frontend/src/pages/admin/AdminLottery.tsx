@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AdminLottery() {
-  const { data: lotteryData, isLoading: lotteryLoading } = useCurrentLottery();
+  const { data: lotteryData, isLoading: lotteryLoading, error } = useCurrentLottery();
   const createMutation = useCreateLottery();
   const pickWinnerMutation = usePickWinner();
 
@@ -120,6 +120,12 @@ export default function AdminLottery() {
             {lotteryLoading ? (
               <div className="flex justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-[#4CBFBF] opacity-40" />
+              </div>
+            ) : error ? (
+              <div className="p-8 rounded-2xl bg-red-50 border border-red-100 text-center">
+                <AlertCircle className="h-8 w-8 text-red-400 mx-auto mb-3" />
+                <p className="text-[10px] font-black text-red-900 uppercase tracking-widest leading-relaxed">Failed to load lottery data</p>
+                <Button onClick={() => window.location.reload()} variant="ghost" className="mt-4 text-[9px] font-black uppercase tracking-widest text-red-600 hover:bg-red-100 h-8">Retry Connection</Button>
               </div>
             ) : lottery ? (
               <div className="space-y-6">
