@@ -63,11 +63,6 @@ export default function Dashboard() {
                   <Settings className="h-4 w-4 mr-1.5" /> {t("myProfile")}
                 </Button>
               </Link>
-              <Link to="/lottery">
-                <Button size="sm" className="rounded-xl bg-[#4CBFBF] hover:bg-[#3fb0b0] text-white border-0 text-xs font-semibold shadow-sm">
-                  <Trophy className="h-4 w-4 mr-1.5" /> {t("enterLotteryAction")}
-                </Button>
-              </Link>
             </div>
           </div>
 

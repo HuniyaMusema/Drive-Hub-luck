@@ -172,9 +172,9 @@ export default function LotteryPayments() {
             <div className="grid grid-cols-12 gap-3 px-6 py-4 bg-slate-50 text-xs font-black text-slate-400 uppercase tracking-widest">
               <div className="col-span-1">#</div>
               <div className="col-span-4">{t("payUser")}</div>
-              <div className="col-span-1">{t("payMethod")}</div>
+              <div className="col-span-2">{t("payMethod")}</div>
               <div className="col-span-1">{t("payTicket")}</div>
-              <div className="col-span-2">{t("payReceipt")}</div>
+              <div className="col-span-1">{t("payReceipt")}</div>
               <div className="col-span-3">{t("payStatus")}</div>
             </div>
 
@@ -198,8 +198,8 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Method */}
-                  <div className="col-span-1">
-                    <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase border ${p.method === 'CBE' ? 'bg-blue-400/10 text-blue-400 border-blue-400/20' : 'bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20'}`}>
+                  <div className="col-span-2">
+                    <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase border whitespace-nowrap ${p.method === 'CBE' ? 'bg-blue-400/10 text-blue-400 border-blue-400/20' : 'bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20'}`}>
                       {p.method}
                     </span>
                   </div>
@@ -212,14 +212,14 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Receipt */}
-                  <div className="col-span-2">
+                  <div className="col-span-1">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-9 gap-2 rounded-xl border-slate-200 bg-slate-50 hover:border-[#4CBFBF]/40 hover:text-[#4CBFBF] text-xs font-black uppercase px-4 text-slate-500"
+                      className="h-9 gap-1 rounded-xl border-slate-200 bg-slate-50 hover:border-[#4CBFBF]/40 hover:text-[#4CBFBF] text-xs font-black uppercase px-3 text-slate-500"
                       onClick={() => setPreviewUrl(p.receipt_url)}
                     >
-                      <Eye className="h-4 w-4" /> {t("payView")}
+                      <Eye className="h-4 w-4" />
                     </Button>
                   </div>
 

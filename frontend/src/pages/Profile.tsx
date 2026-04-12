@@ -222,15 +222,25 @@ export default function Profile() {
                           const s = getEntryStatusCfg(l);
                           const Icon = s.icon;
                           
+                          const isClosed = (l as any).lottery_status === 'closed';
                           return (
                             <div 
                               key={l.id} 
                               onClick={() => label === t("profAwaitingPayment") && navigate("/payment", { state: { tickets: [l] } })}
                               className={cn(
-                                "group relative bg-card rounded-3xl border border-border/60 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 hover:shadow-2xl hover:border-primary/20 hover:-translate-y-1 transition-all overflow-hidden",
+                                "group relative rounded-3xl border p-6 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all overflow-hidden",
+                                isClosed
+                                  ? "bg-slate-100/60 border-slate-200 opacity-75"
+                                  : "bg-card border-border/60 hover:shadow-2xl hover:border-primary/20 hover:-translate-y-1",
                                 label === t("profAwaitingPayment") && "cursor-pointer"
                               )}
                             >
+                               {isClosed && (
+                                 <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-200 border border-slate-300">
+                                 <XCircle className="h-3 w-3 text-slate-400" />
+                                   <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">{t("closedLottery")}</span>
+                                 </div>
+                               )}
                                <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", s.className.split(' ')[0])} />
                                <div className="flex items-center gap-6">
                                   <div className="relative">
