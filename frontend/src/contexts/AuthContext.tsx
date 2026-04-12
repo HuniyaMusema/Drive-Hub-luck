@@ -19,10 +19,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       sessionStorage.setItem("user", JSON.stringify(user));
     } else {
+      const hadUser = sessionStorage.getItem("user");
       sessionStorage.removeItem("user");
       sessionStorage.removeItem("token");
+      if (hadUser) {
+        queryClient.clear();
+      }
     }
-    queryClient.clear();
   }, [user, queryClient]);
 
   const hasPermission = useCallback(

@@ -12,7 +12,7 @@ export default function Lottery() {
   const { ref: stepsRef, isVisible: stepsVisible } = useScrollReveal();
   const { ref: detailsRef, isVisible: detailsVisible } = useScrollReveal();
   const { t } = useLanguage();
-  const { data: lotteryData, isLoading: lotteryLoading, error } = useCurrentLottery();
+  const { data: lotteryData, isPending: lotteryLoading, error } = useCurrentLottery();
   const { settings } = useSettings();
 
   const activeLottery = lotteryData?.lottery;
@@ -65,8 +65,8 @@ export default function Lottery() {
           </div>
         ) : activeLottery ? (
           <div
-            ref={detailsRef}
-            className={`max-w-4xl mx-auto mb-24 relative group transition-all duration-1000 ${detailsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
+            className="max-w-4xl mx-auto mb-24 relative group animate-fade-in-up"
+            style={{ animationDelay: '200ms', animationFillMode: 'both' }}
           >
             {/* Background Glow */}
             <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />

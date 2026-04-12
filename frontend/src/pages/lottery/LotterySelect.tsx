@@ -12,16 +12,16 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
 export default function LotterySelect() {
-  const { data: lotteryData, isLoading: loadingLottery, error: lotteryError } = useCurrentLottery();
-  const { data: takenNumbersList = [], isLoading: loadingTaken, error: takenError } = useTakenNumbers();
-  const { data: history } = useProfileHistory();
+  const { user } = useAuth();
+  const { data: lotteryData, isPending: loadingLottery, error: lotteryError } = useCurrentLottery();
+  const { data: takenNumbersList = [], isPending: loadingTaken, error: takenError } = useTakenNumbers();
+  const { data: history } = useProfileHistory({ enabled: !!user });
   const participateMutation = useParticipateLottery();
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [confirmed, setConfirmed] = useState(false);
   const [reservedTickets, setReservedTickets] = useState<any[] | null>(null);
   const [visibleCount, setVisibleCount] = useState(200);
   const [searchTerm, setSearchTerm] = useState("");
-  const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -153,19 +153,6 @@ export default function LotterySelect() {
                 <Button onClick={() => window.location.reload()} variant="outline" className="border-destructive/40 text-destructive hover:bg-destructive/10">
                   Try Again
                 </Button>
-              </div>
-            ) : isAdminOrStaff ? (
-              <div className="bg-card rounded-[2.5rem] p-16 text-center shadow-xl border border-dashed border-primary/20 relative overflow-hidden">
-                <div className="absolute inset-0 bg-primary/5 blur-3xl opacity-20 pointer-events-none" />
-                <div className="relative z-10 flex flex-col items-center">
-                   <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-                      <LockIcon className="h-8 w-8 text-primary" />
-                   </div>
-                   <h2 className="text-2xl font-black text-foreground tracking-tight uppercase mb-2">{t("l_restrictedAccess")}</h2>
-                   <p className="text-muted-foreground font-medium max-w-md mx-auto">
-                     {t("l_managementRestriction")}
-                   </p>
-                </div>
               </div>
             ) : !lottery ? (
               <div className="bg-card rounded-[2.5rem] p-20 text-center shadow-xl border border-dashed border-border/60">

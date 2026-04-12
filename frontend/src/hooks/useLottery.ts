@@ -93,7 +93,7 @@ export const useLotteryNumbers = () => {
 export const useTakenNumbers = () => {
   return useQuery<number[]>({
     queryKey: ['lottery', 'taken'],
-    queryFn: () => apiFetch('/lottery/taken'),
+    queryFn: () => apiFetch('/lottery/taken').catch(() => []),
   });
 };
 
@@ -152,10 +152,11 @@ export const useVerifyPayment = () => {
   });
 };
 
-export const useProfileHistory = () => {
+export const useProfileHistory = (options?: { enabled?: boolean }) => {
   return useQuery<ProfileHistory>({
     queryKey: ['profile', 'history'],
     queryFn: () => apiFetch('/auth/profile-history'),
+    enabled: options?.enabled !== undefined ? options.enabled : true,
   });
 };
 
