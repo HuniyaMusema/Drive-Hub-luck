@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Car, Eye, EyeOff, ShieldCheck, Sparkles, ArrowRight, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -61,9 +60,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
+    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
       <Header />
-      <div className="flex-1 flex flex-col lg:flex-row mt-16">
+      <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left Side: Cinematic Visuals */}
         <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(160deg, #0a1628 0%, #0d2e22 100%)' }}>
            <img src={heroBg} alt="Luxury Background" className="absolute inset-0 w-full h-full object-cover opacity-55 scale-105" />
@@ -99,16 +98,16 @@ export default function Login() {
         </div>
 
         {/* Right Side: Elegant Form */}
-        <div className="flex-1 flex items-center justify-center p-8 lg:p-24 relative overflow-hidden bg-white">
+        <div className="flex-1 flex items-center justify-center p-6 lg:px-24 lg:py-8 relative overflow-y-auto bg-white">
            {/* Ambient glow */}
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.07) 0%, transparent 70%)' }} />
 
            <div className="w-full max-w-md relative z-10 animate-fade-in-up">
-              <div className="text-center mb-12">
-                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border group" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)' }}>
-                    <Lock className="h-8 w-8 group-hover:rotate-12 transition-transform" style={{ color: '#3df0a2' }} />
+              <div className="text-center mb-8">
+                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 border group" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)' }}>
+                    <Lock className="h-6 w-6 group-hover:rotate-12 transition-transform" style={{ color: '#3df0a2' }} />
                  </div>
-                 <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mb-2">{t("authAuthenticatedAccess")}</h1>
+                 <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase mb-2">{t("authAuthenticatedAccess")}</h1>
                  <p className="font-medium text-slate-500">{t("signInToAccount")}</p>
               </div>
 
@@ -165,7 +164,7 @@ export default function Login() {
                  </Button>
               </form>
 
-              <div className="mt-12 pt-8 border-t border-slate-200 text-center">
+              <div className="mt-6 pt-4 border-t border-slate-200 text-center">
                  <p className="text-sm font-medium text-slate-500">
                     {t("noAccount")}{" "}
                     <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#0d2e22' }}>
@@ -176,7 +175,6 @@ export default function Login() {
            </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

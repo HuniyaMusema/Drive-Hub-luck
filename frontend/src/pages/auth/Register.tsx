@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Car, Eye, EyeOff, Check, UserPlus, ShieldCheck, Mail, Lock, User, Phone, ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -60,9 +59,9 @@ export default function Register() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
+    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
       <Header />
-      <div className="flex-1 flex flex-col lg:flex-row mt-16">
+      <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left Side: Cinematic Onboarding */}
         <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(160deg, #0a1628 0%, #0d2e22 100%)' }}>
            <img src={heroBg} alt="Onboarding Visual" className="absolute inset-0 w-full h-full object-cover opacity-55 scale-105" />
@@ -98,19 +97,19 @@ export default function Register() {
         </div>
 
         {/* Right Side: High-Fidelity Registration */}
-        <div className="flex-1 flex items-center justify-center p-8 lg:p-24 relative overflow-hidden" style={{ background: 'rgba(10,18,32,0.97)' }}>
+        <div className="flex-1 flex items-center justify-center p-4 lg:px-24 lg:py-6 relative overflow-y-auto bg-white">
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.07) 0%, transparent 70%)' }} />
 
            <div className="w-full max-w-lg relative z-10 animate-fade-in-up">
-              <div className="text-center mb-12">
-                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border group" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)' }}>
-                    <UserPlus className="h-8 w-8 group-hover:rotate-12 transition-transform" style={{ color: '#3df0a2' }} />
+              <div className="text-center mb-6">
+                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 border group" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)' }}>
+                    <UserPlus className="h-6 w-6 group-hover:rotate-12 transition-transform" style={{ color: '#3df0a2' }} />
                  </div>
-                 <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">{t("authCreateIdentity")}</h1>
-                 <p className="font-medium" style={{ color: 'rgba(170,200,190,0.70)' }}>{t("joinGech")}</p>
+                 <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase mb-2">{t("authCreateIdentity")}</h1>
+                 <p className="font-medium text-slate-500">{t("joinGech")}</p>
               </div>
 
-              <form className="space-y-6" onSubmit={handleSubmit}>
+              <form className="space-y-4" onSubmit={handleSubmit}>
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                        <Label htmlFor="firstName" className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{t("firstName")}</Label>
@@ -118,7 +117,7 @@ export default function Register() {
                           <Input 
                              id="firstName" 
                              placeholder="Marcus" 
-                             className="h-14 bg-white/5 border-white/10 text-white rounded-2xl px-12 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-700" 
+                             className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
                              value={firstName} 
                              onChange={(e) => setFirstName(e.target.value)} 
                              required 
@@ -131,7 +130,7 @@ export default function Register() {
                        <Input 
                           id="lastName" 
                           placeholder="Rivera" 
-                          className="h-14 bg-white/5 border-white/10 text-white rounded-2xl px-4 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-700" 
+                          className="h-14 text-slate-900 rounded-2xl px-4 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
                           value={lastName} 
                           onChange={(e) => setLastName(e.target.value)} 
                        />
@@ -145,7 +144,7 @@ export default function Register() {
                           id="email" 
                           type="email" 
                           placeholder="identifier@drivehub.com" 
-                          className="h-14 bg-white/5 border-white/10 text-white rounded-2xl px-12 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-700" 
+                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
                           value={email} 
                           onChange={(e) => setEmail(e.target.value)} 
                           required 
@@ -161,7 +160,7 @@ export default function Register() {
                           id="password" 
                           type={showPassword ? "text" : "password"} 
                           placeholder="••••••••" 
-                          className="h-14 bg-white/5 border-white/10 text-white rounded-2xl px-12 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-slate-700 font-mono" 
+                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200 font-mono" 
                           value={password} 
                           onChange={(e) => setPassword(e.target.value)} 
                        />
@@ -169,7 +168,7 @@ export default function Register() {
                        <button 
                           type="button" 
                           onClick={() => setShowPassword(!showPassword)} 
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 hover:text-white transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors text-slate-400 hover:text-slate-600"
                        >
                           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                        </button>
@@ -178,7 +177,7 @@ export default function Register() {
                        <div className="grid grid-cols-3 gap-2 pt-2 ml-1">
                           {checks.map((c, i) => (
                              <div key={i} className="flex flex-col gap-1">
-                                <div className={cn("h-1 rounded-full bg-white/5 overflow-hidden")}>
+                                <div className={cn("h-1 rounded-full bg-slate-100 overflow-hidden")}>
                                    <div className={cn("h-full transition-all duration-500", c.ok ? "bg-primary" : "bg-transparent")} style={{ width: '100%' }} />
                                 </div>
                                 <span className={cn("text-[8px] font-black uppercase tracking-widest", c.ok ? "text-primary" : "text-slate-600")}>{c.label}</span>
@@ -190,18 +189,18 @@ export default function Register() {
 
                  <Button 
                     type="submit" 
-                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0" 
-                    style={{ background: '#3df0a2', color: '#0a1628', boxShadow: '0 0 40px rgba(61,240,162,0.30), 0 8px 24px rgba(61,240,162,0.18)' }}
+                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0 shadow-lg text-white" 
+                    style={{ background: '#0d2e22' }}
                     disabled={isLoading}
                  >
                     {isLoading ? t("authInitializationIdentity") : t("createOne")}
                  </Button>
               </form>
 
-              <div className="mt-12 pt-8 border-t text-center" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                 <p className="text-sm font-medium" style={{ color: 'rgba(150,180,170,0.65)' }}>
+              <div className="mt-4 pt-4 border-t border-slate-200 text-center">
+                 <p className="text-sm font-medium text-slate-500">
                     {t("haveAccount")}{" "}
-                    <Link to="/auth/login" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#3df0a2' }}>
+                    <Link to="/auth/login" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#0d2e22' }}>
                        {t("signInLink")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
                     </Link>
                  </p>
@@ -209,7 +208,6 @@ export default function Register() {
            </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
