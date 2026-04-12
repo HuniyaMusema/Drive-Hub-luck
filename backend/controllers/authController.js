@@ -166,6 +166,7 @@ const getProfileHistory = async (req, res) => {
         JOIN lottery_settings ls ON ln.lottery_id = ls.id
         LEFT JOIN cars c ON ls.prize_car_id = c.id
         WHERE ln.user_id = $1
+        AND ls.status = 'active'
         AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.lottery_number_id = ln.id AND p.user_id = $1)
       ) AS history
       ORDER BY COALESCE(payment_date, reservation_date) DESC
@@ -182,6 +183,7 @@ const getProfileHistory = async (req, res) => {
         date: l.payment_date || l.reservation_date, 
         status: l.number_status,
         payment_status: l.payment_status || null,
+        lottery_status: l.lottery_status,
         prize: l.prize_name || "Unknown Prize"
       }))
     });

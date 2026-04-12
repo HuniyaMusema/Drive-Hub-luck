@@ -89,21 +89,21 @@ export default function LotteryPayments() {
   return (
     <AdminLayout>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center border border-slate-200 shadow-sm">
-            <CreditCard className="h-7 w-7 text-[#4CBFBF]" />
+          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+            <CreditCard className="h-5 w-5 text-[#4CBFBF]" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{t("payLotteryPayments")}</h1>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1.5">{t("payReviewVerify")}</p>
+            <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">{t("payLotteryPayments")}</h1>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-1">{t("payReviewVerify")}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <div className="flex items-center gap-2">
+          <div className="relative w-full sm:w-52">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <Input
-              className="pl-10 rounded-2xl bg-white border-slate-200 focus-visible:ring-[#4CBFBF]/20 h-12 font-black text-slate-900 placeholder:text-slate-300"
+              className="pl-9 rounded-xl bg-white border-slate-200 focus-visible:ring-[#4CBFBF]/20 h-9 font-black text-slate-900 placeholder:text-slate-300 text-sm"
               placeholder={t("lpSearchPlaceholder")}
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -112,46 +112,44 @@ export default function LotteryPayments() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-2xl border-slate-200 bg-white hover:text-[#4CBFBF] transition-all shadow-sm h-12 px-6 font-black text-slate-500"
+            className="gap-1.5 rounded-xl border-slate-200 bg-white hover:text-[#4CBFBF] transition-all shadow-sm h-9 px-4 font-black text-slate-500 text-[10px]"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-[#4CBFBF]' : ''}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin text-[#4CBFBF]' : ''}`} />
             {t("payRefresh")}
           </Button>
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
-          { label: t("payTotal"),    value: counts.all,      color: "text-slate-900", bg: "bg-white", border: "border-slate-200" },
+          { label: t("payTotal"),         value: counts.all,      color: "text-slate-900", bg: "bg-white",     border: "border-slate-200" },
           { label: t("lpPendingReview"),  value: counts.pending,  valueColor: "text-[#f5b027]", color: "text-[#f5b027]", bg: "bg-slate-50", border: "border-slate-200" },
-          { label: t("payApprove"), value: counts.approved, valueColor: "text-[#4CBFBF]", color: "text-[#4CBFBF]", bg: "bg-slate-50", border: "border-slate-200" },
-          { label: t("payReject"), value: counts.rejected, valueColor: "text-red-400", color: "text-red-400", bg: "bg-slate-50", border: "border-slate-200" },
+          { label: t("payApprove"),       value: counts.approved, valueColor: "text-[#4CBFBF]", color: "text-[#4CBFBF]", bg: "bg-slate-50", border: "border-slate-200" },
+          { label: t("payReject"),        value: counts.rejected, valueColor: "text-red-400",   color: "text-red-400",   bg: "bg-slate-50", border: "border-slate-200" },
         ].map(({ label, value, color, bg, border, valueColor }) => (
-          <div key={label} className={`rounded-[2rem] p-8 border ${border} ${bg} shadow-xl shadow-slate-100 hover:translate-y-[-4px] transition-all relative overflow-hidden group`}>
-            <div className={`absolute top-0 right-0 w-24 h-24 rounded-full opacity-[0.05] bg-current blur-3xl -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700 ${color}`} />
-            <p className="text-[10px] text-slate-500 uppercase font-black tracking-[0.2em] mb-3">{label}</p>
-            <p className={`text-4xl font-black tabular-nums tracking-tighter ${valueColor || 'text-white'}`}>{value}</p>
+          <div key={label} className={`rounded-2xl p-4 border ${border} ${bg} shadow-sm relative overflow-hidden group`}>
+            <p className="text-[9px] text-slate-500 uppercase font-black tracking-[0.2em] mb-1">{label}</p>
+            <p className={`text-2xl font-black tabular-nums tracking-tighter ${valueColor || 'text-slate-900'}`}>{value}</p>
           </div>
         ))}
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-4 mb-8">
-        {filterTabs.map(({ key, label }) => (
+      <div className="flex flex-wrap gap-2 mb-6">
+        {filterTabs.map(({ key }) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-3 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all duration-300
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all duration-200
               ${filter === key
-                ? 'bg-[#4CBFBF] text-white border-[#4CBFBF] shadow-xl shadow-[#4CBFBF]/10 scale-105'
-                : 'bg-white text-slate-500 border-slate-200 hover:border-[#4CBFBF]/40 hover:text-slate-900 shadow-sm'}`}
+                ? 'bg-[#4CBFBF] text-white border-[#4CBFBF] shadow-md'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-[#4CBFBF]/40 hover:text-slate-900'}`}
           >
             {key === 'all' ? t("payAll") : key === 'pending' ? t("lpPendingReview") : key === 'approved' ? t("payApprove") : t("payReject")}
-            <span className={`ml-2 px-2.5 py-1 rounded-lg text-[9px] font-black tabular-nums transition-colors
-              ${filter === key ? 'bg-white/20' : 'bg-slate-100'}`}>
+            <span className={`px-1.5 py-0.5 rounded text-[9px] font-black tabular-nums ${filter === key ? 'bg-white/20' : 'bg-slate-100'}`}>
               {counts[key]}
             </span>
           </button>
@@ -159,118 +157,113 @@ export default function LotteryPayments() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-200 overflow-hidden shadow-slate-100 mb-10">
-        <div className="overflow-x-auto">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-24"><Loader2 className="h-12 w-12 animate-spin text-[#4CBFBF] opacity-20" /></div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-              <div className="w-20 h-20 rounded-3xl bg-slate-50 flex items-center justify-center border border-slate-200 shadow-inner">
-                <ImageIcon className="h-10 w-10 text-slate-300" strokeWidth={1.5} />
-              </div>
-              <div>
-                <p className="font-black text-slate-900 uppercase tracking-widest text-xs">{search || filter !== "all" ? t("payNoPaymentsFilter") : t("payNoLotteryPayments")}</p>
-                <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mt-1.5">{t("payPaymentsAppearOnce")}</p>
-              </div>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-10">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-24"><Loader2 className="h-12 w-12 animate-spin text-[#4CBFBF] opacity-20" /></div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+            <ImageIcon className="h-10 w-10 text-slate-300" strokeWidth={1.5} />
+            <p className="font-black text-slate-900 uppercase tracking-widest text-sm">{search || filter !== "all" ? t("payNoPaymentsFilter") : t("payNoLotteryPayments")}</p>
+            <p className="text-slate-400 text-xs uppercase font-black tracking-widest">{t("payPaymentsAppearOnce")}</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {/* Header row */}
+            <div className="grid grid-cols-12 gap-3 px-6 py-4 bg-slate-50 text-xs font-black text-slate-400 uppercase tracking-widest">
+              <div className="col-span-1">#</div>
+              <div className="col-span-4">{t("payUser")}</div>
+              <div className="col-span-1">{t("payMethod")}</div>
+              <div className="col-span-1">{t("payTicket")}</div>
+              <div className="col-span-2">{t("payReceipt")}</div>
+              <div className="col-span-3">{t("payStatus")}</div>
             </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 text-left bg-slate-50/50">
-                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">#</th>
-                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payUser")}</th>
-                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payMethod")}</th>
-                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payTicket")}</th>
-                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payReceipt")}</th>
-                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px]">{t("payStatus")}</th>
-                  <th className="px-8 py-6 font-black text-slate-400 uppercase tracking-[0.2em] text-[9px] text-right">{t("payActions")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p, i) => {
-                  const sc = statusConfig[p.status] || statusConfig.pending;
-                  const StatusIcon = sc.icon;
-                  return (
-                    <tr key={p.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors group">
-                      <td className="px-8 py-6 tabular-nums text-slate-300 text-[10px] font-black">{i + 1}</td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl bg-[#4CBFBF]/10 flex items-center justify-center text-xs font-black text-[#4CBFBF] shrink-0 border border-[#4CBFBF]/20">
-                            {p.user_name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-black text-slate-900 tracking-tighter uppercase text-[11px] group-hover:text-[#4CBFBF] transition-colors">{p.user_name}</p>
-                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">{p.user_email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm
-                          ${p.method === 'CBE' ? 'bg-blue-400/10 text-blue-400 border-blue-400/20' : 'bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20'}`}>
-                          {p.method}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className="font-black text-[#4CBFBF] tabular-nums text-2xl tracking-tighter">
-                          {p.ticket_number.toString().padStart(3, '0')}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6">
+
+            {filtered.map((p, i) => {
+              const sc = statusConfig[p.status] || statusConfig.pending;
+              const StatusIcon = sc.icon;
+              return (
+                <div key={p.id} className="grid grid-cols-12 gap-3 px-6 py-5 items-center hover:bg-slate-50 transition-colors group">
+                  {/* # */}
+                  <div className="col-span-1 text-sm font-black text-slate-300 tabular-nums">{i + 1}</div>
+
+                  {/* User */}
+                  <div className="col-span-4 flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#4CBFBF]/10 flex items-center justify-center text-sm font-black text-[#4CBFBF] shrink-0 border border-[#4CBFBF]/20">
+                      {p.user_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-black text-slate-900 text-sm uppercase truncate group-hover:text-[#4CBFBF] transition-colors">{p.user_name}</p>
+                      <p className="text-xs text-slate-400 font-medium truncate">{p.user_email}</p>
+                    </div>
+                  </div>
+
+                  {/* Method */}
+                  <div className="col-span-1">
+                    <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase border ${p.method === 'CBE' ? 'bg-blue-400/10 text-blue-400 border-blue-400/20' : 'bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20'}`}>
+                      {p.method}
+                    </span>
+                  </div>
+
+                  {/* Ticket */}
+                  <div className="col-span-1">
+                    <span className="font-black text-[#4CBFBF] tabular-nums text-xl tracking-tighter">
+                      {p.ticket_number.toString().padStart(3, '0')}
+                    </span>
+                  </div>
+
+                  {/* Receipt */}
+                  <div className="col-span-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 gap-2 rounded-xl border-slate-200 bg-slate-50 hover:border-[#4CBFBF]/40 hover:text-[#4CBFBF] text-xs font-black uppercase px-4 text-slate-500"
+                      onClick={() => setPreviewUrl(p.receipt_url)}
+                    >
+                      <Eye className="h-4 w-4" /> {t("payView")}
+                    </Button>
+                  </div>
+
+                  {/* Status + Actions */}
+                  <div className="col-span-3 flex flex-col gap-2">
+                    <span className={`inline-flex items-center gap-1.5 w-fit text-xs font-black uppercase tracking-wide px-3 py-1.5 rounded-full border ${sc.className}`}>
+                      <StatusIcon className="h-3.5 w-3.5" />
+                      {p.status === 'pending' ? t("lpPendingReview") : p.status === 'approved' ? t("payApprove") : t("payReject")}
+                    </span>
+                    {p.rejection_reason && (
+                      <p className="text-xs text-red-400 font-bold truncate max-w-full">"{p.rejection_reason}"</p>
+                    )}
+                    {p.status === "pending" && (
+                      <div className="flex gap-2">
                         <Button
-                          variant="outline"
                           size="sm"
-                          className="h-12 gap-3 rounded-2xl border-slate-200 bg-slate-50 hover:border-[#4CBFBF]/40 hover:text-[#4CBFBF] text-[10px] font-black uppercase tracking-widest shadow-sm transition-all px-6 text-slate-400"
-                          onClick={() => setPreviewUrl(p.receipt_url)}
+                          className="h-9 bg-[#4CBFBF] hover:bg-[#3fb0b0] text-white rounded-xl px-4 font-black text-xs uppercase"
+                          onClick={() => setActionDialog({ id: p.id, type: "approve" })}
+                          disabled={verifyMutation.isPending}
                         >
-                          <Eye className="h-4 w-4" /> {t("payView")}
+                          <Check className="h-3.5 w-3.5 mr-1" />{t("payApprove")}
                         </Button>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex flex-col gap-1.5">
-                          <span className={`flex items-center gap-2 w-fit text-[9px] uppercase tracking-[0.15em] px-4 py-2 rounded-full border font-black ${sc.className}`}>
-                            <StatusIcon className="h-3.5 w-3.5" />
-                            {p.status === 'pending' ? t("lpPendingReview") : p.status === 'approved' ? t("payApprove") : t("payReject")}
-                          </span>
-                          {p.rejection_reason && <p className="text-[9px] text-red-500 font-black uppercase tracking-widest mt-1.5 opacity-80 leading-relaxed max-w-[150px]">"{p.rejection_reason}"</p>}
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <div className="flex justify-end gap-3">
-                          {p.status === "pending" && (
-                            <>
-                              <Button
-                                size="sm"
-                                className="h-12 bg-[#4CBFBF] hover:bg-[#3fb0b0] text-[#050505] shadow-xl shadow-[#4CBFBF]/20 rounded-2xl px-6 font-black text-[10px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
-                                onClick={() => setActionDialog({ id: p.id, type: "approve" })}
-                                disabled={verifyMutation.isPending}
-                              >
-                                <Check className="h-4 w-4 mr-2" /> {t("payApprove")}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-12 text-red-400 hover:text-red-500 hover:bg-red-400/10 rounded-2xl px-6 font-black text-[10px] uppercase tracking-widest transition-all"
-                                onClick={() => setActionDialog({ id: p.id, type: "reject" })}
-                                disabled={verifyMutation.isPending}
-                              >
-                                <X className="h-4 w-4 mr-2" /> {t("payReject")}
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-9 text-red-400 hover:bg-red-400/10 rounded-xl px-4 font-black text-xs uppercase"
+                          onClick={() => setActionDialog({ id: p.id, type: "reject" })}
+                          disabled={verifyMutation.isPending}
+                        >
+                          <X className="h-3.5 w-3.5 mr-1" />{t("payReject")}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
         {filtered.length > 0 && (
-          <div className="px-8 py-6 border-t border-slate-100 bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-400 flex justify-between">
+          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 text-xs font-black uppercase tracking-widest text-slate-400 flex justify-between">
             <span>Showing <span className="text-slate-900">{filtered.length}</span> of <span className="text-slate-900">{payments.length}</span> payments</span>
             {(search || filter !== "all") && (
-              <button onClick={() => { setSearch(""); setFilter("all"); }} className="text-[#4CBFBF] hover:text-[#3fb0b0] font-black tracking-widest">{t("lpClearFilters") || "Clear filters"}</button>
+              <button onClick={() => { setSearch(""); setFilter("all"); }} className="text-[#4CBFBF] hover:text-[#3fb0b0] font-black">{t("lpClearFilters") || "Clear filters"}</button>
             )}
           </div>
         )}
@@ -278,19 +271,19 @@ export default function LotteryPayments() {
 
       {/* Receipt Preview Dialog */}
       <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
-        <DialogContent className="max-w-[800px] p-0 overflow-hidden rounded-[2.5rem] border-slate-200 bg-white shadow-2xl">
-          <div className="relative pt-[120%] w-full bg-slate-50 flex items-center justify-center">
-            {previewUrl && <img src={previewUrl} alt="Receipt proof" className="absolute inset-0 w-full h-full object-contain p-8" />}
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-[2.5rem] border-slate-200 bg-white shadow-2xl">
+          <div className="bg-slate-50 flex items-center justify-center p-6">
+            {previewUrl && <img src={previewUrl} alt="Receipt proof" className="w-full h-auto max-h-[70vh] object-contain rounded-2xl" />}
           </div>
-          <div className="p-8 bg-white border-t border-slate-100 flex justify-center">
-            <Button className="rounded-2xl h-14 px-10 font-black uppercase text-[11px] tracking-widest bg-slate-50 border border-slate-200 text-slate-900 hover:bg-slate-100" onClick={() => setPreviewUrl(null)}>Close Viewer</Button>
+          <div className="p-5 bg-white border-t border-slate-100 flex justify-center">
+            <Button className="rounded-2xl h-12 px-10 font-black uppercase text-[11px] tracking-widest bg-slate-50 border border-slate-200 text-slate-900 hover:bg-slate-100" onClick={() => setPreviewUrl(null)}>Close Viewer</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Action Confirmation Dialog */}
       <Dialog open={!!actionDialog} onOpenChange={() => { setActionDialog(null); setReason(""); }}>
-        <DialogContent className="rounded-[2.5rem] border-slate-200 bg-white max-w-sm p-10 shadow-2xl">
+        <DialogContent className="rounded-[2.5rem] border-slate-200 bg-white max-w-md p-10 shadow-2xl">
           <DialogHeader className="pt-2">
             <DialogTitle className={`text-2xl font-black flex items-center gap-4 tracking-tighter uppercase ${actionDialog?.type === "reject" ? "text-red-500" : "text-[#4CBFBF]"}`}>
               {actionDialog?.type === "approve" ? <CheckCircle2 className="h-8 w-8" /> : <XCircle className="h-8 w-8" />}
@@ -301,11 +294,35 @@ export default function LotteryPayments() {
             {actionDialog?.type === "reject" ? (
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Reason for Rejection</Label>
+                {/* Quick-select preset reasons */}
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "Screenshot is blurry or unreadable",
+                    "Transaction reference not found",
+                    "Wrong amount transferred",
+                    "Receipt appears to be edited",
+                    "Payment sent to wrong account",
+                    "Duplicate submission",
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setReason(preset)}
+                      className={`text-[9px] font-black uppercase tracking-wide px-3 py-1.5 rounded-xl border transition-all ${
+                        reason === preset
+                          ? "bg-red-500 text-white border-red-500"
+                          : "bg-slate-50 text-slate-500 border-slate-200 hover:border-red-300 hover:text-red-500"
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
                 <Textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="e.g. Screenshot blurry, reference not found..."
-                  className="rounded-2xl border-slate-200 bg-slate-50 min-h-[120px] focus:ring-[#4CBFBF]/20 text-slate-900 font-black text-sm p-6 placeholder:text-slate-300"
+                  placeholder="Or type a custom reason..."
+                  className="rounded-2xl border-slate-200 bg-slate-50 min-h-[80px] focus:ring-[#4CBFBF]/20 text-slate-900 font-black text-sm p-4 placeholder:text-slate-300"
                 />
               </div>
             ) : (

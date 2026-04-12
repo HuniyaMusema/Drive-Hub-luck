@@ -98,7 +98,7 @@ export default function Login() {
         </div>
 
         {/* Right Side: Elegant Form */}
-        <div className="flex-1 flex items-center justify-center p-6 lg:px-24 lg:py-8 relative overflow-y-auto bg-white">
+        <div className="flex-1 flex items-center justify-center p-6 lg:px-24 lg:py-8 relative overflow-y-auto" style={{ background: 'linear-gradient(160deg, #f0f7f4 0%, #e8f5ee 100%)' }}>
            {/* Ambient glow */}
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.07) 0%, transparent 70%)' }} />
 

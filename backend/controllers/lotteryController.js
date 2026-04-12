@@ -85,15 +85,17 @@ const submitLotteryPayment = async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // 1. Verify the number belongs to the user and is pending
+    // 1. Verify the number belongs to the user, is pending, AND its lottery is still active
     const { rows: numbers } = await client.query(
-      "SELECT id FROM lottery_numbers WHERE id = $1 AND user_id = $2 AND status = 'pending'",
+      `SELECT ln.id FROM lottery_numbers ln
+       JOIN lottery_settings ls ON ln.lottery_id = ls.id
+       WHERE ln.id = $1 AND ln.user_id = $2 AND ln.status = 'pending' AND ls.status = 'active'`,
       [lotteryNumberId, req.user.id]
     );
 
     if (numbers.length === 0) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'Invalid ticket or ticket not in pending state.' });
+      return res.status(400).json({ message: 'Invalid ticket, ticket not in pending state, or lottery is no longer active.' });
     }
 
     // 2. Create the payment record
@@ -144,21 +146,43 @@ const submitLotteryPayment = async (req, res) => {
 // @access  Private
 const getLotteryEntries = async (req, res) => {
   try {
-    let query = `
-      SELECT ln.*, ls.prize_text, ls.status as lottery_status, u.name as user_name
-      FROM lottery_numbers ln
-      JOIN lottery_settings ls ON ln.lottery_id = ls.id
-      JOIN users u ON ln.user_id = u.id
-    `;
-    let params = [];
+    // Scope to active lottery by default; pass ?lottery_id=<id> for historical lookup
+    const lotteryId = req.query.lottery_id;
 
-    // If not admin/staff, only show current user's entries
-    if (req.user.role !== 'admin' && req.user.role !== 'lottery_staff') {
-      query += ` WHERE ln.user_id = $1`;
-      params.push(req.user.id);
+    let query, params;
+
+    if (req.user.role === 'admin' || req.user.role === 'lottery_staff') {
+      if (lotteryId) {
+        query = `
+          SELECT ln.*, ls.prize_text, ls.status as lottery_status, u.name as user_name
+          FROM lottery_numbers ln
+          JOIN lottery_settings ls ON ln.lottery_id = ls.id
+          LEFT JOIN users u ON ln.user_id = u.id
+          WHERE ln.lottery_id = $1 AND ln.status != 'available'
+          ORDER BY ln.updated_at DESC`;
+        params = [lotteryId];
+      } else {
+        // Default: only entries for the current active lottery
+        query = `
+          SELECT ln.*, ls.prize_text, ls.status as lottery_status, u.name as user_name
+          FROM lottery_numbers ln
+          JOIN lottery_settings ls ON ln.lottery_id = ls.id
+          LEFT JOIN users u ON ln.user_id = u.id
+          WHERE ls.status = 'active' AND ln.status != 'available'
+          ORDER BY ln.updated_at DESC`;
+        params = [];
+      }
+    } else {
+      // Regular users: their own entries across all lotteries (for history)
+      query = `
+        SELECT ln.*, ls.prize_text, ls.status as lottery_status, u.name as user_name
+        FROM lottery_numbers ln
+        JOIN lottery_settings ls ON ln.lottery_id = ls.id
+        JOIN users u ON ln.user_id = u.id
+        WHERE ln.user_id = $1
+        ORDER BY ln.updated_at DESC`;
+      params = [req.user.id];
     }
-
-    query += ` ORDER BY ln.updated_at DESC`;
 
     const { rows } = await pool.query(query, params);
     res.status(200).json(rows);

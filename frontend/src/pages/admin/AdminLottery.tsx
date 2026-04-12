@@ -2,7 +2,7 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, Square, Trophy, Loader2, Ticket, Sparkles, CircleDot, TrendingUp } from "lucide-react";
+import { Play, Square, Trophy, Loader2, Ticket, Sparkles, CircleDot, TrendingUp, AlertCircle } from "lucide-react";
 import { useCurrentLottery, useCreateLottery, usePickWinner } from "@/hooks/useLottery";
 import { useState } from "react";
 import { apiFetch } from "@/services/api";
@@ -107,10 +107,10 @@ export default function AdminLottery() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
         {/* Control Panel */}
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-100 border border-slate-200 overflow-hidden">
+        <div className="lg:col-span-2 bg-white rounded-[2.5rem] shadow-xl shadow-slate-100 border border-slate-200 overflow-hidden">
           <div className="bg-slate-50 border-b border-slate-200 px-8 py-6 flex items-center gap-3">
             <CircleDot className="h-4 w-4 text-[#4CBFBF]" />
             <span className="font-black text-slate-600 text-[10px] uppercase tracking-[0.2em]">{t("lotteryControl")}</span>
@@ -134,18 +134,18 @@ export default function AdminLottery() {
                   <div className="absolute top-0 right-0 w-24 h-24 bg-[#4CBFBF]/10 rounded-full blur-2xl -mr-8 -mt-8" />
                   <p className="text-[9px] font-black text-[#4CBFBF] mb-2 uppercase tracking-[0.2em]">{t("activePrize")}</p>
                   <p className="text-lg font-black text-slate-900 uppercase tracking-tight leading-tight">{lottery.prize_car_name || lottery.prize_text}</p>
-                  <div className="mt-5 grid grid-cols-3 gap-3">
-                    <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                  <div className="mt-5 flex gap-2">
+                    <div className="flex-1 bg-white/70 rounded-xl p-3 border border-white/80 min-w-0">
                       <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("range")}</p>
-                      <p className="text-xs font-black text-slate-800 tabular-nums">{lottery.start_number}–{lottery.end_number}</p>
+                      <p className="text-sm font-black text-slate-800 tabular-nums whitespace-nowrap">{lottery.start_number}–{lottery.end_number}</p>
                     </div>
-                    <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                    <div className="flex-1 bg-white/70 rounded-xl p-3 border border-white/80 min-w-0">
                       <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("status")}</p>
-                      <p className="text-xs font-black uppercase text-amber-500">{lottery.status}</p>
+                      <p className="text-sm font-black uppercase text-amber-500 whitespace-nowrap">{lottery.status}</p>
                     </div>
-                    <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                    <div className="flex-1 bg-white/70 rounded-xl p-3 border border-white/80 min-w-0">
                       <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">Price</p>
-                      <p className="text-xs font-black text-slate-800 tabular-nums">ETB {Number(lottery.ticket_price).toLocaleString()}</p>
+                      <p className="text-sm font-black text-slate-800 tabular-nums whitespace-nowrap">ETB {Number(lottery.ticket_price).toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ export default function AdminLottery() {
         </div>
 
         {/* Draw Action Panel */}
-        <div className="lg:col-span-2 bg-white rounded-[2.5rem] shadow-xl shadow-slate-100 border border-slate-200 overflow-hidden">
+        <div className="lg:col-span-3 bg-white rounded-[2.5rem] shadow-xl shadow-slate-100 border border-slate-200 overflow-hidden">
           <div className="bg-slate-50 border-b border-slate-200 px-8 py-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <TrendingUp className="h-4 w-4 text-[#4CBFBF]" />

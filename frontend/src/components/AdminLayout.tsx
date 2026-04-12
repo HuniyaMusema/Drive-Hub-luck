@@ -167,7 +167,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AdminSidebar  />
-      <SidebarInset className="flex flex-col bg-[#f8fafc] w-full min-h-screen relative overflow-x-hidden">
+      <SidebarInset className="flex flex-col bg-[#f8fafc] w-full min-h-screen relative">
         <header className="h-20 shrink-0 flex items-center justify-between border-b border-slate-100 px-8 bg-white sticky top-0 z-30 shadow-sm text-slate-900 w-full mb-px">
           <div className="flex items-center gap-6">
             <SidebarTrigger className="md:hidden text-slate-500 hover:text-[#4CBFBF] transition-colors" />
@@ -223,7 +223,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               )}
             </div>
         </header>
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
           <div className="max-w-[1600px] mx-auto w-full">
             {children}
           </div>

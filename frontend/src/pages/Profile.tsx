@@ -45,6 +45,7 @@ export default function Profile() {
     if (l.payment_status === 'approved' || l.status === 'confirmed') return t("profConfirmedEntry");
     if (l.payment_status === 'rejected') return t("profRejectedEntry");
     if (l.payment_status === 'pending') return t("profVerifyingReceipt");
+    if (l.lottery_status === 'closed') return "Lottery Closed";
     return t("profAwaitingPayment");
   };
 
@@ -53,6 +54,7 @@ export default function Profile() {
     if (l.payment_status === 'approved' || l.status === 'confirmed') return { icon: CheckCircle2, className: "text-[#4CBFBF] border-[#4CBFBF]/20 bg-[#4CBFBF]/5" };
     if (l.payment_status === 'rejected') return { icon: XCircle, className: "text-destructive border-destructive/20 bg-destructive/5" };
     if (l.payment_status === 'pending') return { icon: Clock, className: "text-[#f5b027] border-amber-500/20 bg-amber-500/5" };
+    if (l.lottery_status === 'closed') return { icon: XCircle, className: "text-slate-400 border-slate-300/30 bg-slate-100/50" };
     return { icon: Clock, className: "text-slate-500 border-white/10 bg-white/5" };
   };
 
@@ -186,7 +188,7 @@ export default function Profile() {
                 <div className="flex items-center justify-between px-2">
                    <div className="flex items-center gap-3">
                       <div className="w-1.5 h-6 bg-[#4CBFBF] rounded-full shadow-[0_0_8px_rgba(76,191,191,0.5)]" />
-                      <h2 className="text-2xl font-black text-white tracking-tight uppercase font-sans">{t("profRecentActivity")}</h2>
+                      <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase font-sans">{t("profRecentActivity")}</h2>
                    </div>
                    <div className="text-[10px] font-black text-[#4CBFBF] uppercase border border-[#4CBFBF]/20 rounded-full px-4 py-1.5 bg-[#4CBFBF]/5 backdrop-blur-sm">{t("profSynchronizedLedger")}</div>
                 </div>
@@ -239,7 +241,7 @@ export default function Profile() {
                                      {l.status === 'win' && <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-amber-500 animate-bounce" />}
                                   </div>
                                   <div className="space-y-1.5 text-center sm:text-left">
-                                     <p className="text-sm font-black text-white uppercase tracking-tight leading-none font-sans group-hover:text-[#4CBFBF] transition-colors">{t("profStandardEntry")} • <span className="text-[#4CBFBF]">#{l.number}</span></p>
+                                     <p className="text-sm font-black text-[#4CBFBF] uppercase tracking-tight leading-none font-sans group-hover:text-[#3aadad] transition-colors">{t("profStandardEntry")} • <span className="text-slate-700">#{l.number}</span></p>
                                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
                                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase opacity-60">
                                            <Calendar className="h-3.5 w-3.5" /> {new Date(l.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}

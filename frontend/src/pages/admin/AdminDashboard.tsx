@@ -214,30 +214,64 @@ export default function AdminDashboard() {
             </div>
          </div>
 
-         {/* Quick Setup / Checklist */}
+         {/* Quick Actions */}
          <div className="space-y-6">
             <div className="flex items-center gap-3 px-2">
                <div className="w-1.5 h-6 bg-[#f5b027] rounded-full" />
                <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase">{t("operations")}</h2>
             </div>
             
-            <div className="bg-white rounded-[2.5rem] p-10 text-slate-900 shadow-xl shadow-slate-100 border border-slate-200 relative overflow-hidden group">
-               <div className="relative z-10 space-y-8">
-                  <div className="w-16 h-16 rounded-3xl bg-[#f5b027]/10 flex items-center justify-center shadow-lg transition-transform group-hover:rotate-6 border border-[#f5b027]/20">
-                     <Zap className="h-8 w-8 text-[#f5b027]" fill="currentColor" />
+            <div className="bg-white rounded-[2.5rem] p-8 text-slate-900 shadow-xl shadow-slate-100 border border-slate-200 relative overflow-hidden group">
+               <div className="relative z-10 space-y-6">
+                  <div className="w-14 h-14 rounded-2xl bg-[#f5b027]/10 flex items-center justify-center border border-[#f5b027]/20">
+                     <Zap className="h-7 w-7 text-[#f5b027]" fill="currentColor" />
                   </div>
-                  <div className="space-y-2">
-                     <h3 className="text-3xl font-black tracking-tighter leading-none">{t("adminStartingBackup")}</h3>
-                     <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.25em]">{t("adminSystemCore")}</p>
+                  <div>
+                     <h3 className="text-xl font-black tracking-tighter leading-none">{t("fastLotterySetup")}</h3>
+                     <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">{t("initializationTools")}</p>
                   </div>
-                  <div className="space-y-4">
-                     <NavLink to="/admin/lottery" className="flex items-center justify-between p-5 rounded-[2rem] bg-slate-50 hover:bg-[#4CBFBF]/10 transition-all border border-slate-200 group/btn">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover/btn:text-[#4CBFBF]">{t("newDraw")}</span>
-                        <ArrowUpRight className="h-4 w-4 text-[#f5b027] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                  <div className="space-y-3">
+                     <NavLink to="/admin/lottery" className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-[#4CBFBF]/10 transition-all border border-slate-200 group/btn">
+                        <div className="flex items-center gap-3">
+                           <Ticket className="h-4 w-4 text-[#4CBFBF]" />
+                           <span className="text-xs font-black uppercase tracking-widest text-slate-700 group-hover/btn:text-[#4CBFBF]">{t("newDraw")}</span>
+                        </div>
+                        <ArrowUpRight className="h-4 w-4 text-[#f5b027] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                      </NavLink>
-                     <NavLink to="/admin/generate-lottery" className="flex items-center justify-between p-5 rounded-[2rem] bg-slate-50 hover:bg-[#4CBFBF]/10 transition-all border border-slate-200 group/btn">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover/btn:text-[#4CBFBF]">{t("navNumberBoard")}</span>
-                        <ChevronRight className="h-4 w-4 text-slate-500 group-hover/btn:text-[#4CBFBF]" />
+                     <NavLink to="/admin/lottery-payments" className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-[#4CBFBF]/10 transition-all border border-slate-200 group/btn">
+                        <div className="flex items-center gap-3">
+                           <CreditCard className="h-4 w-4 text-[#f5b027]" />
+                           <div className="flex items-center gap-2">
+                              <span className="text-xs font-black uppercase tracking-widest text-slate-700 group-hover/btn:text-[#4CBFBF]">{t("payLotteryPayments")}</span>
+                              {(stats?.pendingPayments ?? 0) > 0 && (
+                                 <span className="px-2 py-0.5 rounded-full bg-[#f5b027]/10 text-[#f5b027] text-[9px] font-black border border-[#f5b027]/20">
+                                    {stats?.pendingPayments}
+                                 </span>
+                              )}
+                           </div>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover/btn:text-[#4CBFBF]" />
+                     </NavLink>
+                     <NavLink to="/admin/lottery-participants" className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-[#4CBFBF]/10 transition-all border border-slate-200 group/btn">
+                        <div className="flex items-center gap-3">
+                           <Users className="h-4 w-4 text-slate-400" />
+                           <div className="flex items-center gap-2">
+                              <span className="text-xs font-black uppercase tracking-widest text-slate-700 group-hover/btn:text-[#4CBFBF]">{t("lpLotteryParticipants")}</span>
+                              {(stats?.lotteryEntries ?? 0) > 0 && (
+                                 <span className="px-2 py-0.5 rounded-full bg-[#4CBFBF]/10 text-[#4CBFBF] text-[9px] font-black border border-[#4CBFBF]/20">
+                                    {stats?.lotteryEntries}
+                                 </span>
+                              )}
+                           </div>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover/btn:text-[#4CBFBF]" />
+                     </NavLink>
+                     <NavLink to="/admin/generate-lottery" className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-[#4CBFBF]/10 transition-all border border-slate-200 group/btn">
+                        <div className="flex items-center gap-3">
+                           <Target className="h-4 w-4 text-slate-400" />
+                           <span className="text-xs font-black uppercase tracking-widest text-slate-700 group-hover/btn:text-[#4CBFBF]">{t("navNumberBoard")}</span>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover/btn:text-[#4CBFBF]" />
                      </NavLink>
                   </div>
                </div>

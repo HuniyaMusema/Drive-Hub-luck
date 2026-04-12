@@ -94,24 +94,27 @@ const getDashboardStats = async (req, res) => {
       lotteryEntriesCount,
       pendingPaymentsCount,
       usersCount,
-      approvedPaymentsCount
+      revenueResult
     ] = await Promise.all([
       pool.query("SELECT COUNT(*) FROM cars"),
-      pool.query("SELECT COUNT(*) FROM lottery_numbers"),
+      pool.query("SELECT COUNT(*) FROM lottery_numbers WHERE status != 'available'"),
       pool.query("SELECT COUNT(*) FROM payments WHERE status = 'pending'"),
-      pool.query("SELECT COUNT(*) FROM users"),
-      pool.query("SELECT COUNT(*) FROM payments WHERE status = 'approved'")
+      pool.query("SELECT COUNT(*) FROM users WHERE role = 'user'"),
+      pool.query(`
+        SELECT COALESCE(SUM(ls.ticket_price), 0) AS total
+        FROM payments p
+        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+        JOIN lottery_settings ls ON ln.lottery_id = ls.id
+        WHERE p.status = 'approved'
+      `)
     ]);
-    
-    // Revenue logic: just multiply payments approved by an assumed ticket price
-    const revenue = parseInt(approvedPaymentsCount.rows[0].count) * 15;
 
     res.json({
       totalVehicles: parseInt(carsCount.rows[0].count),
       lotteryEntries: parseInt(lotteryEntriesCount.rows[0].count),
       pendingPayments: parseInt(pendingPaymentsCount.rows[0].count),
       registeredUsers: parseInt(usersCount.rows[0].count),
-      revenue: revenue
+      revenue: parseFloat(revenueResult.rows[0].total)
     });
   } catch (error) {
     console.error('[getDashboardStats]', error.message);

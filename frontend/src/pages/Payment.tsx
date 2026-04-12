@@ -398,16 +398,34 @@ export default function Payment() {
                       s = { icon: Clock, className: "bg-blue-500/10 text-blue-600 border-blue-500/20", label: t("payVerifyingReceipt") };
                       label = t("payVerifyingReceipt");
                     } else if (p.status === 'pending' && !p.payment_status) {
-                      s = { icon: Clock, className: "bg-amber-500/10 text-amber-600 border-amber-500/20", label: t("payAwaitingPayment") };
-                      label = t("payAwaitingPayment");
+                      if (p.lottery_status === 'closed') {
+                        s = { icon: XCircle, className: "bg-slate-500/10 text-slate-500 border-slate-500/20", label: "Lottery Closed" };
+                        label = "Lottery Closed";
+                      } else {
+                        s = { icon: Clock, className: "bg-amber-500/10 text-amber-600 border-amber-500/20", label: t("payAwaitingPayment") };
+                        label = t("payAwaitingPayment");
+                      }
                     } else if (p.payment_status === 'rejected') {
                       s = statusConfig.rejected;
                       label = t("payPaymentRejected");
                     }
 
                     const Icon = s.icon;
+                    const isAwaiting = p.status === 'pending' && !p.payment_status && p.lottery_status !== 'closed';
                     return (
-                      <div key={p.id} className="flex items-center justify-between bg-card rounded-[2rem] p-6 shadow-sm border border-border/60 hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
+                      <div
+                        key={p.id}
+                        onClick={() => {
+                          if (isAwaiting) {
+                            setSelectedTicket(p.id);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
+                        className={cn(
+                          "flex items-center justify-between bg-card rounded-[2rem] p-6 shadow-sm border border-border/60 hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative",
+                          isAwaiting && "cursor-pointer hover:border-amber-500/40"
+                        )}
+                      >
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.className.split(' ')[0]}`} />
                         <div className="flex items-center gap-5">
                           <div className="w-14 h-14 rounded-2xl bg-muted/40 border border-border/60 flex items-center justify-center shadow-inner group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
@@ -429,6 +447,11 @@ export default function Payment() {
                                 <Icon className={cn("h-3 w-3", s.label.includes("Verifying") || s.label.includes("Awaiting") ? 'animate-pulse' : '')} strokeWidth={3} />
                                 {label}
                               </span>
+                              {isAwaiting && (
+                                <span className="text-[8px] font-black uppercase tracking-widest text-amber-600 flex items-center gap-1">
+                                  Tap to pay <ChevronRight className="h-2.5 w-2.5" />
+                                </span>
+                              )}
                               {p.rejection_reason && <p className="text-[8px] text-destructive font-bold italic text-right max-w-[120px] line-clamp-1">"{p.rejection_reason}"</p>}
                            </div>
                         </div>

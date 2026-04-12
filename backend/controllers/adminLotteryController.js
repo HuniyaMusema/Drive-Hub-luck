@@ -303,13 +303,35 @@ const getAllLotteries = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const getLotteryPayments = async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT p.*, u.name as user_name, u.email as user_email, ln.number as ticket_number
-       FROM payments p
-       JOIN users u ON p.user_id = u.id
-       JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
-       ORDER BY p.created_at DESC`
-    );
+    // Scope to active lottery only; admins can pass ?lottery_id=<id> to view historical data
+    const lotteryId = req.query.lottery_id;
+
+    let query, params;
+    if (lotteryId) {
+      query = `
+        SELECT p.*, u.name as user_name, u.email as user_email,
+               ln.number as ticket_number, ln.lottery_id
+        FROM payments p
+        JOIN users u ON p.user_id = u.id
+        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+        WHERE ln.lottery_id = $1
+        ORDER BY p.created_at DESC`;
+      params = [lotteryId];
+    } else {
+      // Default: only show payments for the current active lottery
+      query = `
+        SELECT p.*, u.name as user_name, u.email as user_email,
+               ln.number as ticket_number, ln.lottery_id
+        FROM payments p
+        JOIN users u ON p.user_id = u.id
+        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+        JOIN lottery_settings ls ON ln.lottery_id = ls.id
+        WHERE ls.status = 'active'
+        ORDER BY p.created_at DESC`;
+      params = [];
+    }
+
+    const { rows } = await pool.query(query, params);
     return res.status(200).json(rows);
   } catch (error) {
     console.error('[getLotteryPayments]', error.message);
@@ -422,13 +444,30 @@ const rejectPayment = async (req, res) => {
       [req.user.id, rejection_reason, id]
     );
 
-    // 2. CRITICAL: Release the lottery number back to available so others can pick it
-    await client.query(
-      `UPDATE lottery_numbers
-       SET status = 'available', user_id = NULL, updated_at = NOW()
-       WHERE id = $1`,
+    // 2. CRITICAL: Release the lottery number back to available ONLY if lottery is still active
+    const { rows: lotteryCheck } = await client.query(
+      `SELECT ls.status FROM lottery_numbers ln
+       JOIN lottery_settings ls ON ln.lottery_id = ls.id
+       WHERE ln.id = $1`,
       [payment.lottery_number_id]
     );
+
+    if (lotteryCheck.length > 0 && lotteryCheck[0].status === 'active') {
+      await client.query(
+        `UPDATE lottery_numbers
+         SET status = 'available', user_id = NULL, updated_at = NOW()
+         WHERE id = $1`,
+        [payment.lottery_number_id]
+      );
+    } else {
+      // Lottery is closed — just clear the user_id but keep status as-is (do not reopen slot)
+      await client.query(
+        `UPDATE lottery_numbers
+         SET user_id = NULL, updated_at = NOW()
+         WHERE id = $1`,
+        [payment.lottery_number_id]
+      );
+    }
 
     // 3. Notify the user
     const { rows: ticketInfo } = await client.query(
@@ -465,12 +504,31 @@ const rejectPayment = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const getLotteryNumbers = async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT ln.*, u.name as assigned_to_name
-       FROM lottery_numbers ln
-       LEFT JOIN users u ON ln.user_id = u.id
-       ORDER BY ln.number ASC`
-    );
+    // Scope to active lottery by default; pass ?lottery_id=<id> for historical lookup
+    const lotteryId = req.query.lottery_id;
+
+    let query, params;
+    if (lotteryId) {
+      query = `
+        SELECT ln.*, u.name as assigned_to_name
+        FROM lottery_numbers ln
+        LEFT JOIN users u ON ln.user_id = u.id
+        WHERE ln.lottery_id = $1
+        ORDER BY ln.number ASC`;
+      params = [lotteryId];
+    } else {
+      // Default: only numbers belonging to the active lottery
+      query = `
+        SELECT ln.*, u.name as assigned_to_name
+        FROM lottery_numbers ln
+        LEFT JOIN users u ON ln.user_id = u.id
+        JOIN lottery_settings ls ON ln.lottery_id = ls.id
+        WHERE ls.status = 'active'
+        ORDER BY ln.number ASC`;
+      params = [];
+    }
+
+    const { rows } = await pool.query(query, params);
     return res.status(200).json(rows);
   } catch (error) {
     console.error('[getLotteryNumbers]', error.message);
@@ -513,8 +571,12 @@ const pickWinner = async (req, res) => {
     const winner = winnerRows[0];
 
     // 3. Update lottery status to closed AND persist winner info
+    // NOTE: winner_id and winning_number columns must exist on lottery_settings.
+    // If they don't yet, run: ALTER TABLE lottery_settings ADD COLUMN IF NOT EXISTS winner_id UUID REFERENCES users(id) ON DELETE SET NULL, ADD COLUMN IF NOT EXISTS winning_number INTEGER;
     await client.query(
-      "UPDATE lottery_settings SET status = 'closed', winner_id = $1, winning_number = $2, updated_at = NOW() WHERE id = $3",
+      `UPDATE lottery_settings
+       SET status = 'closed', winner_id = $1, winning_number = $2, updated_at = NOW()
+       WHERE id = $3`,
       [winner.user_id, winner.number, lotteryId]
     );
 
