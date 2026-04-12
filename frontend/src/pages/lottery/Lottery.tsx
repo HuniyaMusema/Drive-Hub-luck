@@ -57,10 +57,10 @@ export default function Lottery() {
              <div className="w-16 h-16 rounded-3xl bg-red-100 border border-red-200 flex items-center justify-center mx-auto mb-6">
                 <AlertCircle className="h-8 w-8 text-red-500" />
              </div>
-             <h2 className="text-2xl font-black tracking-tight mb-2 text-red-900">Connection Error</h2>
-             <p className="text-red-600 font-medium text-sm max-w-xs mx-auto mb-4">{(error as Error)?.message || 'Failed to load lottery'}</p>
+             <h2 className="text-2xl font-black tracking-tight mb-2 text-red-900">{t("connectionErrorTitle")}</h2>
+             <p className="text-red-600 font-medium text-sm max-w-xs mx-auto mb-4">{(error as Error)?.message || t("connectionErrorMsg")}</p>
              <Button onClick={() => window.location.reload()} variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
-               Retry
+               {t("tryAgain")}
              </Button>
           </div>
         ) : activeLottery ? (

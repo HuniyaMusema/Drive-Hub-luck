@@ -142,7 +142,7 @@ export default function LotterySelect() {
           <div className="lg:col-span-8 space-y-10 animate-fade-in-up">
             <div>
                <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-3 border border-primary/20">
-                <Sparkles className="h-3 w-3" /> Select Numbers
+                <Sparkles className="h-3 w-3" /> {t("selectNumbersLabel")}
               </div>
               <h1 className="text-4xl lg:text-5xl font-black text-foreground tracking-tighter mb-4">{t("selectYourNumbers")}</h1>
               <p className="text-muted-foreground font-medium text-lg">{t("pickUpTo5")}</p>
@@ -156,10 +156,10 @@ export default function LotterySelect() {
             ) : hasError ? (
               <div className="bg-destructive/10 rounded-[2.5rem] p-16 text-center shadow-xl border border-destructive/20">
                 <AlertCircle className="h-12 w-12 text-destructive opacity-50 mx-auto mb-4" />
-                <h2 className="text-2xl font-black text-destructive tracking-tight mb-2">Connection Error</h2>
-                <p className="text-destructive font-medium mb-6">Failed to sync with the drawing board. Please check your connection.</p>
+                <h2 className="text-2xl font-black text-destructive tracking-tight mb-2">{t("connectionErrorTitle")}</h2>
+                <p className="text-destructive font-medium mb-6">{t("connectionErrorMsg")}</p>
                 <Button onClick={() => window.location.reload()} variant="outline" className="border-destructive/40 text-destructive hover:bg-destructive/10">
-                  Try Again
+                  {t("tryAgain")}
                 </Button>
               </div>
             ) : !lottery ? (
@@ -181,7 +181,7 @@ export default function LotterySelect() {
                       <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                    </div>
                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 bg-muted/30 px-4 py-2 rounded-full border border-border/40 shrink-0">
-                      Rendering {Math.min(visibleCount, lottery.end_number - lottery.start_number + 1)} of {lottery.end_number - lottery.start_number + 1}
+                      {t("l_loadMoreNumbers") || t("loadMoreNumbers")}
                    </div>
                 </div>
 
@@ -238,7 +238,7 @@ export default function LotterySelect() {
                       className="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest border-primary/20 hover:bg-primary/5 transition-all group"
                       onClick={() => setVisibleCount(prev => prev + 500)}
                     >
-                      {t("l_loadMoreNumbers") || "Load More Numbers"}
+                      {t("loadMoreNumbers")}
                       <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform rotate-90" />
                     </Button>
                   </div>
@@ -255,7 +255,7 @@ export default function LotterySelect() {
                   </div>
                   <div className="flex items-center gap-2">
                      <div className="w-4 h-4 rounded-lg bg-amber-50 border-2 border-amber-500 animate-pulse" />
-                     <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">My Reserved</span>
+                     <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">{t("myReservedLabel")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                      <div className="w-4 h-4 rounded-lg bg-muted border-2 border-muted opacity-50" />
@@ -263,7 +263,7 @@ export default function LotterySelect() {
                   </div>
                   <div className="ml-auto flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
                      <Info className="h-3.5 w-3.5" />
-                     Live Status Updated
+                     {t("liveStatusUpdated")}
                   </div>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default function LotterySelect() {
                   {participateMutation.isPending ? (
                     <><Loader2 className="h-5 w-5 animate-spin mr-2" /> PROCESSING...</>
                   ) : isAdminOrStaff ? (
-                    <><LockIcon className="h-4 w-4 mr-2" /> RESTRICTED ROLE</>
+                    <><LockIcon className="h-4 w-4 mr-2" /> {t("restrictedRoleButton")}</>
                   ) : (
                     <>
                       {t("confirmSelection")}
@@ -349,7 +349,7 @@ export default function LotterySelect() {
                 </Button>
 
                 <p className="text-[9px] text-center mt-3 text-muted-foreground font-black uppercase tracking-[0.15em] opacity-40 flex items-center justify-center gap-1.5">
-                  <ShieldCheck className="h-3 w-3" /> Secure Transaction
+                  <ShieldCheck className="h-3 w-3" /> {t("secureTransaction")}
                 </p>
               </div>
             </div>
@@ -362,7 +362,7 @@ export default function LotterySelect() {
         <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden p-4 bg-background/80 backdrop-blur-xl border-t border-primary/20 animate-slide-in-up">
            <div className="container mx-auto flex items-center justify-between gap-4">
               <div className="flex flex-col">
-                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">Selection ({selected.size})</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">{t("selectionMobileLabel")} ({selected.size})</span>
                  <span className="text-sm font-black text-foreground tabular-nums">{(selected.size * ticketPrice).toLocaleString()} {currency}</span>
               </div>
               <Button 
@@ -373,7 +373,7 @@ export default function LotterySelect() {
                 {participateMutation.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <>RESERVE NOW <ChevronRight className="ml-2 h-4 w-4" /></>
+                  <>{t("reserveNowButton")} <ChevronRight className="ml-2 h-4 w-4" /></>
                 )}
               </Button>
            </div>

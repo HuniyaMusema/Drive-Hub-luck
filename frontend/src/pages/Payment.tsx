@@ -73,7 +73,7 @@ export default function Payment() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Please upload an image under 5MB.", variant: "destructive" });
+      toast({ title: t("fileTooLarge"), description: t("fileTooLargeMsg"), variant: "destructive" });
       return;
     }
     setReceiptFile(file);
@@ -82,21 +82,17 @@ export default function Payment() {
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Copied!", description: `${label} copied to clipboard.` });
+    toast({ title: t("copiedTitle"), description: `${label} ${t("copiedTitle").toLowerCase()}` });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedTicket) {
-      toast({ 
-        title: "Selection Needed", 
-        description: "You must reserve your lucky numbers first in the lottery board.", 
-        variant: "destructive" 
-      });
+      toast({ title: t("selectionNeededTitle"), description: t("reserveNumbersFirst"), variant: "destructive" });
       return;
     }
     if (!receiptFile) {
-      toast({ title: "Upload required", description: "Please upload your payment receipt image.", variant: "destructive" });
+      toast({ title: t("uploadRequiredTitle"), description: t("uploadReceiptMsg"), variant: "destructive" });
       return;
     }
 
@@ -111,7 +107,7 @@ export default function Payment() {
         headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
         body: formData,
       });
-      if (!uploadRes.ok) throw new Error("Failed to upload receipt image.");
+      if (!uploadRes.ok) throw new Error(t("uploadFailedMsg"));
       const uploadData = await uploadRes.json();
       receiptUrl = uploadData.url;
     } catch (err: any) {
@@ -126,13 +122,13 @@ export default function Payment() {
         receiptUrl,
         method,
       });
-      toast({ title: "Receipt Submitted!", description: "Your payment is pending review by our team." });
+      toast({ title: t("receiptSubmittedTitle"), description: t("paymentPendingReview") });
       setSelectedTicket("");
       setReceiptFile(null);
       setReceiptPreview(null);
       if (fileRef.current) fileRef.current.value = "";
     } catch (err: any) {
-      toast({ title: "Submission Failed", description: err.message, variant: "destructive" });
+      toast({ title: t("submissionFailedTitle"), description: err.message, variant: "destructive" });
     } finally {
       setUploading(false);
     }
@@ -211,8 +207,8 @@ export default function Payment() {
                              selectableTickets.map(ticket => (
                                <SelectItem key={ticket.id} value={ticket.id} className="rounded-xl p-4 cursor-pointer focus:bg-primary/5">
                                  <div className="flex flex-col">
-                                    <span className="font-black text-foreground text-sm">TICKET #{ticket.number.toString().padStart(3, '0')}</span>
-                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter mt-1">{ticket.prize || "Active Sweepstake"}</span>
+                                    <span className="font-black text-foreground text-sm">{t("ticketLabel")} #{ticket.number.toString().padStart(3, '0')}</span>
+                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter mt-1">{ticket.prize || t("activeSweepstake")}</span>
                                  </div>
                                </SelectItem>
                              ))
@@ -293,7 +289,7 @@ export default function Payment() {
                                 <Upload className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={2.5} />
                               </div>
                               <h4 className="text-lg font-black text-foreground uppercase tracking-tight mb-2">{t("payInstructions")}</h4>
-                              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted rounded-full px-4 py-1.5 border border-border/60">png, jpg, webp · max 5mb</span>
+                              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted rounded-full px-4 py-1.5 border border-border/60">{t("fileFormatHint")}</span>
                            </div>
                            <input ref={fileRef} type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                          </label>
@@ -412,6 +408,7 @@ export default function Payment() {
 
                     const Icon = s.icon;
                     const isAwaiting = p.status === 'pending' && !p.payment_status && p.lottery_status !== 'closed';
+                    const isClosed = p.lottery_status === 'closed';
                     return (
                       <div
                         key={p.id}
@@ -422,10 +419,20 @@ export default function Payment() {
                           }
                         }}
                         className={cn(
-                          "flex items-center justify-between bg-card rounded-[2rem] p-6 shadow-sm border border-border/60 hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative",
+                          "flex items-center justify-between rounded-[2rem] p-6 shadow-sm border transition-all group overflow-hidden relative",
+                          isClosed
+                            ? "bg-slate-100/60 border-slate-200 opacity-70"
+                            : "bg-card border-border/60 hover:shadow-xl hover:-translate-y-1",
                           isAwaiting && "cursor-pointer hover:border-amber-500/40"
                         )}
                       >
+                        {/* Closed lottery banner */}
+                        {isClosed && (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-200 border border-slate-300">
+                            <XCircle className="h-3 w-3 text-slate-400" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">{t("closedLottery")}</span>
+                          </div>
+                        )}
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.className.split(' ')[0]}`} />
                         <div className="flex items-center gap-5">
                           <div className="w-14 h-14 rounded-2xl bg-muted/40 border border-border/60 flex items-center justify-center shadow-inner group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
@@ -449,7 +456,7 @@ export default function Payment() {
                               </span>
                               {isAwaiting && (
                                 <span className="text-[8px] font-black uppercase tracking-widest text-amber-600 flex items-center gap-1">
-                                  Tap to pay <ChevronRight className="h-2.5 w-2.5" />
+                                  {t("tapToPay")} <ChevronRight className="h-2.5 w-2.5" />
                                 </span>
                               )}
                               {p.rejection_reason && <p className="text-[8px] text-destructive font-bold italic text-right max-w-[120px] line-clamp-1">"{p.rejection_reason}"</p>}
