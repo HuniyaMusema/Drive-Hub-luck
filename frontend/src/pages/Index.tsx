@@ -355,21 +355,21 @@ function LotterySection() {
   ];
 
   return (
-    <section ref={ref} className="py-24 lg:py-32 overflow-hidden relative" style={{ background: 'linear-gradient(180deg, #0a1929 0%, #071018 100%)' }}>
+    <section ref={ref} className="py-24 lg:py-32 overflow-hidden relative" style={{ background: 'linear-gradient(180deg, #162840 0%, #112033 100%)' }}>
       {/* Ambient light effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[160px]" style={{ background: 'radial-gradient(ellipse, rgba(76,191,191,0.07) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'radial-gradient(circle, rgba(61,143,181,0.06) 0%, transparent 70%)' }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[160px]" style={{ background: 'radial-gradient(ellipse, rgba(76,191,191,0.09) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'radial-gradient(circle, rgba(61,143,181,0.07) 0%, transparent 70%)' }} />
       </div>
       
       <div className="relative container mx-auto px-4 lg:px-8 z-10">
         <div className={`text-center mb-20 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
           style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border" style={{ background: 'rgba(76,191,191,0.06)', borderColor: 'rgba(76,191,191,0.25)', color: '#4CBFBF' }}>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border" style={{ background: 'rgba(76,191,191,0.08)', borderColor: 'rgba(76,191,191,0.28)', color: '#4CBFBF' }}>
             <Zap className="h-3 w-3" /> {t("howItWorks")}
           </div>
           <h2 className="text-4xl lg:text-5xl font-display text-white tracking-widest uppercase mb-6 leading-tight">{t("winYourNextRide")}</h2>
-          <p className="mt-4 text-sm tracking-wide font-medium max-w-xl mx-auto text-white/50">{t("lotteryLandingDesc")}</p>
+          <p className="mt-4 text-sm tracking-wide font-medium max-w-xl mx-auto text-white/60">{t("lotteryLandingDesc")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -380,18 +380,18 @@ function LotterySection() {
               style={{
                 transitionDelay: `${(i + 1) * 120}ms`,
                 transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-                background: 'rgba(76,191,191,0.03)',
-                borderColor: 'rgba(76,191,191,0.1)',
+                background: 'rgba(76,191,191,0.04)',
+                borderColor: 'rgba(76,191,191,0.12)',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.35)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.06)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.1)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.03)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.35)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.07)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.12)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.04)'; }}
             >
               <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform" style={{ background: 'rgba(245,176,39,0.12)' }}>
                 <step.icon className="h-7 w-7" strokeWidth={1.5} style={{ color: '#f5b027' }} />
               </div>
               <div className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#f5b027' }}>{t("step")} {i + 1}</div>
               <h3 className="text-xl font-display tracking-[0.1em] mb-4 uppercase text-white">{step.title}</h3>
-              <p className="text-xs leading-relaxed tracking-wide font-medium text-white/50">{step.desc}</p>
+              <p className="text-xs leading-relaxed tracking-wide font-medium text-white/55">{step.desc}</p>
               <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(245,176,39,0.10)' }} />
             </div>
           ))}

@@ -54,18 +54,20 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
-  const headerBg = isHome && !scrolled
-    ? 'linear-gradient(to bottom, rgba(7, 20, 35, 0.55) 0%, transparent 100%)'
-    : 'rgba(7, 16, 28, 0.92)';
-  const mobileBg = 'rgba(7, 16, 28, 0.98)';
+  const scrolledBg = 'rgba(18, 35, 58, 0.96)';
+  const mobileBg = 'rgba(18, 35, 58, 0.99)';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500" style={{ background: isHome && !scrolled ? 'transparent' : 'rgba(10, 25, 41, 0.95)', backdropFilter: isHome && !scrolled ? 'none' : 'blur(20px)' }}>
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300" style={{
+      background: isHome && !scrolled ? 'transparent' : scrolledBg,
+      backdropFilter: isHome && !scrolled ? 'none' : 'blur(20px)',
+      boxShadow: isHome && !scrolled ? 'none' : '0 1px 0 rgba(76,191,191,0.08)',
+    }}>
       <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-8 relative">
         
         {/* Left side: Logo */}
         <Link to="/" className="flex items-center justify-center text-white min-w-max hover:opacity-80 transition-opacity gap-2">
-          <span className="text-[20px] font-display tracking-widest leading-[1.2] capitalize">
+          <span className="text-[20px] font-display tracking-widest leading-[1.2] capitalize text-white">
             Gech
           </span>
           <span className="text-[16px] font-display leading-[1.2]" style={{ color: '#4CBFBF' }}>
@@ -102,7 +104,7 @@ export function Header() {
                 {currentLang?.code.toUpperCase()}
               </span>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 bg-[#071018] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
+            <DropdownMenuContent align="end" className="w-32 bg-[#0d1e2e] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
               {languages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
@@ -128,7 +130,7 @@ export function Header() {
                   <ChevronDown className="h-3 w-3 text-white/40 group-hover:text-[#4CBFBF] transition-colors" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 mt-2 bg-[#071018] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
+              <DropdownMenuContent align="end" className="w-48 mt-2 bg-[#0d1e2e] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
                 <DropdownMenuItem asChild className="text-xs cursor-pointer rounded-lg px-3 py-2 transition-colors focus:bg-[#4CBFBF]/10 focus:text-white font-medium">
                   <Link to={user.role === 'admin' || user.role === 'lottery_staff' ? "/admin" : "/dashboard"} className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" />

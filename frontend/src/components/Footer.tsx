@@ -20,11 +20,11 @@ export function Footer() {
   ].filter(l => l.enabled);
 
   return (
-    <footer className="text-white border-t" style={{ background: 'linear-gradient(180deg, #0d1e2e 0%, #071018 100%)', borderColor: 'rgba(76,191,191,0.12)' }}>
+    <footer className="border-t" style={{ background: 'linear-gradient(180deg, #1a2e45 0%, #142338 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
       <div className="container mx-auto px-4 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center justify-start text-white mb-6 hover:opacity-80 transition-opacity gap-2">
+            <Link to="/" className="flex items-center justify-start mb-6 hover:opacity-80 transition-opacity gap-2">
               <span className="text-[24px] font-display tracking-widest leading-[1.2] capitalize text-white">
                 Gech
               </span>
@@ -32,7 +32,7 @@ export function Footer() {
                 (ጌች)
               </span>
             </Link>
-            <p className="text-xs leading-relaxed max-w-sm tracking-wide text-white/50">
+            <p className="text-xs leading-relaxed max-w-sm tracking-wide text-white/55">
               {t("footerDesc")}
             </p>
           </div>
@@ -42,7 +42,7 @@ export function Footer() {
             <ul className="space-y-3">
               {quickLinks.map((l) => (
                 <li key={l.href}>
-                  <Link to={l.href} className="text-xs tracking-wide transition-colors text-white/50" style={{}} onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#4CBFBF'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'}>
+                  <Link to={l.href} className="text-xs tracking-wide transition-colors text-white/55 hover:text-[#4CBFBF]">
                     {l.label}
                   </Link>
                 </li>
@@ -60,7 +60,7 @@ export function Footer() {
                 { label: t("myProfile"), href: "/profile" },
               ].map((l) => (
                 <li key={l.href}>
-                  <Link to={l.href} className="text-xs tracking-wide transition-colors text-white/50" onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#4CBFBF'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'}>
+                  <Link to={l.href} className="text-xs tracking-wide transition-colors text-white/55 hover:text-[#4CBFBF]">
                     {l.label}
                   </Link>
                 </li>
@@ -70,24 +70,24 @@ export function Footer() {
 
           <div>
             <h4 className="font-bold mb-6 text-[10px] uppercase tracking-[0.15em]" style={{ color: '#4CBFBF' }}>{t("contactFooter")}</h4>
-            <ul className="space-y-4 text-xs tracking-wide text-white/50">
+            <ul className="space-y-4 text-xs tracking-wide text-white/55">
               <li className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={1.5} style={{ color: '#3D8FB5' }} />
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={1.5} style={{ color: '#4CBFBF' }} />
                 <span>{t("addressValue")}</span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="h-4 w-4 shrink-0" strokeWidth={1.5} style={{ color: '#3D8FB5' }} />
+                <Phone className="h-4 w-4 shrink-0" strokeWidth={1.5} style={{ color: '#4CBFBF' }} />
                 <span>{settings?.General?.contactPhone || "+251911701849"}</span>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="h-4 w-4 shrink-0" strokeWidth={1.5} style={{ color: '#3D8FB5' }} />
+                <Mail className="h-4 w-4 shrink-0" strokeWidth={1.5} style={{ color: '#4CBFBF' }} />
                 <span>{settings?.General?.contactEmail || "info@gech.com"}</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-16 pt-8 text-center text-[10px] font-bold uppercase tracking-widest text-white/30" style={{ borderTop: '1px solid rgba(76,191,191,0.1)' }}>
+        <div className="mt-16 pt-8 text-center text-[10px] font-bold uppercase tracking-widest text-white/35" style={{ borderTop: '1px solid rgba(76,191,191,0.12)' }}>
           © {new Date().getFullYear()} Gech (ጌች). {t("allRightsReserved")}
         </div>
       </div>

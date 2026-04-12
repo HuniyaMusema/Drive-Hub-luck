@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
 import NotificationBell from "@/components/NotificationBell";
 import { cn } from "@/lib/utils";
-import heroBg from "@/assets/hero-bg.jpg";
 
 interface NavItem {
   title: string;
@@ -59,24 +58,25 @@ function AdminSidebar() {
     return (
       <SidebarMenuItem>
         <SidebarMenuButton asChild tooltip={item.title}>
-          <Link 
-            to={item.url} 
+          <Link
+            to={item.url}
             className={cn(
-              "flex items-center transition-all duration-300 group relative",
-              collapsed ? "justify-center p-0 h-12 w-12 rounded-xl mx-auto" : "gap-3 px-4 py-3.5 rounded-2xl justify-start",
-               isActive 
-                ? "bg-[#4CBFBF]/15 border border-[#4CBFBF]/30 text-[#4CBFBF] shadow-lg shadow-[#4CBFBF]/10 font-black" 
-                : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
+              "flex items-center transition-all duration-200 group relative",
+              collapsed ? "justify-center p-0 h-11 w-11 rounded-xl mx-auto" : "gap-3 px-3 py-2.5 rounded-xl justify-start",
+              isActive
+                ? "bg-[#4CBFBF]/15 text-white font-semibold"
+                : "text-white/55 hover:text-white hover:bg-white/8"
             )}
           >
-            <item.icon className={cn(
-              "h-5 w-5 transition-transform duration-300 group-hover:scale-110",
-              collapsed ? "" : "shrink-0",
-              isActive ? "text-[#4CBFBF]" : "text-slate-500 group-hover:text-[#4CBFBF]"
-            )} />
-            {!collapsed && <span className="text-xs font-black uppercase tracking-widest leading-none mt-0.5">{t(item.labelKey)}</span>}
             {isActive && !collapsed && (
-               <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-[#4CBFBF] animate-pulse shadow-[0_0_8px_rgba(76,191,191,0.6)]" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#4CBFBF]" />
+            )}
+            <item.icon className={cn(
+              "h-[18px] w-[18px] shrink-0 transition-colors",
+              isActive ? "text-[#4CBFBF]" : "text-white/40 group-hover:text-[#4CBFBF]"
+            )} />
+            {!collapsed && (
+              <span className="text-[13px] leading-none">{t(item.labelKey)}</span>
             )}
           </Link>
         </SidebarMenuButton>
@@ -85,89 +85,76 @@ function AdminSidebar() {
   };
 
   return (
-    <Sidebar 
-      collapsible="icon" 
-      className="border-r border-white/20 z-40 overflow-hidden shadow-2xl" 
-      style={{ 
-        background: 'transparent',
-        // @ts-ignore - custom property
-        "--sidebar-width-icon": "5rem" 
-      }}
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-white/10 z-40"
+      style={{ background: '#162840' }}
     >
-      {/* Hero-matching background */}
-      <div className="absolute inset-0 z-0 overflow-hidden bg-[#071018]">
-        <img src={heroBg} alt="" className="w-full h-full object-cover opacity-40 mix-blend-overlay" style={{ objectPosition: 'center' }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#071018]/80 to-transparent" />
-        {/* Subtle glowing orbs */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#4CBFBF]/10 rounded-full blur-[120px] -mr-32 -mt-32" />
-      </div>
+      <div className="absolute inset-0 bg-[#162840]" />
 
-      <SidebarContent className="bg-transparent custom-scrollbar relative z-10">
+      <SidebarContent className="bg-transparent custom-scrollbar relative z-10 flex flex-col h-full">
         {/* Brand Header */}
         <div className={cn(
-          "pb-4 flex mb-2 transition-all duration-300",
-          collapsed ? "flex-col items-center px-0 pt-6" : "items-center justify-between p-6"
+          "flex items-center border-b border-white/10",
+          collapsed ? "flex-col justify-center gap-2 px-0 py-5" : "justify-between px-5 py-4"
         )}>
-          <div className={cn("flex items-center", collapsed ? "flex-col justify-center gap-0" : "gap-3")}>
-            <div className="bg-[#4CBFBF] p-2.5 rounded-2xl shadow-xl shadow-[#4CBFBF]/20 text-[#050505] shrink-0 rotate-3 transition-transform hover:rotate-0 cursor-pointer mx-auto mb-1">
-               <Car className="h-5 w-5" strokeWidth={2.5} />
+          <div className={cn("flex items-center", collapsed ? "flex-col gap-1" : "gap-3")}>
+            <div className="w-9 h-9 rounded-xl bg-[#4CBFBF] flex items-center justify-center shrink-0 shadow-sm shadow-[#4CBFBF]/20">
+              <Car className="h-4 w-4 text-white" strokeWidth={2.5} />
             </div>
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="text-xl font-black text-white tracking-tighter leading-none">{settings?.General?.platformName || "Drive Hub"}</span>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#4CBFBF] mt-1.5">{t("navManagementPortal")}</span>
+                <span className="text-[15px] font-bold text-white leading-none">{settings?.General?.platformName || "Drive Hub"}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#4CBFBF] mt-1">{t("navManagementPortal")}</span>
               </div>
             )}
           </div>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={toggleSidebar}
             className={cn(
-              "hover:bg-white/10 rounded-xl transition-all",
-              collapsed ? "text-[#4CBFBF] mt-2 scale-110" : "text-white/40 hover:text-white"
+              "rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all h-8 w-8",
+              collapsed && "mt-1"
             )}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
 
-        {/* Divider */}
-        {!collapsed && <div className="mx-6 mb-6 h-px bg-gradient-to-r from-transparent via-[#4CBFBF]/20 to-transparent" />}
-
-        <SidebarGroup>
-          {!collapsed && (
-            <div className="px-6 py-2 mb-2 font-black text-[10px] uppercase tracking-[0.25em] text-slate-500">
-              {t("navCoreManagement")}
-            </div>
-          )}
-          <SidebarGroupContent>
-            <SidebarMenu className={cn("gap-1.5", collapsed ? "px-0" : "px-3")}>
-              {visibleSystem.map((item) => <SidebarLink key={item.title} item={item} />)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {visibleLottery.length > 0 && (
-          <SidebarGroup className="mt-6">
+        {/* Nav Groups */}
+        <div className="flex-1 overflow-y-auto py-4 px-2 space-y-5">
+          <SidebarGroup>
             {!collapsed && (
-              <>
-                <div className="mx-6 mb-4 h-px bg-gradient-to-r from-transparent via-[#4CBFBF]/15 to-transparent" />
-                <div className="px-6 py-2 mb-2 font-black text-[10px] uppercase tracking-[0.25em] text-[#4CBFBF]/50">
-                   {t("navLotteryOperations")}
-                </div>
-              </>
+              <p className="px-3 mb-1.5 text-[10px] font-semibold text-white/35 uppercase tracking-[0.15em]">
+                {t("navCoreManagement")}
+              </p>
             )}
             <SidebarGroupContent>
-              <SidebarMenu className={cn("gap-1.5", collapsed ? "px-0" : "px-3")}>
-                {visibleLottery.map((item) => <SidebarLink key={item.title} item={item} />)}
+              <SidebarMenu className="space-y-0.5">
+                {visibleSystem.map((item) => <SidebarLink key={item.title} item={item} />)}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-        )}
 
-        {/* Removed User Card & Logout from sidebar based on user request */}
+          {visibleLottery.length > 0 && (
+            <SidebarGroup>
+              {!collapsed && (
+                <>
+                  <div className="mx-3 mb-3 h-px bg-white/10" />
+                  <p className="px-3 mb-1.5 text-[10px] font-semibold text-white/35 uppercase tracking-[0.15em]">
+                    {t("navLotteryOperations")}
+                  </p>
+                </>
+              )}
+              <SidebarGroupContent>
+                <SidebarMenu className="space-y-0.5">
+                  {visibleLottery.map((item) => <SidebarLink key={item.title} item={item} />)}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+        </div>
       </SidebarContent>
     </Sidebar>
   );
