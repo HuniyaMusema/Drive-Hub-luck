@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Bookmark, Car, Globe, Menu, X, Bell, Ticket, Search, Key, Plus, FileText, ChevronDown, Users, LogOut } from "lucide-react";
+import { Bookmark, Car, Globe, Menu, X, Bell, Ticket, Search, Key, Plus, FileText, ChevronDown, Users, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
@@ -129,6 +129,13 @@ export function Header() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 mt-2 bg-[#071018] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
+                <DropdownMenuItem asChild className="text-xs cursor-pointer rounded-lg px-3 py-2 transition-colors focus:bg-[#4CBFBF]/10 focus:text-white font-medium">
+                  <Link to={user.role === 'admin' || user.role === 'lottery_staff' ? "/admin" : "/dashboard"} className="flex items-center gap-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    {t("dashboard")}
+                  </Link>
+                </DropdownMenuItem>
+                <div className="h-px bg-white/5 my-1" />
                 <DropdownMenuItem asChild className="text-xs cursor-pointer rounded-lg px-3 py-2 transition-colors focus:bg-[#4CBFBF]/10 focus:text-white font-medium">
                   <Link to="/profile" className="flex items-center gap-2">
                     <Users className="h-4 w-4" />

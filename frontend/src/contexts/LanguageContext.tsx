@@ -428,7 +428,7 @@ const translations: Record<Language, Record<string, string>> = {
     navManagementPortal: "Management Portal",
     navCoreManagement: "Core Management",
     navLotteryOperations: "Lottery Operations",
-    navTerminateSession: "Terminate Session",
+    navTerminateSession: "Log Out",
     navEngineHealthy: "Engine Healthy",
     navStaffPortal: "Staff Portal",
     navGlobalAdmin: "Global Admin",
