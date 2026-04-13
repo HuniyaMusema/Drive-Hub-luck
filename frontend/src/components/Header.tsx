@@ -162,6 +162,9 @@ export function Header() {
             </Link>
           )}
 
+          {/* Notification Bell */}
+          {user && <NotificationBell />}
+
           {/* Saved Cars */}
           <Link to="/saved-cars" className="relative text-white/60 hover:text-white transition-colors">
             <FileText className="h-5 w-5" strokeWidth={1.5} />

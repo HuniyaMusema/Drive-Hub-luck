@@ -1,5 +1,6 @@
 const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
+const NotificationService = require('../services/NotificationService');
 
 // @desc    Participate in the lottery (Assign specific chosen numbers)
 // @route   POST /api/lottery/participate
@@ -115,11 +116,13 @@ const submitLotteryPayment = async (req, res) => {
     }
 
     // 2. Create the payment record
-    await client.query(
+    const { rows: paymentRows } = await client.query(
       `INSERT INTO payments (user_id, lottery_number_id, receipt_url, method, status)
-       VALUES ($1, $2, $3, $4, 'pending')`,
+       VALUES ($1, $2, $3, $4, 'pending')
+       RETURNING id`,
       [req.user.id, lotteryNumberId, receiptUrl, method]
     );
+    const paymentId = paymentRows[0].id;
 
     // 3. Notify Admin/Staff
     const { rows: ticketInfo } = await client.query(
@@ -127,23 +130,24 @@ const submitLotteryPayment = async (req, res) => {
       [lotteryNumberId]
     );
     const ticketNumber = ticketInfo[0]?.number || 'Unknown';
-    const notificationService = require('../services/notificationService');
-    
-    // Notify Admin/Staff
-    await notificationService.notifyAdminsAndStaff(
+
+    // Notify Admin/Staff (no reference_id — fan-out to multiple admins, not a single event)
+    await NotificationService.notifyAdminsAndStaff(
       'New Payment Pending',
       `User ${req.user.name} uploaded a receipt for ticket #${ticketNumber}.`,
-      'info',
+      'payment_pending',
       client
     );
 
-    // Notify User
-    await notificationService.createNotification(
+    // Notify User — reference_id = paymentId prevents duplicate on retry/race
+    await NotificationService.createNotification(
       req.user.id,
       'Payment Under Review',
-      `Your payment for ticket #${ticketNumber} has been received and is under review.`,
-      'info',
-      client
+      'Your payment is under review',
+      'payment_pending',
+      client,
+      paymentId,
+      { entity_type: 'payment', event_action: 'payment_submitted', payment_id: paymentId, ticket_number: ticketNumber }
     );
 
     await client.query('COMMIT');

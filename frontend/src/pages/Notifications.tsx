@@ -7,16 +7,19 @@ import {
   Trash2, 
   Info, 
   CheckCircle2, 
-  AlertTriangle, 
   XCircle,
-  Clock
+  Clock,
+  UserCheck,
+  Trophy,
+  Ticket
 } from "lucide-react";
 import { 
   getNotifications, 
   markAsRead, 
   markAllAsRead, 
   deleteNotification, 
-  Notification 
+  Notification,
+  NotificationType
 } from "@/services/notificationService";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -101,12 +104,16 @@ export default function Notifications() {
     }
   };
 
-  const getIcon = (type: string) => {
+  const getIcon = (type: NotificationType) => {
     switch (type) {
-      case 'success': return <CheckCircle2 className="h-5 w-5 text-[#4CBFBF]" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-[#f5b027]" />;
-      case 'error': return <XCircle className="h-5 w-5 text-destructive" />;
-      default: return <Info className="h-5 w-5 text-[#4CBFBF]" />;
+      case 'registration':      return <UserCheck    className="h-5 w-5 text-teal-500" />;
+      case 'payment_pending':   return <Clock        className="h-5 w-5 text-amber-500" />;
+      case 'payment_approved':  return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+      case 'payment_rejected':  return <XCircle      className="h-5 w-5 text-red-500" />;
+      case 'ticket_assigned':   return <Ticket       className="h-5 w-5 text-teal-500" />;
+      case 'lottery_result':    return <Trophy       className="h-5 w-5 text-yellow-500" />;
+      case 'reminder':          return <Bell         className="h-5 w-5 text-amber-500" />;
+      case 'system_update':     return <Info         className="h-5 w-5 text-slate-500" />;
     }
   };
 

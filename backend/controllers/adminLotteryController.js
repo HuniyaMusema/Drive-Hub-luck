@@ -1,4 +1,5 @@
 const pool = require('../config/pgPool');
+const NotificationService = require('../services/NotificationService');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper: fetch the current active lottery (used by multiple handlers)
@@ -381,19 +382,24 @@ const verifyPayment = async (req, res) => {
       [payment.user_id, payment.lottery_number_id]
     );
 
-    // 3. Notify the user
-    const { rows: ticketInfo } = await client.query(
-      'SELECT number FROM lottery_numbers WHERE id = $1',
-      [payment.lottery_number_id]
-    );
-    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
-    const notificationService = require('../services/notificationService');
-    await notificationService.createNotification(
+    // 3. Notify the user — reference_id = payment.id prevents duplicate on retry
+    await NotificationService.createNotification(
       payment.user_id,
-      'Payment Approved!',
-      `Your payment for ticket #${ticketNumber} has been approved. Your lottery number is now confirmed!`,
-      'success',
-      client
+      'Payment Approved',
+      'Your lottery number is confirmed',
+      'payment_approved',
+      client,
+      payment.id,
+      { entity_type: 'payment', event_action: 'payment_approved', payment_id: payment.id, lottery_number_id: payment.lottery_number_id }
+    );
+    await NotificationService.createNotification(
+      payment.user_id,
+      'Ticket Assigned',
+      'Your lottery ticket number has been assigned.',
+      'ticket_assigned',
+      client,
+      payment.lottery_number_id,
+      { entity_type: 'ticket', event_action: 'ticket_assigned', lottery_number_id: payment.lottery_number_id, payment_id: payment.id }
     );
 
     await createAuditLog(client, 'PAYMENT_VERIFIED', req.user.id, id, { status: 'approved', lottery_number_id: payment.lottery_number_id });
@@ -469,19 +475,15 @@ const rejectPayment = async (req, res) => {
       );
     }
 
-    // 3. Notify the user
-    const { rows: ticketInfo } = await client.query(
-      'SELECT number FROM lottery_numbers WHERE id = $1',
-      [payment.lottery_number_id]
-    );
-    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
-    const notificationService = require('../services/notificationService');
-    await notificationService.createNotification(
+    // 3. Notify the user — reference_id = payment.id prevents duplicate on retry
+    await NotificationService.createNotification(
       payment.user_id,
       'Payment Rejected',
-      `Your payment for ticket #${ticketNumber} was rejected. Reason: ${rejection_reason}. Please try again.`,
-      'error',
-      client
+      'Your payment was rejected. Please try again',
+      'payment_rejected',
+      client,
+      payment.id,
+      { entity_type: 'payment', event_action: 'payment_rejected', payment_id: payment.id, rejection_reason: rejection_reason }
     );
 
     await createAuditLog(client, 'PAYMENT_REJECTED', req.user.id, id, { reason: rejection_reason, lottery_number_id: payment.lottery_number_id });
@@ -579,6 +581,23 @@ const pickWinner = async (req, res) => {
        WHERE id = $3`,
       [winner.user_id, winner.number, lotteryId]
     );
+
+    // 4. Notify all confirmed participants — reference_id = lotteryId prevents duplicates
+    const { rows: participants } = await client.query(
+      `SELECT user_id FROM lottery_numbers WHERE lottery_id = $1 AND status = 'confirmed'`,
+      [lotteryId]
+    );
+    for (const participant of participants) {
+      await NotificationService.createNotification(
+        participant.user_id,
+        'Lottery Draw Completed',
+        'Winner has been selected',
+        'lottery_result',
+        client,
+        lotteryId,
+        { entity_type: 'lottery', event_action: 'draw_completed', lottery_id: lotteryId, winning_number: winner.number }
+      );
+    }
 
     await client.query('COMMIT');
 

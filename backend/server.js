@@ -6,11 +6,20 @@ const express = require('express');
 const cors = require('cors');
 const SettingsManager = require('./services/SettingsManager');
 const { maintenanceGuard } = require('./middleware/systemGuards');
+const ReminderJob = require('./jobs/reminderJob');
+const AutoPaymentJob = require('./jobs/autoPaymentJob');
 
 const app = express();
 
-// Load settings on startup
-SettingsManager.loadSettings();
+// Load settings on startup, then start background jobs
+SettingsManager.loadSettings().then(() => {
+  ReminderJob.start();
+  AutoPaymentJob.start();
+}).catch((err) => {
+  console.error('[server] Failed to load settings:', err.message);
+  ReminderJob.start();
+  AutoPaymentJob.start();
+});
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');

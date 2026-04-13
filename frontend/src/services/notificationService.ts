@@ -1,10 +1,20 @@
 import { apiFetch } from './api';
 
+export type NotificationType =
+  | 'registration'
+  | 'payment_pending'
+  | 'payment_approved'
+  | 'payment_rejected'
+  | 'ticket_assigned'
+  | 'lottery_result'
+  | 'reminder'
+  | 'system_update';
+
 export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: NotificationType;
   is_read: boolean;
   created_at: string;
 }

@@ -5,6 +5,7 @@ const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
 const { sendPasswordResetEmail } = require('../services/emailService');
+const NotificationService = require('../services/NotificationService');
 
 // @desc    Generate JWT
 // @param   {string} id - User ID
@@ -69,6 +70,16 @@ const registerUser = async (req, res) => {
     );
 
     const user = rows[0];
+
+    await NotificationService.createNotification(
+      user.id,
+      'Welcome to Gech Car Lottery',
+      'Your account has been created successfully. Welcome to the Gech Car Lottery!',
+      'registration',
+      null,
+      user.id,  // reference_id = user.id — one welcome notification per user, ever
+      { entity_type: 'user', event_action: 'user_registered', user_id: user.id }
+    );
 
     const sessionToken = uuidv4();
     await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);

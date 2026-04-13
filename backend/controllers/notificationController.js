@@ -6,7 +6,7 @@ const pool = require('../config/pgPool');
 const getUserNotifications = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      'SELECT id, title, message, type, is_read, created_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC',
+      'SELECT id, title, message, type, is_read, created_at FROM notifications WHERE user_id = $1 AND is_deleted = FALSE ORDER BY created_at DESC',
       [req.user.id]
     );
     res.status(200).json(rows);
@@ -23,7 +23,7 @@ const markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
     const { rowCount } = await pool.query(
-      'UPDATE notifications SET is_read = TRUE WHERE id = $1 AND user_id = $2',
+      'UPDATE notifications SET is_read = TRUE WHERE id = $1 AND user_id = $2 AND is_deleted = FALSE',
       [id, req.user.id]
     );
 
@@ -44,7 +44,7 @@ const markAsRead = async (req, res) => {
 const markAllAsRead = async (req, res) => {
   try {
     await pool.query(
-      'UPDATE notifications SET is_read = TRUE WHERE user_id = $1 AND is_read = FALSE',
+      'UPDATE notifications SET is_read = TRUE WHERE user_id = $1 AND is_read = FALSE AND is_deleted = FALSE',
       [req.user.id]
     );
     res.status(200).json({ message: 'All notifications marked as read' });
@@ -61,7 +61,7 @@ const deleteNotification = async (req, res) => {
   try {
     const { id } = req.params;
     const { rowCount } = await pool.query(
-      'DELETE FROM notifications WHERE id = $1 AND user_id = $2',
+      'UPDATE notifications SET is_deleted = TRUE, updated_at = NOW() WHERE id = $1 AND user_id = $2',
       [id, req.user.id]
     );
 

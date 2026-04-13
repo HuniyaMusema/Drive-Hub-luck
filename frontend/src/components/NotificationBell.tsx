@@ -32,14 +32,14 @@ const NotificationBell = () => {
   if (!user) return null;
 
   return (
-    <Link to="/notifications" className="relative p-2.5 text-slate-400 hover:text-[#4CBFBF] transition-all bg-slate-50 hover:bg-[#4CBFBF]/5 rounded-xl border border-slate-100 group">
-      <Bell className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+    <Link to="/notifications" className="relative text-white/60 hover:text-white transition-colors group">
+      <Bell className="h-5 w-5 group-hover:rotate-12 transition-transform" strokeWidth={1.5} />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 w-5">
+        <span className="absolute -top-1.5 -right-2 flex h-4 w-4">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
           <Badge 
             variant="destructive" 
-            className="relative h-5 w-5 flex items-center justify-center p-0 text-[10px] font-black rounded-full border-2 border-white shadow-sm"
+            className="relative h-4 w-4 flex items-center justify-center p-0 text-[9px] font-black rounded-full border border-white/20 shadow-sm"
           >
             {unreadCount > 9 ? '9+' : unreadCount}
           </Badge>
