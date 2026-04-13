@@ -134,7 +134,7 @@ export default function Login() {
                  <div className="space-y-2">
                     <div className="flex items-center justify-between ml-1">
                        <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-slate-600">{t("password")}</Label>
-                       <Link to="#" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: '#0d2e22' }}>{t("forgotPassword")}</Link>
+                       <Link to="/auth/forgot-password" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: '#0d2e22' }}>{t("forgotPassword")}</Link>
                     </div>
                     <div className="relative">
                        <Input 

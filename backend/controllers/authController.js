@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
 // @desc    Generate JWT
 // @param   {string} id - User ID
@@ -231,11 +233,105 @@ const updateUserLanguage = async (req, res) => {
   }
 };
 
+// @desc    Request password reset — sends email with token link
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+
+  try {
+    const { rows } = await pool.query(
+      'SELECT id, name, email FROM users WHERE email = $1',
+      [email.toLowerCase().trim()]
+    );
+
+    // Always return 200 to prevent email enumeration attacks
+    if (rows.length === 0) {
+      return res.status(200).json({ message: 'If that email is registered, a reset link has been sent.' });
+    }
+
+    const user = rows[0];
+
+    // Generate a secure random token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+    // Store the hashed token in the DB
+    await pool.query(
+      'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
+      [hashedToken, expiresAt, user.id]
+    );
+
+    // Build the reset URL (the raw token goes in the URL, not the hash)
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
+    const resetUrl = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
+
+    await sendPasswordResetEmail(user.email, user.name, resetToken, resetUrl);
+
+    res.status(200).json({ message: 'If that email is registered, a reset link has been sent.' });
+  } catch (error) {
+    console.error('[forgotPassword]', error.message);
+    res.status(500).json({ message: 'Failed to send reset email. Please try again later.' });
+  }
+};
+
+// @desc    Reset password using the token from the email link
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return res.status(400).json({ message: 'Token and new password are required' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters' });
+  }
+
+  try {
+    // Hash the incoming raw token to compare against the stored hash
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const { rows } = await pool.query(
+      `SELECT id, name, email FROM users 
+       WHERE reset_token = $1 AND reset_token_expires > NOW()`,
+      [hashedToken]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: 'Reset link is invalid or has expired. Please request a new one.' });
+    }
+
+    const user = rows[0];
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Update the password and clear the reset token in one query
+    await pool.query(
+      `UPDATE users 
+       SET password = $1, reset_token = NULL, reset_token_expires = NULL, session_token = NULL 
+       WHERE id = $2`,
+      [hashedPassword, user.id]
+    );
+
+    console.log(`[resetPassword] Password successfully reset for user: ${user.email}`);
+    res.status(200).json({ message: 'Password reset successfully. You can now log in.' });
+  } catch (error) {
+    console.error('[resetPassword]', error.message);
+    res.status(500).json({ message: 'Server error resetting password.' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getMe,
   getProfileHistory,
   updateUserLanguage,
+  forgotPassword,
+  resetPassword,
 };
 
