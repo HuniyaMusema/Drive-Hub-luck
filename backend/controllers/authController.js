@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
-const { sendPasswordResetEmail } = require('../services/emailService');
+const { sendPasswordResetEmail, sendVerificationEmail } = require('../services/emailService');
 const NotificationService = require('../services/NotificationService');
 
 // @desc    Generate JWT
@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
   try {
     // Check if user exists
     const { rows: existing } = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
+      'SELECT id, email_verified FROM users WHERE email = $1',
       [email]
     );
 
@@ -61,12 +61,17 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
+    // Generate single-use verification token
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Create user with pending_verification status
     const { rows } = await pool.query(
-      `INSERT INTO users (name, email, password, role)
-       VALUES ($1, $2, $3, 'user')
+      `INSERT INTO users (name, email, password, role, status, email_verified, verification_token, verification_token_expires, last_verification_sent_at)
+       VALUES ($1, $2, $3, 'user', 'pending_verification', FALSE, $4, $5, NOW())
        RETURNING id, name, email, role, created_at, language`,
-      [name, email, hashedPassword]
+      [name, email, hashedPassword, hashedToken, tokenExpires]
     );
 
     const user = rows[0];
@@ -81,16 +86,15 @@ const registerUser = async (req, res) => {
       { entity_type: 'user', event_action: 'user_registered', user_id: user.id }
     );
 
-    const sessionToken = uuidv4();
-    await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
+    // Build verification URL and send email
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
+    const verifyUrl = `${frontendUrl}/auth/verify-email?token=${rawToken}`;
+    await sendVerificationEmail(user.email, user.name, verifyUrl);
 
     res.status(201).json({
-      id: user.id,
-      name: user.name,
+      message: 'Account created! Please check your email to verify your account before signing in.',
       email: user.email,
-      role: user.role,
-      language: user.language,
-      token: generateToken(user.id, user.role, sessionToken),
+      requiresVerification: true,
     });
   } catch (error) {
     console.error('[registerUser]', error.message);
@@ -106,7 +110,7 @@ const loginUser = async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      'SELECT id, name, email, password, role, session_token, language FROM users WHERE email = $1',
+      'SELECT id, name, email, password, role, session_token, language, email_verified, status FROM users WHERE email = $1',
       [email]
     );
 
@@ -119,6 +123,15 @@ const loginUser = async (req, res) => {
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Block login if email is not verified
+    if (!user.email_verified || user.status === 'pending_verification') {
+      return res.status(403).json({
+        message: 'Please verify your email address before signing in.',
+        requiresVerification: true,
+        email: user.email,
+      });
     }
 
     // Respect multiLoginEnabled setting:
@@ -336,6 +349,140 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// @desc    Verify email using a token from the verification link
+// @route   POST /api/auth/verify-email
+// @access  Public
+const verifyEmail = async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ message: 'Verification token is required' });
+
+  try {
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const { rows } = await pool.query(
+      `SELECT id, name, email FROM users
+       WHERE verification_token = $1 AND verification_token_expires > NOW()`,
+      [hashedToken]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({
+        message: 'Verification link is invalid or has expired. Please request a new one.',
+        expired: true,
+      });
+    }
+
+    const user = rows[0];
+
+    // Activate account and invalidate the token
+    const sessionToken = uuidv4();
+    await pool.query(
+      `UPDATE users
+       SET email_verified = TRUE,
+           status = 'active',
+           verification_token = NULL,
+           verification_token_expires = NULL,
+           session_token = $1,
+           verification_resend_count = 0
+       WHERE id = $2`,
+      [sessionToken, user.id]
+    );
+
+    const { rows: updated } = await pool.query(
+      'SELECT id, name, email, role, language FROM users WHERE id = $1',
+      [user.id]
+    );
+    const fullUser = updated[0];
+
+    console.log(`[verifyEmail] Account activated for: ${fullUser.email}`);
+
+    // Return JWT so the user is auto-logged in immediately
+    res.status(200).json({
+      message: 'Email verified! Your account is now active.',
+      id: fullUser.id,
+      name: fullUser.name,
+      email: fullUser.email,
+      role: fullUser.role,
+      language: fullUser.language,
+      token: generateToken(fullUser.id, fullUser.role, sessionToken),
+    });
+  } catch (error) {
+    console.error('[verifyEmail]', error.message);
+    res.status(500).json({ message: 'Server error during verification.' });
+  }
+};
+
+// @desc    Resend verification email
+// @route   POST /api/auth/resend-verification
+// @access  Public
+const resendVerification = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, name, email, email_verified, status,
+              last_verification_sent_at, verification_resend_count
+       FROM users WHERE email = $1`,
+      [email.toLowerCase().trim()]
+    );
+
+    // Always return 200 to prevent email enumeration
+    if (rows.length === 0) {
+      return res.status(200).json({ message: 'If your account exists, a new verification email has been sent.' });
+    }
+
+    const user = rows[0];
+
+    // Already verified
+    if (user.email_verified) {
+      return res.status(400).json({ message: 'This account is already verified. Please log in.' });
+    }
+
+    // Rate limiting: min 2 minutes between sends
+    if (user.last_verification_sent_at) {
+      const secondsSinceLastSend = (Date.now() - new Date(user.last_verification_sent_at).getTime()) / 1000;
+      if (secondsSinceLastSend < 120) {
+        const waitSeconds = Math.ceil(120 - secondsSinceLastSend);
+        return res.status(429).json({
+          message: `Please wait ${waitSeconds} seconds before requesting another verification email.`,
+        });
+      }
+    }
+
+    // Rate limiting: max 5 resends per account lifetime
+    if (user.verification_resend_count >= 5) {
+      return res.status(429).json({
+        message: 'Maximum resend attempts reached. Please contact support.',
+      });
+    }
+
+    // Generate new token
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await pool.query(
+      `UPDATE users
+       SET verification_token = $1,
+           verification_token_expires = $2,
+           last_verification_sent_at = NOW(),
+           verification_resend_count = verification_resend_count + 1
+       WHERE id = $3`,
+      [hashedToken, tokenExpires, user.id]
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
+    const verifyUrl = `${frontendUrl}/auth/verify-email?token=${rawToken}`;
+    await sendVerificationEmail(user.email, user.name, verifyUrl);
+
+    res.status(200).json({ message: 'If your account exists, a new verification email has been sent.' });
+  } catch (error) {
+    console.error('[resendVerification]', error.message);
+    res.status(500).json({ message: 'Failed to resend verification email.' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -344,5 +491,7 @@ module.exports = {
   updateUserLanguage,
   forgotPassword,
   resetPassword,
+  verifyEmail,
+  resendVerification,
 };
 

@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { Lock, Eye, EyeOff, ShieldCheck, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/hero-bg-lasers.png";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");

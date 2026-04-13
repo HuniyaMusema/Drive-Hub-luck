@@ -12,7 +12,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/services/api";
 import carGiftBow from "@/assets/car-gift-bow.png";
-import heroBg from "@/assets/hero-bg.jpg"; // Using existing background for left side
+import heroBg from "@/assets/hero-bg-lasers.png"; // New red laser background
 
 /* ─── Flashcard Stack – right panel ─── */
 const mockListings = [

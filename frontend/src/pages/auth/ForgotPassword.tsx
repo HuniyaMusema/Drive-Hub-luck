@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { Mail, ArrowRight, ShieldCheck, CheckCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/hero-bg-lasers.png";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
