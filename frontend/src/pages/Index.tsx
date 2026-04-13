@@ -166,17 +166,11 @@ function HeroSection() {
         <div className="absolute inset-0 flex">
           {/* Background image */}
           <div className="w-full h-full relative">
-            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" style={{ filter: "blur(1px) brightness(0.7)" }} />
+            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" />
           </div>
         </div>
-        {/* Directional overlay: dark on left (text), fades out toward right (cards) */}
-        <div className="absolute inset-0" style={{
-          background: "linear-gradient(to right, rgba(5,10,20,0.82) 0%, rgba(5,10,20,0.65) 40%, rgba(5,10,20,0.15) 70%, transparent 100%)"
-        }} />
-        {/* Bottom fade for polish */}
-        <div className="absolute inset-0" style={{
-          background: "linear-gradient(to top, rgba(5,10,20,0.4) 0%, transparent 30%)"
-        }} />
+        {/* Directional overlay removed to clear shadow */}
+        {/* Bottom fade removed to clear shadow */}
       </div>
 
       {/* Right edge fade into footer color */}
