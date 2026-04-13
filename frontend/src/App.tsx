@@ -13,6 +13,8 @@ import { useSettings } from "@/hooks/useSettings";
 import Index from "./pages/Index";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import CarsForSale from "./pages/cars/CarsForSale";
 import CarsForRent from "./pages/cars/CarsForRent";
 import CarDetail from "./pages/cars/CarDetail";
@@ -71,6 +73,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />
+            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="/cars/sale" element={<CarsForSale />} />
             <Route path="/cars/rent" element={<CarsForRent />} />
             <Route path="/cars/:id" element={<CarDetail />} />
