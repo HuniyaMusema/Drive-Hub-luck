@@ -1,14 +1,11 @@
 const pool = require('../config/pgPool');
+const SettingsManager = require('../services/SettingsManager');
 
-/**
- * Create a new notification for a specific user.
- * @param {string} userId - UUID of the user to notify.
- * @param {string} title - Brief title of the notification.
- * @param {string} message - Detailed notification message.
- * @param {string} type - Type of notification (info, success, warning, error).
- * @param {object} client - Optional database client for transaction support.
- */
 const createNotification = async (userId, title, message, type = 'info', client = null) => {
+  // Respect emailEnabled setting — if disabled, skip in-app notifications too
+  const notifications = SettingsManager.getSetting('Notifications', {});
+  if (notifications.emailEnabled === false) return;
+
   const db = client || pool;
   try {
     await db.query(
@@ -18,24 +15,25 @@ const createNotification = async (userId, title, message, type = 'info', client 
     );
   } catch (error) {
     console.error('[NotificationService.createNotification]', error.message);
-    // We don't throw here to avoid failing the main action if notification fails
   }
 };
 
-/**
- * Notify all admin and lottery staff users.
- * @param {string} title - Brief title of the notification.
- * @param {string} message - Detailed notification message.
- * @param {string} type - Type of notification.
- * @param {object} client - Optional database client.
- */
 const notifyAdminsAndStaff = async (title, message, type = 'info', client = null) => {
+  const notifications = SettingsManager.getSetting('Notifications', {});
+
+  // Check alert-specific settings
+  const isLargePaymentAlert = title.toLowerCase().includes('payment') || message.toLowerCase().includes('payment');
+  const isSuspiciousAlert = type === 'warning' || type === 'error';
+
+  if (isLargePaymentAlert && notifications.adminAlertLargePayment === false) return;
+  if (isSuspiciousAlert && notifications.adminAlertSuspicious === false) return;
+  if (notifications.emailEnabled === false) return;
+
   const db = client || pool;
   try {
     const { rows: admins } = await db.query(
       "SELECT id FROM users WHERE role IN ('admin', 'lottery_staff')"
     );
-
     for (const admin of admins) {
       await createNotification(admin.id, title, message, type, db);
     }

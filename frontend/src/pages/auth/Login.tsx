@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Car, Eye, EyeOff, ShieldCheck, Sparkles, ArrowRight, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/hooks/useSettings";
 import type { User } from "@/types/auth";
 import { useToast } from "@/hooks/use-toast";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -19,7 +20,9 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { settings } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
+  const registrationEnabled = settings?.Security?.registrationEnabled !== false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +63,7 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
       <Header />
       <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left Side: Cinematic Visuals */}
@@ -165,12 +168,18 @@ export default function Login() {
               </form>
 
               <div className="mt-6 pt-4 border-t border-slate-200 text-center">
-                 <p className="text-sm font-medium text-slate-500">
-                    {t("noAccount")}{" "}
-                    <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#0d2e22' }}>
-                       {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
-                    </Link>
-                 </p>
+                 {registrationEnabled ? (
+                   <p className="text-sm font-medium text-slate-500">
+                      {t("noAccount")}{" "}
+                      <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2 text-[#4CBFBF]">
+                         {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
+                      </Link>
+                   </p>
+                 ) : (
+                   <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
+                      Registration is currently disabled
+                   </p>
+                 )}
               </div>
            </div>
         </div>

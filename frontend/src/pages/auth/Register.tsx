@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Car, Eye, EyeOff, Check, UserPlus, ShieldCheck, Mail, Lock, User, Phone, ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/hooks/useSettings";
 import heroBg from "@/assets/hero-bg.jpg";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +21,13 @@ export default function Register() {
   
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { settings } = useSettings();
   const navigate = useNavigate();
+
+  const security = settings?.Security || {};
+  const minLength = security.minPasswordLength || 8;
+  const requireNumbers = security.requireNumbers !== false;
+  const requireUppercase = security.requireUppercase !== false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,13 +60,13 @@ export default function Register() {
   };
 
   const checks = [
-    { label: t("atLeast8"), ok: password.length >= 8 },
-    { label: t("containsNumber"), ok: /\d/.test(password) },
-    { label: t("containsUppercase"), ok: /[A-Z]/.test(password) },
+    { label: `At least ${minLength} characters`, ok: password.length >= minLength },
+    ...(requireNumbers ? [{ label: t("containsNumber"), ok: /\d/.test(password) }] : []),
+    ...(requireUppercase ? [{ label: t("containsUppercase"), ok: /[A-Z]/.test(password) }] : []),
   ];
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
       <Header />
       <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left Side: Cinematic Onboarding */}

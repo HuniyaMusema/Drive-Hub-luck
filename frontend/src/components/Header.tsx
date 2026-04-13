@@ -68,10 +68,7 @@ export function Header() {
         {/* Left side: Logo */}
         <Link to="/" className="flex items-center justify-center text-white min-w-max hover:opacity-80 transition-opacity gap-2">
           <span className="text-[20px] font-display tracking-widest leading-[1.2] capitalize text-white">
-            Gech
-          </span>
-          <span className="text-[16px] font-display leading-[1.2]" style={{ color: '#4CBFBF' }}>
-            (ጌች)
+            {settings?.General?.platformName || "Gech"}
           </span>
         </Link>
 

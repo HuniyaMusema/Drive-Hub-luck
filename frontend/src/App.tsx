@@ -45,7 +45,7 @@ const queryClient = new QueryClient({
 
 const PlatformTitle = memo(() => {
   const { settings } = useSettings();
-  const platformName = settings?.General?.platformName || "Drive Hub";
+  const platformName = settings?.General?.platformName || "Gech";
   
   const { t } = useLanguage();
   

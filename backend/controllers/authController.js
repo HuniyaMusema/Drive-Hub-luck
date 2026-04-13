@@ -31,6 +31,18 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ message: 'Please add all fields' });
   }
 
+  // Enforce password policy from settings
+  const minLength = security.minPasswordLength || 8;
+  if (password.length < minLength) {
+    return res.status(400).json({ message: `Password must be at least ${minLength} characters.` });
+  }
+  if (security.requireUppercase !== false && !/[A-Z]/.test(password)) {
+    return res.status(400).json({ message: 'Password must contain at least one uppercase letter.' });
+  }
+  if (security.requireNumbers !== false && !/[0-9]/.test(password)) {
+    return res.status(400).json({ message: 'Password must contain at least one number.' });
+  }
+
   try {
     // Check if user exists
     const { rows: existing } = await pool.query(
@@ -96,9 +108,17 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Force fresh session token for every login to ensure strict isolation
-    const sessionToken = uuidv4();
-    await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
+    // Respect multiLoginEnabled setting:
+    // If disabled (default), rotate session token to kick other sessions.
+    // If enabled, keep existing session token so multiple devices stay logged in.
+    const security = SettingsManager.getSetting('Security', {});
+    const multiLoginEnabled = security.multiLoginEnabled === true;
+
+    let sessionToken = user.session_token;
+    if (!multiLoginEnabled || !sessionToken) {
+      sessionToken = uuidv4();
+      await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
+    }
 
     res.json({
       id: user.id,

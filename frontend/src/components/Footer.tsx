@@ -26,10 +26,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center justify-start mb-6 hover:opacity-80 transition-opacity gap-2">
               <span className="text-[24px] font-display tracking-widest leading-[1.2] capitalize text-white">
-                Gech
-              </span>
-              <span className="text-[20px] font-display leading-[1.2]" style={{ color: '#4CBFBF' }}>
-                (ጌች)
+                {settings?.General?.platformName || "Gech"}
               </span>
             </Link>
             <p className="text-xs leading-relaxed max-w-sm tracking-wide text-white/55">
@@ -88,7 +85,7 @@ export function Footer() {
         </div>
 
         <div className="mt-16 pt-8 text-center text-[10px] font-bold uppercase tracking-widest text-white/35" style={{ borderTop: '1px solid rgba(76,191,191,0.12)' }}>
-          © {new Date().getFullYear()} Gech (ጌች). {t("allRightsReserved")}
+          © {new Date().getFullYear()} {settings?.General?.platformName || "Gech"}. {t("allRightsReserved")}
         </div>
       </div>
     </footer>

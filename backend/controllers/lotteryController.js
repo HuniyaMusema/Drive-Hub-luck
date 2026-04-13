@@ -14,7 +14,7 @@ const participateLottery = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const lotteryModuleEnabled = SettingsManager.getSetting('lotteryModuleEnabled', true);
+    const lotteryModuleEnabled = SettingsManager.getSetting('Operational', {})?.lotteryModuleEnabled !== false;
     if (!lotteryModuleEnabled) {
       return res.status(403).json({ message: 'Lottery module is currently disabled' });
     }
@@ -31,6 +31,22 @@ const participateLottery = async (req, res) => {
       return res.status(404).json({ message: 'No active lottery currently running.' });
     }
     const lotteryId = lotteryRows[0].id;
+
+    // 1b. Enforce maxTicketsPerUser from settings
+    const lotterySettings = SettingsManager.getSetting('Lottery', {});
+    const maxTickets = lotterySettings.maxTicketsPerUser || 5;
+    const { rows: existingTickets } = await client.query(
+      `SELECT COUNT(*) FROM lottery_numbers
+       WHERE lottery_id = $1 AND user_id = $2 AND status != 'available'`,
+      [lotteryId, req.user.id]
+    );
+    const currentCount = parseInt(existingTickets[0].count, 10);
+    if (currentCount + numbers.length > maxTickets) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        message: `You can only hold up to ${maxTickets} ticket(s) per lottery. You currently have ${currentCount}.`
+      });
+    }
 
     // 2. Check availability of EVERY chosen number
     const { rows: matched } = await client.query(

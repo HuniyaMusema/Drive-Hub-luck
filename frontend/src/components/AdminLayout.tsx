@@ -104,7 +104,7 @@ function AdminSidebar() {
             </div>
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="text-[15px] font-bold text-white leading-none">{settings?.General?.platformName || "Drive Hub"}</span>
+                <span className="text-[15px] font-bold text-white leading-none">{settings?.General?.platformName || "Gech"}</span>
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-[#4CBFBF] mt-1">{t("navManagementPortal")}</span>
               </div>
             )}

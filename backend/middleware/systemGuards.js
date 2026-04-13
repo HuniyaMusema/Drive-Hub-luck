@@ -26,7 +26,9 @@ const maintenanceGuard = async (req, res, next) => {
     }
   }
 
-  return res.status(503).json({ message: 'System under maintenance' });
+  return res.status(503).json({ 
+    message: operational.maintenanceMessage || 'System under maintenance'
+  });
 };
 
 const requireModule = (moduleSettingKey) => {

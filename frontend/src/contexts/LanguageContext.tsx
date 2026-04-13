@@ -780,6 +780,19 @@ const translations: Record<Language, Record<string, string>> = {
     fileTooLargeMsg: "Please upload an image under 5MB.",
     closedLottery: "Closed Lottery",
     tapToPay: "Tap to pay",
+
+    // Admin settings missing keys
+    staffCanVerify: "Staff Can Verify",
+    adminCanOverride: "Admin Override",
+    staffPermissions: "Staff Permissions",
+    paymentVerificationPerm: "Payment Verification",
+    adminOverridePerm: "Admin can override staff actions",
+    configureSystemCore: "Configure System Core",
+    saveSettings: "Save All Settings",
+    adminLotteryEngine: "Lottery Engine",
+    adminToggleTicketing: "Toggle ticketing and draws",
+    storageProvider: "Storage Provider",
+    sqlDatabaseSnapshot: "SQL Database Snapshot",
   },
   am: {
     // Nav
@@ -1553,6 +1566,19 @@ const translations: Record<Language, Record<string, string>> = {
     fileTooLargeMsg: "እባክዎ ከ5MB በታች ስዕል ይጫኑ።",
     closedLottery: "የተዘጋ ሎተሪ",
     tapToPay: "ለመክፈል ይጫኑ",
+
+    // Admin settings missing keys
+    staffCanVerify: "ሰራተኛ ማረጋገጥ ይችላል",
+    adminCanOverride: "አስተዳዳሪ ሊሽር ይችላል",
+    staffPermissions: "የሰራተኛ ፈቃዶች",
+    paymentVerificationPerm: "የክፍያ ማረጋገጫ",
+    adminOverridePerm: "አስተዳዳሪ የሰራተኛ ድርጊቶችን ሊሽር ይችላል",
+    configureSystemCore: "ዋና ስርዓቱን ያዋቅሩ",
+    saveSettings: "ሁሉንም ቅንብሮች አስቀምጥ",
+    adminLotteryEngine: "የሎተሪ ሞተር",
+    adminToggleTicketing: "ቲኬቶችን እና ዕጣዎችን ቀያይር",
+    storageProvider: "የማከማቻ አቅራቢ",
+    sqlDatabaseSnapshot: "የSQL ዳታቤዝ ቅጂ",
   },
   om: {
     // Nav
@@ -2270,6 +2296,19 @@ const translations: Record<Language, Record<string, string>> = {
     fileTooLargeMsg: "Maaloo suuraa 5MB gadi fe'i.",
     closedLottery: "Lootarii Cufame",
     tapToPay: "Kafaluuf tuqi",
+
+    // Admin settings missing keys
+    staffCanVerify: "Hojjetaan Mirkaneessuu Danda'a",
+    adminCanOverride: "Bulchaan Haquu Danda'a",
+    staffPermissions: "Hayyama Hojjetaa",
+    paymentVerificationPerm: "Mirkaneessa Kafaltii",
+    adminOverridePerm: "Bulchaan hojii hojjetaa haquu danda'a",
+    configureSystemCore: "Qabiyyee Sirna Qindeessi",
+    saveSettings: "Qindaa'ina Hunda Kuusi",
+    adminLotteryEngine: "Injinii Lootarii",
+    adminToggleTicketing: "Tikeeta fi harkifannaa jijjiiri",
+    storageProvider: "Dhiyeessaa Kuusaa",
+    sqlDatabaseSnapshot: "Suuraa Kuusaa Daataa SQL",
 
     // Hero section
     heroEyebrow: "Gech — Pilaatfoormii Konkolaataa #1 Itoophiyaa",
