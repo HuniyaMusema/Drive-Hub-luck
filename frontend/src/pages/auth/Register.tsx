@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { Eye, EyeOff, UserPlus, ShieldCheck, Mail, Lock, User, ArrowRight, Sparkles, CheckCircle, MailCheck, Car } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/hero-bg-lasers.png";
 import { cn } from "@/lib/utils";
 
 export default function Register() {
