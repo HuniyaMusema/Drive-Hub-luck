@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Header } from "@/components/Header";
-import { Car, Eye, EyeOff, ShieldCheck, Sparkles, ArrowRight, Lock, Mail } from "lucide-react";
+import { Car, Eye, EyeOff, ShieldCheck, Sparkles, ArrowRight, Lock, Mail, MailCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { User } from "@/types/auth";
@@ -15,11 +15,14 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
   const { setUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +52,9 @@ export default function Login() {
         } else {
           navigate("/dashboard");
         }
+      } else if (response.status === 403 && data.requiresVerification) {
+        // Account exists but email is not verified yet
+        setUnverifiedEmail(data.email || email.toLowerCase().trim());
       } else {
         toast({ title: t("authAccessDenied"), description: data.message || t("authCredentialConflict"), variant: "destructive" });
       }
@@ -56,6 +62,30 @@ export default function Login() {
       toast({ title: t("authNetworkError"), description: t("authConnectionFailed"), variant: "destructive" });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+    setResendLoading(true);
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: unverifiedEmail })
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        setResendSent(true);
+        toast({ title: "Email Sent", description: "A new verification link has been sent to your email." });
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to resend verification email.", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Network Error", description: "Failed to connect to the server.", variant: "destructive" });
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -153,6 +183,37 @@ export default function Login() {
                        </button>
                     </div>
                  </div>
+
+                  {/* Unverified Email Alert */}
+                  {unverifiedEmail && (
+                    <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50 animate-fade-in-up">
+                      <div className="flex items-start gap-3 text-left">
+                        <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-amber-200 text-amber-700">
+                          <MailCheck className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-black uppercase tracking-widest text-amber-800 mb-1">Unverified Account</p>
+                          <p className="text-xs text-amber-700 font-medium leading-relaxed mb-3">
+                            Please verify your link at <span className="font-bold underline">{unverifiedEmail}</span> to activate your access.
+                          </p>
+                          {!resendSent ? (
+                            <Button 
+                              type="button"
+                              onClick={handleResendVerification}
+                              disabled={resendLoading}
+                              className="h-8 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-600 hover:bg-amber-700 text-white border-0 shadow-sm"
+                            >
+                              {resendLoading ? "Sending..." : "Resend Verification Link"}
+                            </Button>
+                          ) : (
+                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-1">
+                              <Sparkles className="h-3 w-3" /> Resent Successfully
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                  <Button 
                     type="submit" 

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Header } from "@/components/Header";
-import { Car, Eye, EyeOff, Check, UserPlus, ShieldCheck, Mail, Lock, User, Phone, ArrowRight, Sparkles } from "lucide-react";
+import { Eye, EyeOff, UserPlus, ShieldCheck, Mail, Lock, User, ArrowRight, Sparkles, CheckCircle, MailCheck, Car } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -17,6 +17,8 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
   
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -40,8 +42,8 @@ export default function Register() {
 
       const data = await response.json();
       if (response.ok) {
-        toast({ title: t("authAccountInitialized"), description: t("authIdentityVerified") });
-        navigate("/auth/login");
+        setRegisteredEmail(email.toLowerCase().trim());
+        setRegistered(true);
       } else {
         toast({ title: t("authRegistrationBlocked"), description: data.message || t("authCredentialConflict"), variant: "destructive" });
       }
@@ -96,11 +98,36 @@ export default function Register() {
            </div>
         </div>
 
-        {/* Right Side: High-Fidelity Registration */}
+        {/* Right Side */}
         <div className="flex-1 flex items-center justify-center p-4 lg:px-24 lg:py-6 relative overflow-y-auto bg-white">
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.07) 0%, transparent 70%)' }} />
 
            <div className="w-full max-w-lg relative z-10 animate-fade-in-up">
+
+              {/* ─── SUCCESS: EMAIL SENT ───────────────────────────── */}
+              {registered ? (
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(61,240,162,0.12)', border: '2px solid rgba(61,240,162,0.3)' }}>
+                    <MailCheck className="h-8 w-8" style={{ color: '#3df0a2' }} />
+                  </div>
+                  <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase mb-3">Check Your Email</h1>
+                  <p className="text-slate-500 font-medium mb-2">We sent a verification link to:</p>
+                  <p className="font-black text-slate-800 mb-6">{registeredEmail}</p>
+                  <p className="text-sm text-slate-400 mb-8 leading-relaxed">
+                    Click the link in the email to activate your account. The link expires in <strong>24 hours</strong>.
+                    <br />Check your spam folder if you don't see it.
+                  </p>
+                  <Link
+                    to="/auth/login"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-white shadow-lg hover:scale-[1.02] transition-all"
+                    style={{ background: '#0d2e22' }}
+                  >
+                    Go to Sign In <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              ) : (
+              <>
+              {/* ─── FORM ─────────────────────────────────────────── */}
               <div className="text-center mb-6">
                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 border group" style={{ background: 'rgba(61,240,162,0.10)', borderColor: 'rgba(61,240,162,0.25)' }}>
                     <UserPlus className="h-6 w-6 group-hover:rotate-12 transition-transform" style={{ color: '#3df0a2' }} />
@@ -114,25 +141,25 @@ export default function Register() {
                     <div className="space-y-2">
                        <Label htmlFor="firstName" className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{t("firstName")}</Label>
                        <div className="relative">
-                          <Input 
-                             id="firstName" 
-                             placeholder="Marcus" 
-                             className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
-                             value={firstName} 
-                             onChange={(e) => setFirstName(e.target.value)} 
-                             required 
+                          <Input
+                             id="firstName"
+                             placeholder="Marcus"
+                             className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200"
+                             value={firstName}
+                             onChange={(e) => setFirstName(e.target.value)}
+                             required
                           />
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-600" />
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                        </div>
                     </div>
                     <div className="space-y-2">
                        <Label htmlFor="lastName" className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{t("lastName")}</Label>
-                       <Input 
-                          id="lastName" 
-                          placeholder="Rivera" 
-                          className="h-14 text-slate-900 rounded-2xl px-4 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
-                          value={lastName} 
-                          onChange={(e) => setLastName(e.target.value)} 
+                       <Input
+                          id="lastName"
+                          placeholder="Rivera"
+                          className="h-14 text-slate-900 rounded-2xl px-4 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
                        />
                     </div>
                  </div>
@@ -140,44 +167,44 @@ export default function Register() {
                  <div className="space-y-2">
                     <Label htmlFor="email" className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{t("email")}</Label>
                     <div className="relative">
-                       <Input 
-                          id="email" 
-                          type="email" 
-                          placeholder="identifier@drivehub.com" 
-                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
-                          value={email} 
-                          onChange={(e) => setEmail(e.target.value)} 
-                          required 
+                       <Input
+                          id="email"
+                          type="email"
+                          placeholder="identifier@drivehub.com"
+                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
                        />
-                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-600" />
+                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                     </div>
                  </div>
 
                  <div className="space-y-2">
                     <Label htmlFor="password" className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{t("password")}</Label>
                     <div className="relative">
-                       <Input 
-                          id="password" 
-                          type={showPassword ? "text" : "password"} 
-                          placeholder="••••••••" 
-                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200 font-mono" 
-                          value={password} 
-                          onChange={(e) => setPassword(e.target.value)} 
+                       <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200 font-mono"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
                        />
-                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-600" />
-                       <button 
-                          type="button" 
-                          onClick={() => setShowPassword(!showPassword)} 
+                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                       <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors text-slate-400 hover:text-slate-600"
                        >
                           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                        </button>
                     </div>
                     {password && (
-                       <div className="grid grid-cols-3 gap-2 pt-2 ml-1">
+                       <div className="grid grid-cols-3 gap-2 pt-1 ml-1">
                           {checks.map((c, i) => (
                              <div key={i} className="flex flex-col gap-1">
-                                <div className={cn("h-1 rounded-full bg-slate-100 overflow-hidden")}>
+                                <div className="h-1 rounded-full bg-slate-100 overflow-hidden">
                                    <div className={cn("h-full transition-all duration-500", c.ok ? "bg-primary" : "bg-transparent")} style={{ width: '100%' }} />
                                 </div>
                                 <span className={cn("text-[8px] font-black uppercase tracking-widest", c.ok ? "text-primary" : "text-slate-600")}>{c.label}</span>
@@ -187,9 +214,9 @@ export default function Register() {
                     )}
                  </div>
 
-                 <Button 
-                    type="submit" 
-                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0 shadow-lg text-white" 
+                 <Button
+                    type="submit"
+                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0 shadow-lg text-white"
                     style={{ background: '#0d2e22' }}
                     disabled={isLoading}
                  >
@@ -205,9 +232,13 @@ export default function Register() {
                     </Link>
                  </p>
               </div>
+              </>
+              )}
+
            </div>
         </div>
       </div>
     </div>
   );
 }
+

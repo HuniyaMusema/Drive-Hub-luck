@@ -15,6 +15,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 import CarsForSale from "./pages/cars/CarsForSale";
 import CarsForRent from "./pages/cars/CarsForRent";
 import CarDetail from "./pages/cars/CarDetail";
@@ -75,6 +76,7 @@ const App = () => (
             <Route path="/auth/register" element={<Register />} />
             <Route path="/auth/forgot-password" element={<ForgotPassword />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/verify-email" element={<VerifyEmail />} />
             <Route path="/cars/sale" element={<CarsForSale />} />
             <Route path="/cars/rent" element={<CarsForRent />} />
             <Route path="/cars/:id" element={<CarDetail />} />
