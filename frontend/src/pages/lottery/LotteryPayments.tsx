@@ -46,7 +46,8 @@ export default function LotteryPayments() {
       list = list.filter(p =>
         p.user_name.toLowerCase().includes(q) ||
         p.user_email.toLowerCase().includes(q) ||
-        p.ticket_number.toString().includes(q)
+        (p.ticket_numbers && p.ticket_numbers.some((num: any) => num.toString().includes(q))) ||
+        (p.ticket_number && p.ticket_number.toString().includes(q)) // fallback for single ticket schema
       );
     }
     return list;
@@ -75,8 +76,8 @@ export default function LotteryPayments() {
         reason: type === "reject" ? reason : undefined
       });
       toast({
-        title: type === "approve" ? "Payment Approved" : "Payment Rejected",
-        description: "The transaction has been processed successfully.",
+        title: type === "approve" ? t("paymentApprovedToast") : t("paymentRejectedToast"),
+        description: t("paymentProcessedToast"),
       });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -173,14 +174,17 @@ export default function LotteryPayments() {
               <div className="col-span-1">#</div>
               <div className="col-span-4">{t("payUser")}</div>
               <div className="col-span-2">{t("payMethod")}</div>
-              <div className="col-span-1">{t("payTicket")}</div>
+              <div className="col-span-2">{t("payTickets") || "Tickets"}</div>
               <div className="col-span-1">{t("payReceipt")}</div>
-              <div className="col-span-3">{t("payStatus")}</div>
+              <div className="col-span-2">{t("payStatus")}</div>
             </div>
 
             {filtered.map((p, i) => {
               const sc = statusConfig[p.status] || statusConfig.pending;
               const StatusIcon = sc.icon;
+              const ticketList = p.ticket_numbers || [p.ticket_number];
+              const ticketDisplay = ticketList.map((n: any) => n.toString().padStart(3, '0')).join(", ");
+
               return (
                 <div key={p.id} className="grid grid-cols-12 gap-3 px-6 py-5 items-center hover:bg-slate-50 transition-colors group">
                   {/* # */}
@@ -205,9 +209,11 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Ticket */}
-                  <div className="col-span-1">
-                    <span className="font-black text-[#4CBFBF] tabular-nums text-xl tracking-tighter">
-                      {p.ticket_number.toString().padStart(3, '0')}
+                  <div className="col-span-2">
+                    <span className="font-black text-[#4CBFBF] tabular-nums text-sm truncate block" title={ticketDisplay}>
+                      {ticketList.length > 2 
+                        ? `${ticketList.slice(0, 2).map((n:any)=>n.toString().padStart(3,'0')).join(", ")} +${ticketList.length - 2}`
+                        : ticketDisplay}
                     </span>
                   </div>
 
@@ -224,7 +230,7 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Status + Actions */}
-                  <div className="col-span-3 flex flex-col gap-2">
+                  <div className="col-span-2 flex flex-col gap-2">
                     <span className={`inline-flex items-center gap-1.5 w-fit text-xs font-black uppercase tracking-wide px-3 py-1.5 rounded-full border ${sc.className}`}>
                       <StatusIcon className="h-3.5 w-3.5" />
                       {p.status === 'pending' ? t("lpPendingReview") : p.status === 'approved' ? t("payApprove") : t("payReject")}
@@ -276,7 +282,7 @@ export default function LotteryPayments() {
             {previewUrl && <img src={previewUrl} alt="Receipt proof" className="w-full h-auto max-h-[70vh] object-contain rounded-2xl" />}
           </div>
           <div className="p-5 bg-white border-t border-slate-100 flex justify-center">
-            <Button className="rounded-2xl h-12 px-10 font-black uppercase text-[11px] tracking-widest bg-slate-50 border border-slate-200 text-slate-900 hover:bg-slate-100" onClick={() => setPreviewUrl(null)}>Close Viewer</Button>
+            <Button className="rounded-2xl h-12 px-10 font-black uppercase text-[11px] tracking-widest bg-slate-50 border border-slate-200 text-slate-900 hover:bg-slate-100" onClick={() => setPreviewUrl(null)}>{t("closeViewerBtn")}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -287,22 +293,22 @@ export default function LotteryPayments() {
           <DialogHeader className="pt-2">
             <DialogTitle className={`text-2xl font-black flex items-center gap-4 tracking-tighter uppercase ${actionDialog?.type === "reject" ? "text-red-500" : "text-[#4CBFBF]"}`}>
               {actionDialog?.type === "approve" ? <CheckCircle2 className="h-8 w-8" /> : <XCircle className="h-8 w-8" />}
-              {actionDialog?.type === "approve" ? "Confirm Approval" : "Reject Transaction"}
+              {actionDialog?.type === "approve" ? t("confirmApprovalTitle") : t("rejectTransactionTitle")}
             </DialogTitle>
           </DialogHeader>
           <div className="py-8">
             {actionDialog?.type === "reject" ? (
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Reason for Rejection</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">{t("reasonForRejection")}</Label>
                 {/* Quick-select preset reasons */}
                 <div className="flex flex-wrap gap-2">
                   {[
-                    "Screenshot is blurry or unreadable",
-                    "Transaction reference not found",
-                    "Wrong amount transferred",
-                    "Receipt appears to be edited",
-                    "Payment sent to wrong account",
-                    "Duplicate submission",
+                    t("reasonBlurry"),
+                    t("reasonNoRef"),
+                    t("reasonWrongAmount"),
+                    t("reasonEdited"),
+                    t("reasonWrongAccount"),
+                    t("reasonDuplicate"),
                   ].map((preset) => (
                     <button
                       key={preset}
@@ -321,25 +327,25 @@ export default function LotteryPayments() {
                 <Textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="Or type a custom reason..."
+                  placeholder={t("customReason")}
                   className="rounded-2xl border-slate-200 bg-slate-50 min-h-[80px] focus:ring-[#4CBFBF]/20 text-slate-900 font-black text-sm p-4 placeholder:text-slate-300"
                 />
               </div>
             ) : (
               <p className="text-slate-500 text-sm font-black uppercase tracking-widest leading-relaxed">
-                Approve this payment to confirm the lottery ticket. The number will be permanently locked to the user.
+                {t("approvePaymentDesc")}
               </p>
             )}
           </div>
           <DialogFooter className="flex flex-col gap-3">
-             <Button
+            <Button
               className={`w-full h-16 rounded-2xl shadow-xl font-black uppercase text-[11px] tracking-[0.2em] ${actionDialog?.type === "reject" ? "bg-red-500 hover:bg-red-600 text-white shadow-red-500/20" : "bg-[#4CBFBF] hover:bg-[#3fb0b0] text-white shadow-[#4CBFBF]/20"}`}
               onClick={handleAction}
               disabled={verifyMutation.isPending || (actionDialog?.type === "reject" && !reason.trim())}
             >
-              {verifyMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-3" />Processing…</> : (actionDialog?.type === "approve" ? "Verify Now" : "Confirm Rejection")}
+              {verifyMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-3" />{t("processing")}</> : (actionDialog?.type === "approve" ? t("verifyNowBtn") : t("confirmRejectionBtn"))}
             </Button>
-            <Button variant="ghost" className="w-full h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:bg-slate-50" onClick={() => { setActionDialog(null); setReason(""); }}>Cancel</Button>
+            <Button variant="ghost" className="w-full h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:bg-slate-50" onClick={() => { setActionDialog(null); setReason(""); }}>{t("cancelBtn")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -85,7 +85,7 @@ export default function AdminUsers() {
           await updateStatusMutation.mutateAsync({ id: user.id, status: 'active' });
           toast({ title: t("adminAccountActivated"), description: `${user.name}${t("adminAccountActivatedDesc")}` });
         } catch (err: any) {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
+        toast({ title: t("toastError"), description: err.message, variant: "destructive" });
       }
     }
   };
@@ -101,7 +101,7 @@ export default function AdminUsers() {
         toast({ title: t("adminUserSuspended"), description: t("adminAccountRevoked") });
         setSuspensionDialog({ isOpen: false, userId: null, name: "" });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -110,7 +110,7 @@ export default function AdminUsers() {
       await deleteUserMutation.mutateAsync(userId);
       toast({ title: t("adminUserDeleted"), description: t("adminAccountRemoved") });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
   const handleAddStaff = async () => {
@@ -247,19 +247,17 @@ export default function AdminUsers() {
                         </div>
                       </div>
                     </td>
-                     <td className="px-8 py-6">
-                      <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full border shadow-sm transition-all ${
-                         u.role === 'admin' ? "bg-purple-400/10 text-purple-400 border-purple-400/20" :
-                        u.role === 'lottery_staff' ? "bg-[#f5b027]/10 text-[#f5b027] border-[#f5b027]/20" :
-                        "bg-slate-100 text-slate-500 border-slate-200"
+                    <td className="px-8 py-6">
+                      <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${
+                         u.role === 'admin' ? "text-purple-400" :
+                        u.role === 'lottery_staff' ? "text-[#f5b027]" :
+                        "text-slate-400"
                       }`}>
-                        <span className="flex items-center gap-2">
-                          <Shield className="h-2.5 w-2.5" />
-                          {u.role === 'admin' ? t("admin") :
-                           u.role === 'lottery_staff' ? t("lotteryStaff") :
-                           t("user")}
-                        </span>
-                      </span>
+                        <Shield className="h-3.5 w-3.5 opacity-70" />
+                        {u.role === 'admin' ? t("admin") :
+                         u.role === 'lottery_staff' ? t("lotteryStaff") :
+                         t("user")}
+                      </div>
                     </td>
                      <td className="px-8 py-6">
                       <div className="flex flex-col gap-1.5">

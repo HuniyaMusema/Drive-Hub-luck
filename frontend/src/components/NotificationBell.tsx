@@ -32,7 +32,7 @@ const NotificationBell = () => {
   if (!user) return null;
 
   return (
-    <Link to="/notifications" className="relative text-white/60 hover:text-white transition-colors group">
+    <Link to="/notifications" className="relative text-slate-400 hover:text-[#4CBFBF] transition-colors group">
       <Bell className="h-5 w-5 group-hover:rotate-12 transition-transform" strokeWidth={1.5} />
       {unreadCount > 0 && (
         <span className="absolute -top-1.5 -right-2 flex h-4 w-4">

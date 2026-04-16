@@ -16,12 +16,14 @@ const {
 
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { requireModule, requirePermission } = require('../middleware/systemGuards');
+const multer  = require('multer');
+const upload  = multer({ storage: multer.memoryStorage() });
 
 // All routes require authentication AND authorized role/mode (admin/lottery_staff in lottery_mode)
 router.use(protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'));
 
 // ── Admin-Only or Staff-Allowed Routes ──────────────────────────────────────
-router.post('/', createLottery);
+router.post('/', upload.single('prize_image'), createLottery);
 router.get('/', getAllLotteries);
 router.get('/current', getCurrentLottery);
 router.put('/:id/start', startLottery);

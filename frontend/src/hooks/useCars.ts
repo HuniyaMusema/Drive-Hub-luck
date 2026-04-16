@@ -9,7 +9,8 @@ export interface BackendCar {
   description: string;
   specs: any;
   location: string;
-  images: string[];
+  image_url?: string;
+  images?: string[];
 }
 
 export interface Car {
@@ -33,6 +34,8 @@ export const mapBackendCar = (backendCar: BackendCar): Car => {
   const specs = typeof backendCar.specs === 'string' ? JSON.parse(backendCar.specs) : (backendCar.specs || {});
   const images = typeof backendCar.images === 'string' ? JSON.parse(backendCar.images) : (backendCar.images || []);
 
+  const primaryImage = backendCar.image_url || images[0] || '';
+
   return {
     id: backendCar.id,
     name: backendCar.name,
@@ -42,7 +45,7 @@ export const mapBackendCar = (backendCar: BackendCar): Car => {
     priceLabel: backendCar.type === 'rental' ? `${Number(backendCar.price).toLocaleString()} Birr / day` : `${Number(backendCar.price).toLocaleString()} Birr`,
     type: backendCar.type,
     available: true,
-    image: images[0] || '',
+    image: primaryImage,
     mileage: specs.mileage || '',
     fuel: specs.fuel || '',
     transmission: specs.transmission || '',

@@ -9,6 +9,7 @@ import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useSettings } from "@/hooks/useSettings";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 import Index from "./pages/Index";
 import Login from "./pages/auth/Login";
@@ -31,6 +32,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminCars from "./pages/admin/AdminCars";
 import Contact from "./pages/Contact";
 import SavedCars from "./pages/SavedCars";
 import Notifications from "./pages/Notifications";
@@ -69,6 +71,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             {/* Public */}
             <Route path="/" element={<Index />} />
@@ -96,6 +99,7 @@ const App = () => (
             <Route path="/admin/lottery" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLottery /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsers /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />
+            <Route path="/admin/cars" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCars /></ProtectedRoute>} />
 
             {/* Admin + Lottery Staff */}
             <Route path="/admin/lottery-payments" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><LotteryPayments /></ProtectedRoute>} />

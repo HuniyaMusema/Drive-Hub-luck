@@ -4,7 +4,7 @@ import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Phone, LogOut, Loader2, Car, Ticket, Sparkles, ShieldCheck, Zap, ChevronRight, Clock, CheckCircle2, XCircle, History, Calendar, Settings2, Trophy } from "lucide-react";
+import { User, Mail, Phone, LogOut, Loader2, Car, Ticket, Sparkles, ShieldCheck, Zap, ChevronRight, Clock, CheckCircle2, XCircle, History, Calendar, Settings2, Trophy, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useProfileHistory } from "@/hooks/useLottery";
@@ -45,7 +45,7 @@ export default function Profile() {
     if (l.payment_status === 'approved' || l.status === 'confirmed') return t("profConfirmedEntry");
     if (l.payment_status === 'rejected') return t("profRejectedEntry");
     if (l.payment_status === 'pending') return t("profVerifyingReceipt");
-    if (l.lottery_status === 'closed') return "Lottery Closed";
+    if (l.lottery_status === 'closed') return t("closedLottery");
     return t("profAwaitingPayment");
   };
 
@@ -260,6 +260,15 @@ export default function Profile() {
                                            <Clock className="h-3.5 w-3.5" /> {new Date(l.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                         </div>
                                      </div>
+                                     {l.payment_status === 'rejected' && l.rejection_reason && (
+                                       <div className="mt-4 p-4 rounded-2xl bg-red-400/5 border border-red-400/10 animate-fade-in-up flex flex-col gap-2">
+                                          <div className="flex items-center gap-2">
+                                             <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                                             <span className="text-[10px] font-black uppercase tracking-widest text-red-500/80">{t("payRejectionReason") || "Rejection Reason"}</span>
+                                          </div>
+                                          <p className="text-xs text-slate-600 font-bold leading-relaxed">{l.rejection_reason}</p>
+                                       </div>
+                                     )}
                                   </div>
                                </div>
 

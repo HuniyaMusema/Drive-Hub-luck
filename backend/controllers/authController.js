@@ -190,9 +190,11 @@ const getProfileHistory = async (req, res) => {
           p.status as payment_status, 
           p.created_at as payment_date, 
           ln.created_at as reservation_date,
-          ln.status as number_status
+          ln.status as number_status,
+          p.rejection_reason as rejection_reason
         FROM payments p
-        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+        CROSS JOIN LATERAL unnest(COALESCE(p.ticket_ids, ARRAY[p.lottery_number_id])) AS t_id
+        JOIN lottery_numbers ln ON t_id = ln.id
         JOIN lottery_settings ls ON ln.lottery_id = ls.id
         LEFT JOIN cars c ON ls.prize_car_id = c.id
         WHERE p.user_id = $1
@@ -207,13 +209,18 @@ const getProfileHistory = async (req, res) => {
           NULL::payment_status as payment_status, 
           NULL::timestamptz as payment_date, 
           ln.created_at as reservation_date,
-          ln.status as number_status
+          ln.status as number_status,
+          NULL as rejection_reason
         FROM lottery_numbers ln
         JOIN lottery_settings ls ON ln.lottery_id = ls.id
         LEFT JOIN cars c ON ls.prize_car_id = c.id
         WHERE ln.user_id = $1
         AND ls.status = 'active'
-        AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.lottery_number_id = ln.id AND p.user_id = $1)
+        AND NOT EXISTS (
+          SELECT 1 FROM payments p 
+          WHERE (p.lottery_number_id = ln.id OR (p.ticket_ids IS NOT NULL AND ln.id = ANY(p.ticket_ids))) 
+          AND p.user_id = $1
+        )
       ) AS history
       ORDER BY COALESCE(payment_date, reservation_date) DESC
     `, [req.user.id]);
@@ -229,6 +236,7 @@ const getProfileHistory = async (req, res) => {
         date: l.payment_date || l.reservation_date, 
         status: l.number_status,
         payment_status: l.payment_status || null,
+        rejection_reason: l.rejection_reason,
         lottery_status: l.lottery_status,
         prize: l.prize_name || "Unknown Prize"
       }))

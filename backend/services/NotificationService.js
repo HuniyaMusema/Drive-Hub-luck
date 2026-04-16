@@ -1,4 +1,5 @@
 const pool = require('../config/pgPool');
+const { translate } = require('../utils/i18n');
 
 const ALLOWED_TYPES = [
   'registration',
@@ -21,7 +22,7 @@ const ALLOWED_TYPES = [
  *                                 When provided, the DB unique index prevents duplicate events.
  * @param {object} [metadata]    - optional JSONB payload (payment_id, ticket_number, etc.)
  */
-const createNotification = async (userId, title, message, type, client = null, referenceId = null, metadata = null) => {
+const createNotification = async (userId, titleOrKey, messageOrKey, type, client = null, referenceId = null, metadata = null) => {
   if (!ALLOWED_TYPES.includes(type)) {
     console.error(`[NotificationService.createNotification] Invalid type: "${type}". Allowed types: ${ALLOWED_TYPES.join(', ')}`);
     return;
@@ -29,6 +30,15 @@ const createNotification = async (userId, title, message, type, client = null, r
 
   const db = client || pool;
   try {
+    // 1. Get the user's language preference
+    const userRes = await db.query('SELECT language FROM users WHERE id = $1', [userId]);
+    const lang = userRes.rows[0]?.language || 'en';
+
+    // 2. Translate the title and message using i18n utility
+    // We pass metadata as interpolation parameters (e.g. for {rejection_reason})
+    const title = translate(lang, titleOrKey, metadata || {});
+    const message = translate(lang, messageOrKey, metadata || {});
+
     await db.query(
       `INSERT INTO notifications (user_id, title, message, type, reference_id, metadata)
        VALUES ($1, $2, $3, $4, $5, $6)

@@ -269,7 +269,7 @@ export default function AdminDashboard() {
                      <NavLink to="/admin/generate-lottery" className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-[#4CBFBF]/10 transition-all border border-slate-200 group/btn">
                         <div className="flex items-center gap-3">
                            <Target className="h-4 w-4 text-slate-400" />
-                           <span className="text-xs font-black uppercase tracking-widest text-slate-700 group-hover/btn:text-[#4CBFBF]">{t("navNumberBoard")}</span>
+                           <span className="text-xs font-black uppercase tracking-widest text-slate-700 group-hover/btn:text-[#4CBFBF]">{t("glNumberBoard")}</span>
                         </div>
                         <ChevronRight className="h-4 w-4 text-slate-400 group-hover/btn:text-[#4CBFBF]" />
                      </NavLink>

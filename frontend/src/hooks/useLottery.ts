@@ -7,6 +7,7 @@ export interface Lottery {
   end_number: number;
   prize_text: string | null;
   prize_car_id: string | null;
+  prize_image_url?: string | null;
   ticket_price: number | string;
   status: 'active' | 'closed';
   created_at: string;
@@ -115,7 +116,7 @@ export const useParticipateLottery = () => {
 export const useSubmitLotteryPayment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { lotteryNumberId: string; receiptUrl: string; method: string }) =>
+    mutationFn: (data: { lotteryNumberIds: string[]; receiptUrl: string; method: string }) =>
       apiFetch('/lottery/submit-payment', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -177,10 +178,11 @@ export const useRentCar = () => {
 export const useCreateLottery = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { start_number: number; end_number: number; prize_text: string; ticket_price: number }) =>
+    mutationFn: (data: FormData) =>
       apiFetch('/admin/lottery', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: data,
+        // When sending FormData, the browser automatically sets the correct Content-Type with boundary
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lottery', 'current'] });

@@ -77,16 +77,21 @@ const createCar = async (req, res) => {
     const images = JSON.stringify(image ? [image] : []);
 
     const { rows } = await pool.query(
-      `INSERT INTO cars (seller_id, name, price, type, status, description, specs, location, contact_phone, images)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO cars (seller_id, name, price, type, status, description, specs, location, contact_phone, image_url, images)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
-      [req.user.id, name, price, sql_type, sql_status, description, specs, location, contactPhone, images]
+      [req.user.id, name, price, sql_type, sql_status, description, specs, location, contactPhone, image, images]
     );
 
     res.status(201).json(rows[0]);
   } catch (error) {
-    console.error('[createCar]', error.message);
-    res.status(400).json({ message: error.message });
+    console.error('[createCar] Error details:', {
+      message: error.message,
+      stack: error.stack,
+      body: req.body,
+      user: req.user ? req.user.id : 'unknown'
+    });
+    res.status(400).json({ message: 'Failed to create car: ' + error.message });
   }
 };
 
@@ -147,8 +152,8 @@ const updateCar = async (req, res) => {
 
     const { rows: updated } = await pool.query(
       `UPDATE cars 
-       SET name = $1, price = $2, type = $3, status = $4, description = $5, specs = $6, location = $7, contact_phone = $8, images = $9, updated_at = NOW()
-       WHERE id = $10
+       SET name = $1, price = $2, type = $3, status = $4, description = $5, specs = $6, location = $7, contact_phone = $8, image_url = $9, images = $10, updated_at = NOW()
+       WHERE id = $11
        RETURNING *`,
       [
         name, 
@@ -159,6 +164,7 @@ const updateCar = async (req, res) => {
         JSON.stringify(specs), 
         location !== undefined ? location : car.location, 
         contactPhone !== undefined ? contactPhone : car.contact_phone, 
+        image || car.image_url,
         JSON.stringify(images), 
 
         id

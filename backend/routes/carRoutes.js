@@ -11,25 +11,52 @@ const {
 } = require('../controllers/carController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-// Multer Config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`);
-  }
-});
+const { createClient } = require('@supabase/supabase-js');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
+// Multer Config
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.post('/upload', protect, authorize(['admin'], 'car_mode'), upload.single('image'), (req, res) => {
+router.post('/upload', protect, authorize(['admin'], 'car_mode'), upload.single('image'), async (req, res) => {
+  const client = supabaseAdmin || supabase; // Fallback to public if admin not available
+  
+  if (!client) {
+    return res.status(500).json({ message: 'Supabase is not configured. Please add SUPABASE_URL and SUPABASE_ANON_KEY to your .env file.' });
+  }
+
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
-  res.json({ 
-    url: `/uploads/${req.file.filename}` 
-  });
+
+  try {
+    const file = req.file;
+    const fileExt = path.extname(file.originalname);
+    const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
+    const filePath = `${fileName}`;
+
+    const { data, error } = await client.storage
+      .from('Car images')
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    const { data: publicUrlData } = client.storage
+      .from('Car images')
+      .getPublicUrl(filePath);
+
+    res.json({ 
+      url: publicUrlData.publicUrl 
+    });
+  } catch (error) {
+    console.error('[Upload]', error.message);
+    res.status(500).json({ message: 'Upload to Supabase failed: ' + error.message });
+  }
 });
 router.route('/').get(getCars).post(protect, authorize(['admin'], 'car_mode'), createCar);
 router

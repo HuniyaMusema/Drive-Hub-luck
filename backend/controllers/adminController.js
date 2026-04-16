@@ -103,7 +103,8 @@ const getDashboardStats = async (req, res) => {
       pool.query(`
         SELECT COALESCE(SUM(ls.ticket_price), 0) AS total
         FROM payments p
-        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+        CROSS JOIN LATERAL unnest(COALESCE(p.ticket_ids, ARRAY[p.lottery_number_id])) AS t_id
+        JOIN lottery_numbers ln ON t_id = ln.id
         JOIN lottery_settings ls ON ln.lottery_id = ls.id
         WHERE p.status = 'approved'
       `)

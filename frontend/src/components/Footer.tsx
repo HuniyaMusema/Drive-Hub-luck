@@ -20,7 +20,7 @@ export function Footer() {
   ].filter(l => l.enabled);
 
   return (
-    <footer className="border-t" style={{ background: 'linear-gradient(180deg, #1a2e45 0%, #142338 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
+    <footer className="border-t" style={{ background: 'linear-gradient(180deg, #334155 0%, #1e293b 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
       <div className="container mx-auto px-4 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="lg:col-span-1">

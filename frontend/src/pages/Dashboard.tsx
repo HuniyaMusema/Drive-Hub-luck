@@ -53,7 +53,7 @@ export default function Dashboard() {
             <div>
               <p className="text-xs text-slate-400 font-medium mb-1">{t("userAccountTier")}</p>
               <h1 className="text-2xl font-bold text-slate-800">
-                {t("welcomeBack")}, <span className="text-[#4CBFBF]">{user?.name?.split(' ')[0] || "User"}</span> 👋
+                {t("welcomeBack")}, <span className="text-[#4CBFBF]">{user?.name?.split(' ')[0] || t("userFallback")}</span> 👋
               </h1>
               <p className="text-sm text-slate-500 mt-1">{t("dashboardSubtitle")}</p>
             </div>

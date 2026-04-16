@@ -2,7 +2,7 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, Square, Trophy, Loader2, Ticket, Sparkles, CircleDot, TrendingUp, AlertCircle } from "lucide-react";
+import { Play, Square, Trophy, Loader2, Ticket, Sparkles, CircleDot, TrendingUp, AlertCircle, Plus } from "lucide-react";
 import { useCurrentLottery, useCreateLottery, usePickWinner } from "@/hooks/useLottery";
 import { useState } from "react";
 import { apiFetch } from "@/services/api";
@@ -19,6 +19,8 @@ export default function AdminLottery() {
   const [endNumber, setEndNumber] = useState("100");
   const [prizeText, setPrizeText] = useState("");
   const [ticketPrice, setTicketPrice] = useState("100");
+  const [prizeImage, setPrizeImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
   const { toast } = useToast();
@@ -30,24 +32,42 @@ export default function AdminLottery() {
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!prizeText.trim()) return toast({ title: "Validation Error", description: "Prize text is required.", variant: "destructive" });
-    if (Number(endNumber) <= Number(startNumber)) return toast({ title: "Validation Error", description: "End number must be greater than start number.", variant: "destructive" });
-    if (!ticketPrice || Number(ticketPrice) <= 0) return toast({ title: "Validation Error", description: "Ticket price must be greater than 0.", variant: "destructive" });
+    if (!prizeText.trim()) return toast({ title: t("validationError"), description: t("prizeTextRequired"), variant: "destructive" });
+    if (Number(endNumber) <= Number(startNumber)) return toast({ title: t("validationError"), description: t("endNumGreater"), variant: "destructive" });
+    if (!ticketPrice || Number(ticketPrice) <= 0) return toast({ title: t("validationError"), description: t("ticketPriceGreater"), variant: "destructive" });
 
     try {
-      await createMutation.mutateAsync({
-        start_number: Number(startNumber),
-        end_number: Number(endNumber),
-        prize_text: prizeText,
-        ticket_price: Number(ticketPrice),
-      });
-      toast({ title: "Lottery Started", description: `Successfully generated numbers ${startNumber} to ${endNumber}.` });
+      const formData = new FormData();
+      formData.append('start_number', startNumber);
+      formData.append('end_number', endNumber);
+      formData.append('prize_text', prizeText);
+      formData.append('ticket_price', ticketPrice);
+      if (prizeImage) {
+        formData.append('prize_image', prizeImage);
+      }
+
+      await createMutation.mutateAsync(formData);
+      toast({ title: t("lotteryStarted"), description: `${t("generatedNumbers")} ${startNumber} - ${endNumber}.` });
       setPrizeText("");
       setTicketPrice("100");
       setEndNumber("100");
       setStartNumber("1");
+      setPrizeImage(null);
+      setImagePreview(null);
     } catch (err: any) {
       toast({ title: t("startFailed"), description: err.message, variant: "destructive" });
+    }
+  };
+
+  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPrizeImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -58,7 +78,7 @@ export default function AdminLottery() {
       toast({ title: t("lotteryStopped"), description: t("alDrawClosed") });
       queryClient.invalidateQueries({ queryKey: ['lottery'] });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -124,8 +144,8 @@ export default function AdminLottery() {
             ) : error ? (
               <div className="p-8 rounded-2xl bg-red-50 border border-red-100 text-center">
                 <AlertCircle className="h-8 w-8 text-red-400 mx-auto mb-3" />
-                <p className="text-[10px] font-black text-red-900 uppercase tracking-widest leading-relaxed">Failed to load lottery data</p>
-                <Button onClick={() => window.location.reload()} variant="ghost" className="mt-4 text-[9px] font-black uppercase tracking-widest text-red-600 hover:bg-red-100 h-8">Retry Connection</Button>
+                <p className="text-[10px] font-black text-red-900 uppercase tracking-widest leading-relaxed">{t("failedToLoadLottery")}</p>
+                <Button onClick={() => window.location.reload()} variant="ghost" className="mt-4 text-[9px] font-black uppercase tracking-widest text-red-600 hover:bg-red-100 h-8">{t("retryConnection")}</Button>
               </div>
             ) : lottery ? (
               <div className="space-y-6">
@@ -133,7 +153,21 @@ export default function AdminLottery() {
                 <div className="p-6 rounded-[1.5rem] bg-gradient-to-br from-[#4CBFBF]/5 to-[#4CBFBF]/10 border border-[#4CBFBF]/20 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-[#4CBFBF]/10 rounded-full blur-2xl -mr-8 -mt-8" />
                   <p className="text-[9px] font-black text-[#4CBFBF] mb-2 uppercase tracking-[0.2em]">{t("activePrize")}</p>
-                  <p className="text-lg font-black text-slate-900 uppercase tracking-tight leading-tight">{lottery.prize_car_name || lottery.prize_text}</p>
+                  <p className="text-[lg] font-black text-slate-900 uppercase tracking-tight leading-tight">{lottery.prize_car_name || lottery.prize_text}</p>
+                  
+                  {lottery.prize_image_url && (
+                    <div className="mt-4 rounded-xl overflow-hidden border border-[#4CBFBF]/20 shadow-sm relative aspect-video bg-slate-100">
+                      <img 
+                        src={lottery.prize_image_url} 
+                        alt="Prize" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Prize+Image';
+                        }}
+                      />
+                    </div>
+                  )}
+
                   <div className="mt-5 flex gap-2">
                     <div className="flex-1 bg-white/70 rounded-xl p-3 border border-white/80 min-w-0">
                       <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("range")}</p>
@@ -144,7 +178,7 @@ export default function AdminLottery() {
                       <p className="text-sm font-black uppercase text-amber-500 whitespace-nowrap">{lottery.status}</p>
                     </div>
                     <div className="flex-1 bg-white/70 rounded-xl p-3 border border-white/80 min-w-0">
-                      <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">Price</p>
+                      <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mb-1">{t("priceLabel")}</p>
                       <p className="text-sm font-black text-slate-800 tabular-nums whitespace-nowrap">ETB {Number(lottery.ticket_price).toLocaleString()}</p>
                     </div>
                   </div>
@@ -181,11 +215,11 @@ export default function AdminLottery() {
                   <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 ml-1">{t("numberRangeLabel")}</Label>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-2 ml-1">From</p>
+                      <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-2 ml-1">{t("fromLabel")}</p>
                       <div className="h-14 w-full flex items-center bg-slate-100 border border-slate-200 rounded-2xl px-5 font-black text-slate-400 tabular-nums text-base select-none">1</div>
                     </div>
                     <div>
-                      <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-2 ml-1">To</p>
+                      <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-2 ml-1">{t("toLabel")}</p>
                       <Input
                         inputMode="numeric"
                         pattern="[0-9]*"
@@ -209,6 +243,46 @@ export default function AdminLottery() {
                     placeholder={t("alPrizeExample")}
                     className="h-14 bg-white border-2 border-slate-200 hover:border-[#4CBFBF]/40 focus-visible:ring-2 focus-visible:ring-[#4CBFBF]/30 focus-visible:border-[#4CBFBF] text-slate-900 font-black rounded-2xl px-5 placeholder:text-slate-300 transition-colors"
                   />
+                </div>
+
+                {/* Prize Image Upload */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end mb-1">
+                    <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500 ml-1">{t("prizeImageOptional")}</Label>
+                    {imagePreview && (
+                      <button 
+                        type="button" 
+                        onClick={() => { setPrizeImage(null); setImagePreview(null); }}
+                        className="text-[9px] font-black text-red-500 uppercase tracking-widest hover:underline"
+                      >
+                        {t("removeLabel")}
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="group/upload">
+                    <div className={`
+                      relative h-32 w-full rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center gap-2 overflow-hidden
+                      ${imagePreview ? 'border-emerald-500/50 bg-emerald-50/30' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-[#4CBFBF]/40'}
+                    `}>
+                      {imagePreview ? (
+                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <>
+                          <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center group-hover/upload:bg-[#4CBFBF]/10 transition-colors">
+                            <Plus className="h-5 w-5 text-slate-400 group-hover/upload:text-[#4CBFBF]" />
+                          </div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("selectImage")}</p>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={onImageChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Ticket Price */}

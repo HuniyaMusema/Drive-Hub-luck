@@ -3,7 +3,7 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCars, useCreateCar, useUpdateCar, useDeleteCar, useUploadImage, Car } from "@/hooks/useCars";
-import { Plus, Pencil, Trash2, Search, AlertTriangle, Upload, Image as ImageIcon, X, Car as CarIcon, MapPin, Calendar, Tag, Info, Fuel, Settings2, Users, Loader2, Sparkles, RefreshCw, Layers } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, AlertTriangle, Upload, Image as ImageIcon, X, Car as CarIcon, MapPin, Calendar, Tag, Info, Fuel, Settings2, Users, Loader2, Sparkles, RefreshCw, Layers, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -138,23 +138,23 @@ export default function AdminCars() {
 
       if (editingCar) {
         await updateMutation.mutateAsync({ id: editingCar.id, data: payload });
-        toast({ title: t("carUpdated") || "Car Updated", description: t("vehicleDetailsSaved") || "Vehicle details have been saved." });
+        toast({ title: t("carUpdated"), description: t("vehicleDetailsSaved") });
       } else {
         await createMutation.mutateAsync(payload);
-        toast({ title: t("carAdded") || "Car Added", description: t("newVehicleAdded") || "New vehicle has been added to inventory." });
+        toast({ title: t("carAdded"), description: t("newVehicleAdded") });
       }
       setIsOpen(false);
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteMutation.mutateAsync(id);
-      toast({ title: t("carDeleted") || "Car Deleted", description: t("vehicleRemoved") || "Vehicle removed from inventory." });
+      toast({ title: t("carDeleted"), description: t("vehicleRemoved") });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -170,7 +170,7 @@ export default function AdminCars() {
           </div>
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4CBFBF]/10 text-[#4CBFBF] text-[9px] font-black uppercase tracking-[0.2em] mb-2 border border-[#4CBFBF]/20 shadow-sm">
-              <Sparkles className="h-3 w-3" /> {t("inventoryControl") || "INVENTORY CONTROL"}
+              <Sparkles className="h-3 w-3" /> {t("inventoryControl")}
             </div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{t("carManagement")}</h1>
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1.5">{t("addEditRemoveVehicles")}</p>
@@ -248,7 +248,7 @@ export default function AdminCars() {
                    <td colSpan={5} className="py-40 text-center">
                     <div className="flex flex-col items-center gap-6">
                       <Loader2 className="h-14 w-14 animate-spin text-[#4CBFBF]/30" />
-                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">{t("fetchingInventory") || "Connecting to Inventory..."}</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">{t("fetchingInventory")}</p>
                     </div>
                   </td>
                 </tr>
@@ -341,7 +341,7 @@ export default function AdminCars() {
                                 {t("confirmDeletion")}
                               </AlertDialogTitle>
                               <AlertDialogDescription className="text-slate-500 font-bold text-sm tracking-wide mt-4">
-                                {t("areYouSureDeleteCar")} This vehicle will be permanently removed from the public listings. This action cannot be undone.
+                                {t("confirmDeleteCarWarning")}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter className="mt-10 gap-4">
@@ -364,192 +364,218 @@ export default function AdminCars() {
           </table>
         </div>
         <div className="bg-slate-50 px-8 py-5 border-t border-slate-200 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
-           <span>Showing {filteredCars.length} of {carsData.length} records</span>
-           <span className="flex items-center gap-2 text-[#f5b027]"><Info className="h-3.5 w-3.5" /> system synchronized</span>
+           <span>{t("showingRecords")} {filteredCars.length} {t("ofRecords")} {carsData.length} {t("recordsLabel")}</span>
+           <span className="flex items-center gap-2 text-[#f5b027]"><Info className="h-3.5 w-3.5" /> {t("systemSynchronized")}</span>
         </div>
       </div>
 
        {/* Car Editor Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-4xl rounded-[3rem] border-slate-200 bg-white p-0 overflow-hidden shadow-2xl flex flex-col max-h-[92vh] text-slate-900 mt-2">
-          <div className="bg-slate-50 p-10 border-b border-slate-200 flex items-center justify-between relative overflow-hidden">
-            <div className="flex items-center gap-6 relative z-10">
-               <div className="w-16 h-16 rounded-2xl bg-[#4CBFBF]/10 flex items-center justify-center shadow-sm border border-[#4CBFBF]/20">
-                  {editingCar ? <Settings2 className="h-8 w-8 text-[#4CBFBF]" strokeWidth={2.5} /> : <Plus className="h-8 w-8 text-[#4CBFBF]" strokeWidth={2.5} />}
-               </div>
-               <div>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{editingCar ? t("editVehicleDetails") : t("addNewVehicle")}</h2>
-                  <p className="text-[10px] uppercase font-black tracking-[0.3em] text-slate-500 mt-2">Vehicle Configuration Module v3.0</p>
-               </div>
-            </div>
-            <button className="rounded-2xl h-12 w-12 bg-white border border-slate-200 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center" onClick={() => setIsOpen(false)}><X className="h-6 w-6" /></button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-12 custom-scrollbar-teal space-y-12 group/form">
-            {/* Visual Section */}
-            <div className="space-y-6">
-              <Label className="text-[11px] font-black uppercase tracking-[0.4em] text-[#4CBFBF] flex items-center gap-3 mb-4">
-                <ImageIcon className="h-4 w-4" /> {t("vehicleShowcaseImage")}
-              </Label>
-               <div className="flex flex-col gap-4">
-                {imagePreview ? (
-                  <div className="relative group w-full aspect-[21/9] rounded-[2.5rem] overflow-hidden border border-slate-200 bg-slate-50 shadow-sm">
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1549317661-bd32c0e5a809";
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center gap-6 backdrop-blur-[2px]">
-                      <Label htmlFor="image-upload" className="cursor-pointer bg-[#4CBFBF] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all hover:scale-110 active:scale-95 shadow-lg">
-                        <Upload className="h-4 w-4" /> {t("changeImage") || "UPDATE IMAGE"}
-                      </Label>
-                      <Button type="button" variant="ghost" className="bg-red-500 text-white rounded-2xl h-14 w-14 shadow-lg transition-all" onClick={() => { setImageFile(null); setImagePreview(""); setFormData({...formData, image: ""}); }}>
-                        <X className="h-6 w-6" />
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <Label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full aspect-[21/9] rounded-[3rem] border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-[#4CBFBF]/5 hover:border-[#4CBFBF]/20 transition-all cursor-pointer relative overflow-hidden group/upload">
-                    <div className="flex flex-col items-center gap-4 text-slate-400 group-hover/upload:text-[#4CBFBF] transition-all relative z-10 py-10">
-                      <div className="w-20 h-20 rounded-[2rem] bg-white flex items-center justify-center shadow-sm group-hover/upload:scale-110 group-hover/upload:-rotate-6 transition-all border border-slate-100">
-                        <Upload className="h-8 w-8" strokeWidth={2.5} />
-                      </div>
-                      <div className="text-center">
-                         <span className="text-[11px] font-black uppercase tracking-[0.3em] block mb-2">{t("clickToUploadImage")}</span>
-                         <p className="text-[10px] font-black text-slate-400 tracking-widest uppercase">High-resolution PNG / WEBP recommended</p>
-                      </div>
-                    </div>
-                  </Label>
-                )}
-                <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+        <DialogContent className="max-w-[1440px] h-[92vh] p-0 overflow-hidden bg-white border-none rounded-[3.5rem] shadow-2xl flex flex-col">
+          <header className="px-10 h-24 shrink-0 flex items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-xl sticky top-0 z-20">
+            <div className="flex items-center gap-5">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm ring-4 ring-primary/5">
+                <CarIcon className="h-6 w-6" strokeWidth={2.5} />
+              </div>
+              <div className="flex flex-col">
+                <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none">
+                  {editingCar ? t("editVehicleDetails") : t("addNewVehicle")}
+                </h2>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mt-1.5">{t("inventoryControl") || "System Inventory"}</span>
               </div>
             </div>
+            
+            <div className="flex items-center gap-4">
+              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="bg-primary hover:bg-primary/90 text-white font-black px-10 h-14 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-3 text-xs tracking-widest uppercase" onClick={() => (document.querySelector('form') as HTMLFormElement)?.requestSubmit()}>
+                {(createMutation.isPending || updateMutation.isPending) ? (
+                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                {editingCar ? t("updateVehicle") : t("addVehicle")}
+              </Button>
+              <button className="rounded-2xl h-14 w-14 bg-slate-100/50 text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center hover:bg-slate-100" onClick={() => setIsOpen(false)}>
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+          </header>
 
-            {/* Core Data Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
-               <div className="space-y-10">
-                  <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 flex items-center gap-3 mb-2"><CarIcon className="h-4 w-4" /> {t("make")} & {t("model")}</Label>
-                    <div className="flex gap-4">
-                       <Input required value={formData.make} onChange={e => setFormData({...formData, make: e.target.value})} placeholder="Toyota" className="h-14 rounded-2xl font-black bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#4CBFBF]/20 shadow-sm" />
-                       <Input required value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})} placeholder="Camry SE" className="h-14 rounded-2xl font-black bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#4CBFBF]/20 shadow-sm" />
+          <form onSubmit={handleSubmit} className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-2 gap-0 group/form bg-white">
+            {/* LEFT COLUMN: VISUALS & DESC */}
+            <div className="h-full overflow-y-auto p-10 border-r border-slate-50 space-y-10 custom-scrollbar-teal bg-slate-50/20">
+               <div className="space-y-4">
+                  <div className="flex items-center justify-between px-2">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{t("vehicleShowcaseImage")}</Label>
+                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t("highResAspect")}</span>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {imagePreview ? (
+                      <div className="relative group w-full aspect-[21/9] rounded-[2.5rem] overflow-hidden border border-slate-200 bg-white shadow-sm ring-8 ring-slate-100/50">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1549317661-bd32c0e5a809";
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center gap-6 backdrop-blur-[2px]">
+                          <Label htmlFor="image-upload" className="cursor-pointer bg-white text-slate-900 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all hover:scale-110 active:scale-95 shadow-lg">
+                            <Upload className="h-4 w-4" /> {t("changeImage") || t("selectImage")}
+                          </Label>
+                          <Button type="button" variant="ghost" className="bg-red-500/90 text-white rounded-2xl h-14 w-14 shadow-lg transition-all" onClick={() => { setImageFile(null); setImagePreview(""); setFormData({...formData, image: ""}); }}>
+                            <X className="h-6 w-6" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full aspect-[21/9] rounded-[3rem] border-2 border-dashed border-slate-200 bg-white hover:bg-primary/5 hover:border-primary/20 transition-all cursor-pointer relative overflow-hidden group/upload shadow-sm ring-8 ring-slate-100/50">
+                        <div className="flex flex-col items-center gap-4 text-slate-300 group-hover/upload:text-primary transition-all relative z-10 py-10">
+                          <div className="w-16 h-16 rounded-[1.5rem] bg-slate-50 flex items-center justify-center shadow-inner group-hover/upload:scale-110 group-hover/upload:-rotate-6 transition-all border border-slate-100">
+                            <Upload className="h-6 w-6" strokeWidth={3} />
+                          </div>
+                          <div className="text-center">
+                             <span className="text-[10px] font-black uppercase tracking-[0.3em] block mb-1">{t("clickToUploadImage")}</span>
+                             <p className="text-[9px] font-black text-slate-300 tracking-widest uppercase">Max 5MB • PNG / JPG / WEBP</p>
+                          </div>
+                        </div>
+                      </Label>
+                    )}
+                    <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-2">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{t("vehicleDescription")}</Label>
+                  </div>
+                  <Textarea 
+                    value={formData.description} 
+                    onChange={e => setFormData({...formData, description: e.target.value})} 
+                    placeholder={t("descPlaceholder")} 
+                    className="h-[30vh] rounded-[2rem] border-slate-200 bg-white p-8 text-sm font-bold text-slate-700 focus:ring-primary/20 resize-none leading-relaxed shadow-sm transition-all focus:bg-white placeholder:text-slate-300 ring-8 ring-slate-100/50" 
+                  />
+                </div>
+            </div>
+
+            {/* RIGHT COLUMN: CORE DATA */}
+            <div className="h-full overflow-y-auto p-10 space-y-12 custom-scrollbar-teal">
+               {/* 1. Identity & Location */}
+               <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <CarIcon className="h-4 w-4 text-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{t("identityLocation")}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("make")}</Label>
+                      <Input required value={formData.make} onChange={e => setFormData({...formData, make: e.target.value})} placeholder="Toyota" className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black focus:bg-white transition-all shadow-sm" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("model")}</Label>
+                      <Input required value={formData.model} onChange={e => setFormData({...formData, model: e.target.value})} placeholder="Camry SE" className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black focus:bg-white transition-all shadow-sm" />
                     </div>
                   </div>
-
-                   <div className="grid grid-cols-2 gap-6">
-                     <div className="space-y-4">
-                        <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-2 block"><Calendar className="h-4 w-4 inline mr-2" /> {t("year")}</Label>
-                        <Input type="number" required value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} placeholder="2024" className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black tabular-nums text-slate-900" />
-                     </div>
-                     <div className="space-y-4">
-                        <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-2 block"><MapPin className="h-4 w-4 inline mr-2" /> {t("location")}</Label>
-                        <Input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} placeholder="Addis Ababa" className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black text-slate-900" />
-                     </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-[#f5b027] mb-2 flex items-center gap-3"><Tag className="h-4 w-4" /> {t("price")} & {t("dealType")}</Label>
-                    <div className="flex gap-4">
-                       <div className="relative flex-1">
-                          <Input 
-                            type="text" required 
-                            value={formData.price} 
-                            onChange={e => {
-                              const raw = e.target.value.replace(/[^0-9]/g, "");
-                              setFormData({...formData, price: raw ? Number(raw).toLocaleString() : ""});
-                            }} 
-                            placeholder="Price" className="h-16 rounded-2xl font-black text-3xl text-[#f5b027] bg-[#f5b027]/10 border-[#f5b027]/20 pl-10 pr-16 focus-visible:ring-[#f5b027]/20 shadow-sm" 
-                          />
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[#f5b027]/40 tabular-nums"></span>
-                          <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#f5b027]/40 uppercase tracking-tighter tabular-nums">{settings?.General?.defaultCurrency || 'ETB'}</span>
-                       </div>
-                       <div className="w-[140px]">
-                          <Select value={formData.type} onValueChange={v => setFormData({...formData, type: v})}>
-                            <SelectTrigger className="h-16 rounded-2xl bg-slate-50 border-slate-200 font-black text-xs uppercase tracking-[0.2em] shadow-sm text-slate-900"><SelectValue /></SelectTrigger>
-                            <SelectContent className="rounded-2xl border-slate-200 bg-white text-slate-900 shadow-xl">
-                              <SelectItem value="sale" className="hover:bg-slate-50">{t("sale")}</SelectItem>
-                              <SelectItem value="rent" className="hover:bg-slate-50">{t("rent")}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                       </div>
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("year")}</Label>
+                      <Input type="number" required value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} placeholder="2024" className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black focus:bg-white transition-all shadow-sm pointer-events-auto" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("location")}</Label>
+                      <Input value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} placeholder="Addis Ababa" className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black focus:bg-white transition-all shadow-sm" />
                     </div>
                   </div>
                </div>
 
-                <div className="space-y-10">
+               {/* 2. Specs */}
+               <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Settings2 className="h-4 w-4 text-amber-500" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{t("technicalSpecs")}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-10 gap-y-6">
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("mileageLabel")}</Label>
+                      <Input value={formData.mileage} onChange={e => setFormData({...formData, mileage: e.target.value})} placeholder="0 km" className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("seatsLabel")}</Label>
+                      <Input type="number" value={formData.seats} onChange={e => setFormData({...formData, seats: e.target.value})} placeholder="5" className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("fuelLabel")}</Label>
+                      <Select value={formData.fuel} onValueChange={v => setFormData({...formData, fuel: v})}>
+                        <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black text-slate-900 shadow-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                           <SelectItem value="Gasoline">{t("gasoline")}</SelectItem>
+                           <SelectItem value="Diesel">{t("diesel")}</SelectItem>
+                           <SelectItem value="Electric">{t("electric")}</SelectItem>
+                           <SelectItem value="Hybrid">{t("hybrid")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("gearboxLabel")}</Label>
+                      <Select value={formData.transmission} onValueChange={v => setFormData({...formData, transmission: v})}>
+                        <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-200 font-black text-slate-900 shadow-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          <SelectItem value="Automatic">{t("auto")}</SelectItem>
+                          <SelectItem value="Manual">{t("manual")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+               </div>
+
+               {/* 3. Pricing (Clean High Visibility) */}
+               <div className="space-y-8 bg-[#4CBFBF]/5 p-8 rounded-[2.5rem] border border-[#4CBFBF]/10">
                   <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 flex items-center gap-3 mb-2"><Layers className="h-4 w-4" /> {t("specifications")}</Label>
-                    <div className="grid grid-cols-2 gap-6">
-                       <div className="space-y-2">
-                          <p className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest leading-none">Mileage</p>
-                          <Input value={formData.mileage} onChange={e => setFormData({...formData, mileage: e.target.value})} placeholder="0 km" className="h-11 rounded-2xl bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400" />
-                       </div>
-                       <div className="space-y-2">
-                          <p className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest leading-none">Seats</p>
-                          <Input type="number" value={formData.seats} onChange={e => setFormData({...formData, seats: e.target.value})} placeholder="5" className="h-11 rounded-2xl bg-slate-50 border-slate-200 text-slate-900 font-black" />
-                       </div>
+                    <div className="flex items-center justify-between px-1">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary flex items-center gap-2">
+                        <Tag className="h-4 w-4" /> {t("price")}
+                      </Label>
+                      <span className="text-[9px] font-black text-[#4CBFBF]/60 bg-[#4CBFBF]/10 px-3 py-1 rounded-full uppercase tracking-widest">{settings?.General?.defaultCurrency || 'ETB'}</span>
+                    </div>
+                    <div className="relative">
+                      <Input 
+                        type="text" required 
+                        value={formData.price} 
+                        onChange={e => {
+                          const raw = e.target.value.replace(/[^0-9]/g, "");
+                          setFormData({...formData, price: raw ? Number(raw).toLocaleString() : ""});
+                        }} 
+                        placeholder="0" 
+                        className="h-20 rounded-2xl font-black text-5xl text-primary bg-white border-primary/20 px-8 focus-visible:ring-primary/40 shadow-xl shadow-primary/5 tracking-tighter tabular-nums" 
+                      />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-2 block">Fuel System</Label>
-                      <Select value={formData.fuel} onValueChange={v => setFormData({...formData, fuel: v})}>
-                        <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black text-slate-900 px-6 focus:ring-[#4CBFBF]/20"><SelectValue /></SelectTrigger>
-                        <SelectContent className="rounded-2xl bg-white border-slate-200 text-slate-900 shadow-xl">
-                           {["Gasoline", "Diesel", "Electric", "Hybrid"].map(f => <SelectItem key={f} value={f} className="hover:bg-slate-50">{f}</SelectItem>)}
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("dealType")}</Label>
+                      <Select value={formData.type} onValueChange={v => setFormData({...formData, type: v})}>
+                        <SelectTrigger className="h-12 rounded-xl bg-white border-slate-200 font-black text-xs uppercase tracking-widest shadow-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          <SelectItem value="sale">{t("sale")}</SelectItem>
+                          <SelectItem value="rent">{t("rent")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-4">
-                      <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-2 block">Gearbox</Label>
-                      <Select value={formData.transmission} onValueChange={v => setFormData({...formData, transmission: v})}>
-                        <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-black text-slate-900 px-6 focus:ring-[#4CBFBF]/20"><SelectValue /></SelectTrigger>
-                        <SelectContent className="rounded-2xl bg-white border-slate-200 text-slate-900 shadow-xl">
-                          <SelectItem value="Automatic" className="hover:bg-slate-50">Auto</SelectItem>
-                          <SelectItem value="Manual" className="hover:bg-slate-50">Manual</SelectItem>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{t("availability")}</Label>
+                      <Select value={formData.status} onValueChange={v => setFormData({...formData, status: v})}>
+                        <SelectTrigger className="h-12 rounded-xl bg-white border-slate-200 font-black text-[9px] uppercase tracking-widest shadow-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          <SelectItem value="available">{t("availableCaps")}</SelectItem>
+                          <SelectItem value="unavailable">{t("soldRentedCaps")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 flex items-center gap-3 mb-2"><Info className="h-4 w-4" /> {t("availability")}</Label>
-                    <Select value={formData.status} onValueChange={v => setFormData({...formData, status: v})}>
-                      <SelectTrigger className="h-14 border-slate-200 font-black text-[10px] uppercase tracking-[0.2em] bg-slate-50 text-slate-900 px-8 focus:ring-[#4CBFBF]/20"><SelectValue /></SelectTrigger>
-                      <SelectContent className="rounded-2xl bg-white border-slate-200 text-slate-900 shadow-xl">
-                        <SelectItem value="available" className="hover:bg-slate-50">MARK AS AVAILABLE</SelectItem>
-                        <SelectItem value="unavailable" className="hover:bg-slate-50">MARK AS SOLD / RENTED</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                </div>
             </div>
-
-            <div className="space-y-6">
-              <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 flex items-center gap-3 mb-2"><Info className="h-4 w-4" /> {t("vehicleDescription")}</Label>
-              <div className="relative group/text">
-                <Textarea 
-                  value={formData.description} 
-                  onChange={e => setFormData({...formData, description: e.target.value})} 
-                  placeholder="List technical highlights, condition, service history and other unique selling points..." 
-                  className="min-h-[180px] rounded-[2.5rem] border-slate-200 bg-slate-50 p-8 text-sm font-bold text-slate-900 focus:ring-[#4CBFBF]/20 resize-none leading-relaxed shadow-sm transition-all placeholder:text-slate-400" 
-                />
-              </div>
-            </div>
           </form>
-
-          <footer className="p-10 border-t border-slate-200 bg-slate-50 flex justify-end items-center">
-             <div className="flex gap-6">
-                <Button variant="ghost" onClick={() => setIsOpen(false)} className="h-14 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all">{t("cancel")}</Button>
-                <Button onClick={handleSubmit} disabled={isPending} className="h-14 px-12 rounded-2xl bg-[#4CBFBF] text-white font-black uppercase text-[10px] tracking-widest shadow-xl shadow-[#4CBFBF]/15 transition-all hover:scale-[1.05] active:scale-95 border-0">
-                  {isPending ? <><Loader2 className="h-5 w-5 animate-spin mr-3" /> PROCESSING…</> : (editingCar ? t("updateVehicle") : t("addVehicle"))}
-                </Button>
-             </div>
-          </footer>
         </DialogContent>
       </Dialog>
     </AdminLayout>
