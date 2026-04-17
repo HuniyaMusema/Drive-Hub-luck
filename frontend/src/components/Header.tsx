@@ -4,6 +4,7 @@ import { Bookmark, Car, Globe, Menu, X, Bell, Ticket, Search, Key, Plus, FileTex
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/hooks/useSettings";
 import NotificationBell from "@/components/NotificationBell";
@@ -16,9 +17,9 @@ import {
 
 const navLinks = [
   { key: "home", href: "/" },
-  { key: "cars", href: "/cars/sale" },
-  { key: "rentals", href: "/cars/rent" },
   { key: "lottery", href: "/lottery" },
+  { key: "navSale", href: "/cars/sale" },
+  { key: "navRent", href: "/cars/rent" },
   { key: "contact", href: "/contact" },
 ];
 
@@ -164,7 +165,7 @@ export function Header() {
 
           {/* Notification Bell */}
           {user && <NotificationBell />}
-
+          
           {/* Saved Cars */}
           <Link to="/saved-cars" className="relative text-white/60 hover:text-white transition-colors">
             <FileText className="h-5 w-5" strokeWidth={1.5} />
@@ -174,6 +175,8 @@ export function Header() {
               </span>
             )}
           </Link>
+
+
 
           {/* Hamburger for mobile */}
           <button
@@ -223,6 +226,8 @@ export function Header() {
                 )}
               </Link>
             )}
+            
+
 
             {user && (
               <Link

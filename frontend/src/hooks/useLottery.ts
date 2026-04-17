@@ -28,7 +28,8 @@ export interface LotteryPayment {
   receipt_url: string;
   method: 'CBE' | 'Telebirr';
   status: 'pending' | 'approved' | 'rejected';
-  ticket_number: number;
+  ticket_number?: number;
+  ticket_numbers?: number[] | null;
   rejection_reason?: string;
   created_at: string;
 }
@@ -84,10 +85,17 @@ export const useCurrentLottery = () => {
   });
 };
 
-export const useLotteryNumbers = () => {
+export const useLotteryNumbers = (lotteryId?: string) => {
   return useQuery<any[]>({
-    queryKey: ['lottery', 'numbers'],
-    queryFn: () => apiFetch('/admin/lottery/numbers'),
+    queryKey: ['lottery', 'numbers', lotteryId],
+    queryFn: () => apiFetch(lotteryId ? `/admin/lottery/numbers?lottery_id=${lotteryId}` : '/admin/lottery/numbers'),
+  });
+};
+
+export const useLotteryHistory = () => {
+  return useQuery<any[]>({
+    queryKey: ['lottery', 'history'],
+    queryFn: () => apiFetch('/admin/lottery/history'),
   });
 };
 

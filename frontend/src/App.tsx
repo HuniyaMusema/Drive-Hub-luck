@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
+
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useSettings } from "@/hooks/useSettings";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -17,15 +18,16 @@ import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
-import CarsForSale from "./pages/cars/CarsForSale";
-import CarsForRent from "./pages/cars/CarsForRent";
-import CarDetail from "./pages/cars/CarDetail";
+
 import Lottery from "./pages/lottery/Lottery";
 import LotterySelect from "./pages/lottery/LotterySelect";
 import LotteryPayments from "./pages/lottery/LotteryPayments";
 import GenerateLotteryNumbers from "./pages/lottery/GenerateLotteryNumbers";
 import LotteryParticipants from "./pages/lottery/LotteryParticipants";
 import Payment from "./pages/Payment";
+import CarsForSale from "./pages/cars/CarsForSale";
+import CarsForRent from "./pages/cars/CarsForRent";
+import CarDetail from "./pages/cars/CarDetail";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -33,6 +35,7 @@ import AdminLottery from "./pages/admin/AdminLottery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminCars from "./pages/admin/AdminCars";
+
 import Contact from "./pages/Contact";
 import SavedCars from "./pages/SavedCars";
 import Notifications from "./pages/Notifications";
@@ -80,13 +83,13 @@ const App = () => (
             <Route path="/auth/forgot-password" element={<ForgotPassword />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
-            <Route path="/cars/sale" element={<CarsForSale />} />
-            <Route path="/cars/rent" element={<CarsForRent />} />
-            <Route path="/cars/:id" element={<CarDetail />} />
             <Route path="/lottery" element={<Lottery />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/lottery/select" element={<LotterySelect />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/cars/sale" element={<CarsForSale />} />
+            <Route path="/cars/rent" element={<CarsForRent />} />
+            <Route path="/cars/:id" element={<CarDetail />} />
             <Route path="/saved-cars" element={<SavedCars />} />
 
             {/* User */}
@@ -109,7 +112,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
       </SavedCarsProvider>
       </LanguageProvider>
       </AuthProvider>

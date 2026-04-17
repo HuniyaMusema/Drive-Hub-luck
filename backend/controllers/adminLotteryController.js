@@ -299,7 +299,7 @@ const stopLottery = async (req, res) => {
 
     const { rows: updated } = await pool.query(
       `UPDATE lottery_settings
-       SET    status = 'closed', updated_at = NOW()
+       SET    status = 'closed', updated_at = NOW(), closed_at = NOW()
        WHERE  id = $1
        RETURNING *`,
       [id]
@@ -628,16 +628,29 @@ const pickWinner = async (req, res) => {
     // If they don't yet, run: ALTER TABLE lottery_settings ADD COLUMN IF NOT EXISTS winner_id UUID REFERENCES users(id) ON DELETE SET NULL, ADD COLUMN IF NOT EXISTS winning_number INTEGER;
     await client.query(
       `UPDATE lottery_settings
-       SET status = 'closed', winner_id = $1, winning_number = $2, updated_at = NOW()
+       SET status = 'closed', winner_id = $1, winning_number = $2, updated_at = NOW(), closed_at = NOW()
        WHERE id = $3`,
       [winner.user_id, winner.number, lotteryId]
     );
 
-    // 4. Notify all confirmed participants — reference_id = lotteryId prevents duplicates
-    const { rows: participants } = await client.query(
-      `SELECT user_id FROM lottery_numbers WHERE lottery_id = $1 AND status = 'confirmed'`,
-      [lotteryId]
+    // 4. Notify everyone
+    // The winner gets a special "Congratulations" message
+    await NotificationService.createNotification(
+      winner.user_id,
+      'lottery_winner_title',
+      'lottery_winner_msg',
+      'lottery_result',
+      client,
+      lotteryId,
+      { entity_type: 'lottery', event_action: 'draw_completed', lottery_id: lotteryId, winning_number: winner.number }
     );
+
+    // All OTHER participants get a general "Draw Completed" message
+    const { rows: participants } = await client.query(
+      `SELECT DISTINCT user_id FROM lottery_numbers WHERE lottery_id = $1 AND status = 'confirmed' AND user_id != $2`,
+      [lotteryId, winner.user_id]
+    );
+
     for (const participant of participants) {
       await NotificationService.createNotification(
         participant.user_id,
@@ -669,6 +682,31 @@ const pickWinner = async (req, res) => {
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// @desc    Get all closed lotteries (history)
+// @route   GET /api/admin/lottery/history
+// @access  Private / Admin
+// ─────────────────────────────────────────────────────────────────────────────
+const getLotteryHistory = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT ls.id, ls.prize_text, ls.prize_image_url, ls.winning_number, ls.winner_id AS winner_user_id, ls.closed_at, ls.created_at, ls.ticket_price,
+              u.name AS winner_name, c.name AS prize_car_name,
+              (SELECT COUNT(DISTINCT user_id) FROM lottery_numbers ln WHERE ln.lottery_id = ls.id AND ln.status = 'confirmed') as total_participants
+       FROM   lottery_settings ls
+       LEFT JOIN users u ON u.id = ls.winner_id
+       LEFT JOIN cars c ON c.id = ls.prize_car_id
+       WHERE  ls.status = 'closed'
+       ORDER  BY ls.closed_at DESC NULLS LAST, ls.created_at DESC`
+    );
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.error('[getLotteryHistory]', error.message);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createLottery,
   getCurrentLottery,
@@ -680,4 +718,5 @@ module.exports = {
   rejectPayment,
   getLotteryNumbers,
   pickWinner,
+  getLotteryHistory,
 };

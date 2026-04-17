@@ -14,7 +14,9 @@ const dictionaries = {
     
     // Lottery
     lottery_draw_title: 'Lottery Draw Completed',
-    lottery_draw_msg: 'Winner has been selected',
+    lottery_draw_msg: 'A winner has been selected. The winning number is #{winning_number}.',
+    lottery_winner_title: 'Congratulations! You Won!',
+    lottery_winner_msg: 'Your ticket #{winning_number} has won the prize! Our team will contact you shortly.',
 
     // Rejection Reasons
     "Screenshot is blurry or unreadable": "Screenshot is blurry or unreadable",
@@ -35,8 +37,11 @@ const dictionaries = {
     payment_rejected_title: 'ክፍያ ውድቅ ተደርጓል',
     payment_rejected_msg: 'ክፍያዎ ውድቅ ተደርጓል። ምክንያት: {rejection_reason}',
     
+    // Lottery
     lottery_draw_title: 'የሎተሪ ዕጣ ወጥቷል',
-    lottery_draw_msg: 'አሸናፊ ተመርጧል',
+    lottery_draw_msg: 'አሸናፊ ተመርጧል። አሸናፊው ቁጥር #{winning_number} ነው።',
+    lottery_winner_title: 'እንኳን ደስ ያለዎት! አሸንፈዋል!',
+    lottery_winner_msg: 'ቲኬት ቁጥር #{winning_number} ሽልማቱን አሸንፏል! ቡድናችን በቅርቡ ያገኝዎታል።',
 
     // Rejection Reasons
     "Screenshot is blurry or unreadable": "ቅጂው ብዥ ያለ ወይም የማይነበብ ነው",
@@ -57,8 +62,11 @@ const dictionaries = {
     payment_rejected_title: 'Kaffaltiin Kuffisame',
     payment_rejected_msg: 'Kaffaltiin keessan kuffisameera. Sababa: {rejection_reason}',
     
+    // Lottery
     lottery_draw_title: 'Qurxiin Lootarii Raawwateera',
-    lottery_draw_msg: 'Mo\'ataan filatameera',
+    lottery_draw_msg: 'Mo\'ataan filatameera. Lakkoofsi mo\'ate #{winning_number} dha.',
+    lottery_winner_title: 'Baga Gammanne! Injifatteetta!',
+    lottery_winner_msg: 'Tikeetiin kee #{winning_number} badhaasa kana injifateera! Gareen keenya dhiyootti si qunnama.',
 
     // Rejection Reasons
     "Screenshot is blurry or unreadable": "Suuraan hin mul'atu ykn hin dubbifamu",

@@ -151,7 +151,7 @@ export default function Login() {
                        <Input 
                           id="email" 
                           type="text" 
-                          placeholder="identifier@drivehub.com" 
+                          placeholder="identifier@gech.com" 
                           className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
                           value={email} 
                           onChange={(e) => setEmail(e.target.value)} 

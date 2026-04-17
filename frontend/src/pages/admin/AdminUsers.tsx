@@ -48,7 +48,7 @@ export default function AdminUsers() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
-  const { t } = useLanguage();
+  const { t, formatDate } = useLanguage();
   
   const filtered = useMemo(() => {
     return users.filter((u) => {
@@ -83,7 +83,7 @@ export default function AdminUsers() {
     } else {
         try {
           await updateStatusMutation.mutateAsync({ id: user.id, status: 'active' });
-          toast({ title: t("adminAccountActivated"), description: `${user.name}${t("adminAccountActivatedDesc")}` });
+          toast({ title: t("adminAccountActivated"), description: t("adminAccountActivatedDesc", { name: user.name }) });
         } catch (err: any) {
         toast({ title: t("toastError"), description: err.message, variant: "destructive" });
       }
@@ -268,15 +268,15 @@ export default function AdminUsers() {
                         </span>
                         {u.status === 'suspended' && u.suspension_reason && (
                           <p className="text-[10px] text-red-400/70 italic truncate max-w-[150px] mt-1 uppercase tracking-tighter">
-                            "{u.suspension_reason}"
+                            "{t(u.suspension_reason)}"
                           </p>
                         )}
                       </div>
                     </td>
-                     <td className="px-8 py-6">
+                      <td className="px-8 py-6">
                        <div className="flex items-center gap-2 text-slate-500 text-xs font-black tabular-nums uppercase">
                          <Calendar className="h-3.5 w-3.5 opacity-40" />
-                         {new Date(u.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                         {formatDate(u.created_at)}
                        </div>
                     </td>
                      <td className="px-8 py-6 text-right">
@@ -354,11 +354,31 @@ export default function AdminUsers() {
 </DialogHeader>
 <div className="py-8 space-y-4">
 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-2">{t("suspensionReason")}</Label>
+<div className="flex flex-wrap gap-2 mb-2">
+  {[
+    "reasonSuspicious",
+    "reasonTermViolation",
+    "reasonDuplicate"
+  ].map((presetKey) => (
+    <button
+      key={presetKey}
+      type="button"
+      onClick={() => setSuspensionReason(presetKey)}
+      className={`text-[9px] font-black uppercase tracking-wide px-3 py-1.5 rounded-xl border transition-all ${
+        suspensionReason === presetKey
+          ? "bg-[#f5b027] text-white border-[#f5b027]"
+          : "bg-slate-50 text-slate-500 border-slate-200 hover:border-[#f5b027] hover:text-[#f5b027]"
+      }`}
+    >
+      {t(presetKey)}
+    </button>
+  ))}
+</div>
 <Textarea 
 placeholder={t("adminSuspensionReasonPlaceholder")} 
 value={suspensionReason}
 onChange={(e) => setSuspensionReason(e.target.value)}
-className="rounded-2xl border-slate-200 bg-slate-50 min-h-[120px] p-6 text-xs font-bold leading-relaxed focus:ring-[#f5b027]/20 text-slate-900 placeholder:text-slate-400"
+className="rounded-2xl border-slate-200 bg-slate-50 min-h-[100px] p-6 text-xs font-bold leading-relaxed focus:ring-[#f5b027]/20 text-slate-900 placeholder:text-slate-400"
 />
 </div>
 <DialogFooter className="flex-row gap-4 mt-2">
@@ -404,7 +424,7 @@ className="flex-1 rounded-2xl h-14 font-black uppercase text-[10px] tracking-wid
               <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 ml-2"><Mail className="h-3 w-3 "/> {t("adminWorkEmail")}</Label>
               <Input
                 type="email"
-                placeholder="staff@drivehub.com"
+                placeholder="staff@gech.com"
                 value={staffForm.email}
                 onChange={(e) => setStaffForm(prev => ({ ...prev, email: e.target.value }))}
                 className="rounded-2xl bg-slate-50 border-slate-200 text-slate-900 h-12 font-bold placeholder:text-slate-400 focus-visible:ring-[#4CBFBF]/20"

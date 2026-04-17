@@ -9,12 +9,10 @@ export function Footer() {
 
   const operational = settings?.Operational || {};
   const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
-  const isSalesEnabled = operational.salesModuleEnabled !== false;
-  const isRentalsEnabled = operational.rentalsModuleEnabled !== false;
 
   const quickLinks = [
-    { label: t("carsForSale"), href: "/cars/sale", enabled: isSalesEnabled },
-    { label: t("carsForRent"), href: "/cars/rent", enabled: isRentalsEnabled },
+    { label: t("carsForSale"), href: "/cars/sale", enabled: true },
+    { label: t("carsForRent"), href: "/cars/rent", enabled: true },
     { label: t("lottery"), href: "/lottery", enabled: isLotteryEnabled },
     { label: t("contact"), href: "/contact", enabled: true },
   ].filter(l => l.enabled);

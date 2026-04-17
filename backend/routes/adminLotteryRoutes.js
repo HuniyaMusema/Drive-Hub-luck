@@ -12,6 +12,7 @@ const {
   rejectPayment,
   getLotteryNumbers,
   pickWinner,
+  getLotteryHistory,
 } = require('../controllers/adminLotteryController');
 
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -26,6 +27,7 @@ router.use(protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'));
 router.post('/', upload.single('prize_image'), createLottery);
 router.get('/', getAllLotteries);
 router.get('/current', getCurrentLottery);
+router.get('/history', getLotteryHistory);
 router.put('/:id/start', startLottery);
 router.put('/:id/stop', stopLottery);
 router.put('/pick-winner', pickWinner);

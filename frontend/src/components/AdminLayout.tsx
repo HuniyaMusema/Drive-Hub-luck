@@ -3,8 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar, SidebarInset } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/hooks/useSettings";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LayoutDashboard, Car, Ticket, CreditCard, Users, LogOut, Hash, ChevronDown, UserCheck, Settings, Trophy, ShieldCheck, Zap, Bell, Menu, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage, languages } from "@/contexts/LanguageContext";
+import { LayoutDashboard, Car, Ticket, CreditCard, Users, LogOut, Hash, ChevronDown, UserCheck, Settings, Trophy, ShieldCheck, Zap, Bell, Menu, Sparkles, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
@@ -28,8 +28,8 @@ const lotteryItems: NavItem[] = [
 
 const systemItems: NavItem[] = [
   { title: "Dashboard", labelKey: "navDashboard",  url: "/admin",          icon: LayoutDashboard, roles: ["admin", "lottery_staff"] },
-  { title: "Cars",      labelKey: "adminCars",     url: "/admin/cars",     icon: Car,             roles: ["admin"] },
   { title: "Users",     labelKey: "navUsers",       url: "/admin/users",    icon: Users,           roles: ["admin"] },
+  { title: "Cars",      labelKey: "cars",        url: "/admin/cars",     icon: Car,             roles: ["admin"] },
   { title: "Settings",  labelKey: "settings",    url: "/admin/settings", icon: Settings,        roles: ["admin"] },
 ];
 
@@ -218,7 +218,8 @@ function AdminSidebar() {
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, setUser } = useAuth();
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
+  const currentLang = languages.find((l) => l.code === language);
 
   return (
     <SidebarProvider>
@@ -239,6 +240,32 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
           
             <div className="flex items-center gap-3">
+              {/* Language Selector */}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 p-2 rounded-2xl bg-white border border-slate-200 hover:border-[#4CBFBF]/30 hover:shadow-lg transition-all duration-300 group outline-none">
+                  <Globe className="h-4 w-4 text-slate-400 group-hover:text-[#4CBFBF] transition-colors" />
+                  <span className="text-[10px] font-black uppercase text-slate-600 group-hover:text-slate-900 transition-colors">
+                    {currentLang?.code.toUpperCase()}
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[180px] mt-2 p-1.5 bg-white border border-slate-200 shadow-2xl rounded-2xl animate-in fade-in zoom-in duration-200">
+                  <div className="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-[#4CBFBF] opacity-50">{t("defaultLanguage")}</div>
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      className={cn(
+                        "rounded-xl cursor-pointer py-2.5 px-3 flex items-center justify-between group",
+                        language === lang.code ? "bg-[#4CBFBF]/5 text-[#4CBFBF] font-black" : "text-slate-600 hover:bg-slate-50"
+                      )}
+                      onClick={() => setLanguage(lang.code)}
+                    >
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{lang.nativeLabel}</span>
+                      {language === lang.code && <div className="w-1 h-1 rounded-full bg-[#4CBFBF] shadow-[0_0_8px_rgba(76,191,191,0.8)]" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <NotificationBell />
               
               {user && (

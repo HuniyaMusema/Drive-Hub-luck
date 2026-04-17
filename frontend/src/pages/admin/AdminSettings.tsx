@@ -114,7 +114,7 @@ const defaultBackup: BackupSettings = {
 export default function AdminSettings() {
   const { toast } = useToast();
   const { settings, updateSetting, isLoading: settingsLoading } = useSettings();
-  const { t, setLanguage } = useLanguage();
+  const { t, setLanguage, formatDate } = useLanguage();
   const { data: auditLogs = [], isLoading: logsLoading } = useAuditLogs();
   const { data: backups = [], isLoading: backupsLoading } = useBackups();
   const createBackupMutation = useCreateBackup();
@@ -408,11 +408,23 @@ export default function AdminSettings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
                     <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">{t("minPasswordLength")}</Label>
-                    <Input type="number" min={6} className="rounded-xl h-12 bg-white border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-4 tabular-nums shadow-sm" value={security.minPasswordLength} onChange={(e) => setSecurity({ ...security, minPasswordLength: Number(e.target.value) })} />
+                    <Input 
+                      type="text" 
+                      inputMode="numeric"
+                      className="rounded-xl h-12 bg-white border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-4 tabular-nums shadow-sm" 
+                      value={security.minPasswordLength} 
+                      onChange={(e) => setSecurity({ ...security, minPasswordLength: e.target.value.replace(/\D/g, "") as any })} 
+                    />
                   </div>
                   <div className="space-y-3 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
                     <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">{t("sessionTimeout")} (min)</Label>
-                    <Input type="number" min={5} className="rounded-xl h-12 bg-white border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-4 tabular-nums shadow-sm" value={security.sessionTimeout} onChange={(e) => setSecurity({ ...security, sessionTimeout: Number(e.target.value) })} />
+                    <Input 
+                      type="text" 
+                      inputMode="numeric"
+                      className="rounded-xl h-12 bg-white border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-4 tabular-nums shadow-sm" 
+                      value={security.sessionTimeout} 
+                      onChange={(e) => setSecurity({ ...security, sessionTimeout: e.target.value.replace(/\D/g, "") as any })} 
+                    />
                   </div>
                 </div>
 
@@ -450,7 +462,13 @@ export default function AdminSettings() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4 p-8 bg-slate-50 rounded-[2.5rem] border border-slate-200 shadow-sm">
                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1 block leading-none">{t("adminMaxTicketsPerUser")}</Label>
-                   <Input type="number" className="h-14 bg-transparent border-none font-black tabular-nums text-4xl text-slate-900 px-0 w-full focus-visible:ring-0" value={lottery.maxTicketsPerUser} onChange={(e) => setLottery({ ...lottery, maxTicketsPerUser: Number(e.target.value) })} />
+                   <Input 
+                     type="text" 
+                     inputMode="numeric"
+                     className="h-14 bg-transparent border-none font-black tabular-nums text-4xl text-slate-900 px-0 w-full focus-visible:ring-0" 
+                     value={lottery.maxTicketsPerUser} 
+                     onChange={(e) => setLottery({ ...lottery, maxTicketsPerUser: e.target.value.replace(/\D/g, "") as any })} 
+                   />
                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest leading-none">{t("perDrawLimit")}</p>
                 </div>
 
@@ -635,7 +653,9 @@ export default function AdminSettings() {
                       <div className="p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-all hover:shadow-xl hover:border-[#f5b027]/20 shadow-sm group-hover/log:-translate-y-1">
                         <div className="flex items-center justify-between mb-4">
                           <p className="text-lg font-black text-slate-900 uppercase tracking-tighter group-hover/log:text-[#f5b027] transition-colors leading-none">{log.action_type}</p>
-                          <span className="text-[10px] font-black text-slate-500 tabular-nums bg-white px-4 py-1.5 rounded-full uppercase tracking-widest border border-slate-200">{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span className="text-[10px] font-black text-slate-500 tabular-nums bg-white px-4 py-1.5 rounded-full uppercase tracking-widest border border-slate-200">
+                            {formatDate(log.timestamp, { hour: '2-digit', minute: '2-digit' })}
+                          </span>
                         </div>
                         <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-6">
                           <span className="text-slate-900">{log.user_name}</span> {t("performedActionFromIp")} <span className="text-[#f5b027]">{log.details?.ip || t("unknown")}</span>
@@ -646,7 +666,7 @@ export default function AdminSettings() {
                            </pre>
                         </div>
                         <p className="text-[9px] text-right mt-4 text-slate-600 font-black tracking-[0.3em] tabular-nums uppercase">
-                          {new Date(log.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {formatDate(log.timestamp)}
                         </p>
                       </div>
                     </div>
