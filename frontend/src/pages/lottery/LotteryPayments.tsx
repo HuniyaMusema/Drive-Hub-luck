@@ -175,12 +175,12 @@ export default function LotteryPayments() {
             {/* Header row */}
             <div className="grid grid-cols-12 gap-3 px-6 py-4 bg-slate-50 text-xs font-black text-slate-400 uppercase tracking-widest">
               <div className="col-span-1">#</div>
-              <div className="col-span-3">{t("payUser")}</div>
-              <div className="col-span-2">{t("payMethod")}</div>
+              <div className="col-span-2">{t("payUser")}</div>
+              <div className="col-span-1">{t("payMethod")}</div>
               <div className="col-span-1">{t("payTickets")}</div>
               <div className="col-span-2">{t("year")}</div>
               <div className="col-span-1">{t("payReceipt")}</div>
-              <div className="col-span-2">{t("payStatus")}</div>
+              <div className="col-span-4">{t("payStatus")}</div>
             </div>
 
             {filtered.map((p, i) => {
@@ -195,7 +195,7 @@ export default function LotteryPayments() {
                   <div className="col-span-1 text-sm font-black text-slate-300 tabular-nums">{i + 1}</div>
 
                   {/* User */}
-                  <div className="col-span-3 flex items-center gap-3 min-w-0">
+                  <div className="col-span-2 flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-xl bg-[#4CBFBF]/10 flex items-center justify-center text-sm font-black text-[#4CBFBF] shrink-0 border border-[#4CBFBF]/20">
                       {p.user_name.charAt(0).toUpperCase()}
                     </div>
@@ -206,7 +206,7 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Method */}
-                  <div className="col-span-2">
+                  <div className="col-span-1">
                     <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase border whitespace-nowrap ${p.method === 'CBE' ? 'bg-blue-400/10 text-blue-400 border-blue-400/20' : 'bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20'}`}>
                       {p.method}
                     </span>
@@ -239,7 +239,7 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Status + Actions */}
-                  <div className="col-span-2 flex flex-col gap-2">
+                  <div className="col-span-4 flex flex-col gap-2">
                     <span className={`inline-flex items-center gap-1.5 w-fit text-xs font-black uppercase tracking-wide px-3 py-1.5 rounded-full border ${sc.className}`}>
                       <StatusIcon className="h-3.5 w-3.5" />
                       {t(sc.labelKey)}

@@ -89,7 +89,13 @@ const registerUser = async (req, res) => {
     // Build verification URL and send email
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
     const verifyUrl = `${frontendUrl}/auth/verify-email?token=${rawToken}`;
-    await sendVerificationEmail(user.email, user.name, verifyUrl);
+    
+    try {
+      await sendVerificationEmail(user.email, user.name, verifyUrl);
+    } catch (emailErr) {
+      console.error('[registerUser] Verification email failed to send:', emailErr.message);
+      // Proceed anyway so the account is created, user can request resend later
+    }
 
     res.status(201).json({
       message: 'Account created! Please check your email to verify your account before signing in.',

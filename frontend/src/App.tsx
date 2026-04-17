@@ -58,8 +58,8 @@ const PlatformTitle = memo(() => {
   const { t } = useLanguage();
   
   useEffect(() => {
-    document.title = `${platformName} | ${t("appSuffix")}`;
-  }, [platformName, t]);
+    document.title = platformName;
+  }, [platformName]);
   
   return null;
 });

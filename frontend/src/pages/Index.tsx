@@ -18,13 +18,27 @@ import heroBg from "@/assets/hero-bg-lasers.png"; // New red laser background
 function FlashcardStack() {
   const [hovered, setHovered] = useState(false);
   const { t } = useLanguage();
+  const { data: carsData = [] } = useCars();
 
-  const mockListings = [
-    { name: "Mercedes-AMG GT 63", year: 2024, price: `4,200,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
-    { name: "BMW M8 Competition",  year: 2023, price: `3,750,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
-    { name: "Porsche 911 Turbo S", year: 2024, price: `5,100,000 ${t("birr")}`, tag: t("newIn"),    color: "#f5b027" },
-    { name: "Lamborghini Urus SE", year: 2024, price: `8,900,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
-  ];
+  const listings = useMemo(() => {
+    if (carsData.length === 0) {
+      return [
+        { name: "Mercedes-AMG GT 63", year: 2024, price: `4,200,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
+        { name: "BMW M8 Competition",  year: 2023, price: `3,750,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
+        { name: "Porsche 911 Turbo S", year: 2024, price: `5,100,000 ${t("birr")}`, tag: t("newIn"),    color: "#f5b027" },
+        { name: "Lamborghini Urus SE", year: 2024, price: `8,900,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
+      ];
+    }
+    
+    // Take real cars and map them to the same display format
+    return carsData.slice(0, 4).map(car => ({
+      name: car.name,
+      year: car.year,
+      price: `${car.price.toLocaleString()} ${t("birr")}`,
+      tag: car.available ? t("available") : t("sold"),
+      color: car.available ? "#22c55e" : "#ef4444"
+    }));
+  }, [carsData, t]);
 
   return (
     <div
@@ -61,12 +75,11 @@ function FlashcardStack() {
               <p className="text-sm font-bold text-white mt-0.5">{t("carsForSale")}</p>
             </div>
             <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full" style={{ background: "rgba(245,176,39,0.18)", color: "#f5b027", border: "1px solid rgba(245,176,39,0.3)" }}>
-              {mockListings.length} {t("listedLabel")}
+              {listings.length} {t("listedLabel")}
             </span>
           </div>
-          {/* Listing rows */}
-          <ul className="divide-y divide-white/[0.06]">
-            {mockListings.map((car, i) => (
+                     <ul className="divide-y divide-white/[0.06]">
+            {listings.map((car, i) => (
               <li key={i} className="px-6 py-3 flex items-center justify-between group/item hover:bg-white/[0.04] transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(76,191,191,0.12)" }}>

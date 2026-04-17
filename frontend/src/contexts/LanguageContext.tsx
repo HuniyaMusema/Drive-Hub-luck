@@ -90,7 +90,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     // If still missing, return the key itself
     if (typeof translation !== "string") {
-      if (process.env.NODE_ENV === "development") {
+      if (import.meta.env.DEV) {
         console.warn(`[i18n] Missing translation for key: ${key}`);
       }
       return key;

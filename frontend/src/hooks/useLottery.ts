@@ -48,6 +48,8 @@ export interface ProfileHistory {
     number: number;
     status: string;
     payment_status?: string | null;
+    rejection_reason?: string | null;
+    lottery_status?: string;
     date: string;
     prize: string;
   }>;
