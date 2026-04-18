@@ -3,8 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar, SidebarInset } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/hooks/useSettings";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LayoutDashboard, Car, Ticket, CreditCard, Users, LogOut, Hash, ChevronDown, UserCheck, Settings, Trophy, ShieldCheck, Zap, Bell, Menu, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage, languages } from "@/contexts/LanguageContext";
+import { LayoutDashboard, Car, Ticket, CreditCard, Users, LogOut, Hash, ChevronDown, UserCheck, Settings, Trophy, ShieldCheck, Zap, Bell, Menu, Sparkles, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/auth";
@@ -29,6 +29,7 @@ const lotteryItems: NavItem[] = [
 const systemItems: NavItem[] = [
   { title: "Dashboard", labelKey: "navDashboard",  url: "/admin",          icon: LayoutDashboard, roles: ["admin", "lottery_staff"] },
   { title: "Users",     labelKey: "navUsers",       url: "/admin/users",    icon: Users,           roles: ["admin"] },
+  { title: "Cars",      labelKey: "cars",        url: "/admin/cars",     icon: Car,             roles: ["admin"] },
   { title: "Settings",  labelKey: "settings",    url: "/admin/settings", icon: Settings,        roles: ["admin"] },
 ];
 
@@ -64,12 +65,19 @@ function AdminSidebar() {
               "flex items-center transition-all duration-200 group relative",
               collapsed ? "justify-center p-2 h-10 w-10 rounded-xl mx-auto" : "gap-3 px-4 py-3 rounded-xl justify-start min-h-[44px]",
               isActive
-                ? "bg-[#4CBFBF]/15 text-white font-semibold"
-                : "text-white/55 hover:text-white hover:bg-white/8"
+                ? "text-white font-semibold shadow-lg"
+                : "text-white/50 hover:text-white"
             )}
+            style={isActive ? {
+              background: 'linear-gradient(135deg, rgba(76,191,191,0.15) 0%, rgba(76,191,191,0.05) 100%)',
+              borderLeft: collapsed ? 'none' : '2px solid rgba(76,191,191,0.6)',
+            } : {}}
+            onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+            onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
+            {/* Active glow dot */}
             {isActive && !collapsed && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#4CBFBF]" />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#4CBFBF] shadow-[0_0_8px_rgba(76,191,191,0.8)]" />
             )}
             <item.icon className={cn(
               "shrink-0 transition-colors",
@@ -88,25 +96,44 @@ function AdminSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-white/10 z-40"
-      style={{ background: '#162840' }}
+      className="border-r z-40"
+      style={{ borderColor: 'rgba(255,255,255,0.06)' }}
     >
-      <div className="absolute inset-0 bg-[#162840]" />
+      {/* Premium gradient background */}
+      <div className="absolute inset-0" style={{
+        background: 'linear-gradient(160deg, #1a2538 0%, #141e2d 50%, #0f1720 100%)',
+      }} />
+      {/* Subtle top glow */}
+      <div className="absolute top-0 left-0 right-0 h-32 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse at 50% 0%, rgba(76,191,191,0.07) 0%, transparent 70%)'
+      }} />
+      {/* Bottom ambient */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{
+        background: 'linear-gradient(0deg, rgba(0,0,0,0.2) 0%, transparent 100%)'
+      }} />
 
       <SidebarContent className="bg-transparent custom-scrollbar relative z-10 flex flex-col h-full">
-        {/* Brand Header */}
+        {/* Premium Brand Header */}
         <div className={cn(
-          "flex items-center border-b border-white/10",
-          collapsed ? "flex-col justify-center gap-2 px-0 py-5" : "justify-between px-5 py-4"
-        )}>
+          "flex items-center relative",
+          collapsed ? "flex-col justify-center gap-2 px-0 py-5" : "justify-between px-4 py-4"
+        )} style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          {/* Header top glow line */}
+          <div className="absolute top-0 left-4 right-4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(76,191,191,0.4), transparent)' }} />
+
           <div className={cn("flex items-center", collapsed ? "flex-col gap-1" : "gap-3")}>
-            <div className="w-9 h-9 rounded-xl bg-[#4CBFBF] flex items-center justify-center shrink-0 shadow-sm shadow-[#4CBFBF]/20">
-              <Car className="h-4 w-4 text-white" strokeWidth={2.5} />
+            <div className="relative">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{
+                background: 'linear-gradient(135deg, #4CBFBF 0%, #3aa8a8 100%)',
+              }}>
+                <Car className="h-4 w-4 text-white" strokeWidth={2.5} />
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#141e2d]" />
             </div>
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="text-[15px] font-bold text-white leading-none">{settings?.General?.platformName || "Drive Hub"}</span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#4CBFBF] mt-1">{t("navManagementPortal")}</span>
+                <span className="text-[14px] font-black text-white leading-none tracking-tight">{settings?.General?.platformName || "Gech"}</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.18em] mt-1" style={{ color: 'rgba(76,191,191,0.85)' }}>{t("navManagementPortal")}</span>
               </div>
             )}
           </div>
@@ -115,24 +142,27 @@ function AdminSidebar() {
             size="icon"
             onClick={toggleSidebar}
             className={cn(
-              "rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all h-8 w-8",
+              "rounded-xl text-white/30 hover:text-white transition-all h-7 w-7",
               collapsed && "mt-1"
             )}
+            style={{ background: 'rgba(255,255,255,0.05)' }}
           >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
           </Button>
         </div>
 
         {/* Nav Groups */}
-        <div className="flex-1 overflow-y-auto py-4 px-2 space-y-5">
+        <div className="flex-1 overflow-y-auto py-4 px-2 space-y-4">
           <SidebarGroup>
             {!collapsed && (
-              <p className="px-3 mb-1.5 text-[10px] font-semibold text-white/35 uppercase tracking-[0.15em]">
+              <p className="px-3 mb-2 text-[9px] font-black text-white/25 uppercase tracking-[0.2em] flex items-center gap-2">
+                <span className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(76,191,191,0.25), transparent)' }} />
                 {t("navCoreManagement")}
+                <span className="flex-1 h-px" style={{ background: 'linear-gradient(270deg, rgba(76,191,191,0.25), transparent)' }} />
               </p>
             )}
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-0.5">
+              <SidebarMenu className="space-y-1">
                 {visibleSystem.map((item) => <SidebarLink key={item.title} item={item} />)}
               </SidebarMenu>
             </SidebarGroupContent>
@@ -141,21 +171,39 @@ function AdminSidebar() {
           {visibleLottery.length > 0 && (
             <SidebarGroup>
               {!collapsed && (
-                <>
-                  <div className="mx-3 mb-3 h-px bg-white/10" />
-                  <p className="px-3 mb-1.5 text-[10px] font-semibold text-white/35 uppercase tracking-[0.15em]">
-                    {t("navLotteryOperations")}
-                  </p>
-                </>
+                <p className="px-3 mb-2 text-[9px] font-black text-white/25 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <span className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(245,176,39,0.25), transparent)' }} />
+                  {t("navLotteryOperations")}
+                  <span className="flex-1 h-px" style={{ background: 'linear-gradient(270deg, rgba(245,176,39,0.25), transparent)' }} />
+                </p>
               )}
               <SidebarGroupContent>
-                <SidebarMenu className="space-y-0.5">
+                <SidebarMenu className="space-y-1">
                   {visibleLottery.map((item) => <SidebarLink key={item.title} item={item} />)}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           )}
         </div>
+
+        {/* Premium bottom user strip */}
+        {!collapsed && user && (
+          <div className="px-3 py-3 mx-2 mb-3 rounded-2xl flex items-center gap-2.5" style={{
+            background: 'rgba(0,0,0,0.2)',
+            border: '1px solid rgba(255,255,255,0.07)',
+          }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-black text-white shrink-0" style={{
+              background: 'linear-gradient(135deg, rgba(76,191,191,0.5), rgba(76,191,191,0.2))',
+              border: '1px solid rgba(76,191,191,0.3)',
+            }}>
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[11px] font-bold text-white/90 truncate leading-none">{user.name}</span>
+              <span className="text-[9px] font-semibold uppercase tracking-widest mt-0.5" style={{ color: 'rgba(76,191,191,0.7)' }}>{user.role.replace("_", " ")}</span>
+            </div>
+          </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );
@@ -163,7 +211,8 @@ function AdminSidebar() {
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, setUser } = useAuth();
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
+  const currentLang = languages.find((l) => l.code === language);
 
   return (
     <SidebarProvider>
@@ -184,6 +233,32 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
           
             <div className="flex items-center gap-3">
+              {/* Language Selector */}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 p-2 rounded-2xl bg-white border border-slate-200 hover:border-[#4CBFBF]/30 hover:shadow-lg transition-all duration-300 group outline-none">
+                  <Globe className="h-4 w-4 text-slate-400 group-hover:text-[#4CBFBF] transition-colors" />
+                  <span className="text-[10px] font-black uppercase text-slate-600 group-hover:text-slate-900 transition-colors">
+                    {currentLang?.code.toUpperCase()}
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[180px] mt-2 p-1.5 bg-white border border-slate-200 shadow-2xl rounded-2xl animate-in fade-in zoom-in duration-200">
+                  <div className="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-[#4CBFBF] opacity-50">{t("defaultLanguage")}</div>
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      className={cn(
+                        "rounded-xl cursor-pointer py-2.5 px-3 flex items-center justify-between group",
+                        language === lang.code ? "bg-[#4CBFBF]/5 text-[#4CBFBF] font-black" : "text-slate-600 hover:bg-slate-50"
+                      )}
+                      onClick={() => setLanguage(lang.code)}
+                    >
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{lang.nativeLabel}</span>
+                      {language === lang.code && <div className="w-1 h-1 rounded-full bg-[#4CBFBF] shadow-[0_0_8px_rgba(76,191,191,0.8)]" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <NotificationBell />
               
               {user && (

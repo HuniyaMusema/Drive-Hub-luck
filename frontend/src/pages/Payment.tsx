@@ -24,7 +24,7 @@ export default function Payment() {
   const location = useLocation();
   const isAdminOrStaff = user?.role === 'admin' || user?.role === 'lottery_staff';
 
-  const [selectedTicket, setSelectedTicket] = useState<string>("");
+  const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
   const [method, setMethod] = useState<"CBE" | "Telebirr">("CBE");
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -65,9 +65,25 @@ export default function Payment() {
 
   useEffect(() => {
     if (passedTickets.length > 0) {
-      setSelectedTicket(passedTickets[0].id);
+      setSelectedTickets(passedTickets.map((t: any) => t.id));
     }
   }, [passedTickets]);
+
+  const handleToggleTicket = (id: string) => {
+    setSelectedTickets(prev => 
+      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedTickets.length === selectableTickets.length) {
+      setSelectedTickets([]);
+    } else {
+      setSelectedTickets(selectableTickets.map(t => t.id));
+    }
+  };
+
+  const totalPrice = ticketPrice * selectedTickets.length;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,7 +103,7 @@ export default function Payment() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedTicket) {
+    if (selectedTickets.length === 0) {
       toast({ title: t("selectionNeededTitle"), description: t("reserveNumbersFirst"), variant: "destructive" });
       return;
     }
@@ -111,19 +127,19 @@ export default function Payment() {
       const uploadData = await uploadRes.json();
       receiptUrl = uploadData.url;
     } catch (err: any) {
-      toast({ title: "Upload Failed", description: err.message, variant: "destructive" });
+      toast({ title: t("uploadFailedMsg") || "Upload Failed", description: err.message, variant: "destructive" });
       setUploading(false);
       return;
     }
 
     try {
       await submitMutation.mutateAsync({
-        lotteryNumberId: selectedTicket,
+        lotteryNumberIds: selectedTickets,
         receiptUrl,
         method,
       });
       toast({ title: t("receiptSubmittedTitle"), description: t("paymentPendingReview") });
-      setSelectedTicket("");
+      setSelectedTickets([]);
       setReceiptFile(null);
       setReceiptPreview(null);
       if (fileRef.current) fileRef.current.value = "";
@@ -182,136 +198,177 @@ export default function Payment() {
                   </div>
                ) : (
                   <form className="space-y-10 relative z-10" onSubmit={handleSubmit}>
-                    {/* Step 1: Selection */}
-                    <div className="space-y-4">
-                       <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 mb-2">
-                          <Ticket className="h-3 w-3" /> 01. {t("paySelectionReservation")}
-                       </Label>
-                       <Select value={selectedTicket} onValueChange={setSelectedTicket}>
-                         <SelectTrigger className="rounded-[1.25rem] border-border/60 h-16 bg-muted/20 focus:ring-primary/20 font-bold p-6">
-                           <SelectValue placeholder={t("payWhichReservation")} />
-                         </SelectTrigger>
-                         <SelectContent className="rounded-2xl p-2">
-                           {selectableTickets.length === 0 ? (
-                             <div className="p-10 text-center bg-muted/10 rounded-3xl border border-dashed border-border/60">
-                                <Ticket className="h-10 w-10 text-muted-foreground opacity-20 mx-auto mb-4" />
-                                <p className="text-sm font-black uppercase tracking-tight text-foreground mb-2">{t("payNoReservedFound")}</p>
-                                <p className="text-[10px] text-muted-foreground font-medium mb-6">{t("payPickConfirmNumbers")}</p>
-                                <Link to="/lottery" className="inline-block">
-                                  <Button variant="outline" size="sm" className="rounded-full font-black uppercase tracking-widest text-[9px] px-6">
-                                    {t("payGoToBoard")}
-                                  </Button>
-                                </Link>
-                             </div>
-                           ) : (
-                             selectableTickets.map(ticket => (
-                               <SelectItem key={ticket.id} value={ticket.id} className="rounded-xl p-4 cursor-pointer focus:bg-primary/5">
-                                 <div className="flex flex-col">
-                                    <span className="font-black text-foreground text-sm">{t("ticketLabel")} #{ticket.number.toString().padStart(3, '0')}</span>
-                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter mt-1">{ticket.prize || t("activeSweepstake")}</span>
-                                 </div>
-                               </SelectItem>
-                             ))
-                           )}
-                         </SelectContent>
-                       </Select>
-                       {selectedTicket && (
-                         <div className="flex items-center gap-2 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 animate-fade-in">
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
-                              {t("payAmountDue")}: {(ticketPrice).toLocaleString()} {currency}
-                            </span>
-                         </div>
-                       )}
-                    </div>
-   
-                    {/* Step 2: Method */}
-                    <div className="space-y-4">
-                       <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 mb-2">
-                          <Landmark className="h-3 w-3" /> 02. {t("payGateway")}
-                       </Label>
-                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                         {[
-                           { id: "CBE", name: "Commercial Bank", logo: Landmark, color: "primary" },
-                           { id: "Telebirr", name: "Telebirr Wallet", logo: Smartphone, color: "blue-600" }
-                         ].map(m => (
-                           <button
-                             key={m.id}
-                             type="button"
-                             onClick={() => setMethod(m.id as any)}
-                             className={cn(
-                               "flex items-center gap-4 p-5 rounded-[1.5rem] border-2 transition-all group/btn text-left",
-                               method === m.id
-                                 ? 'border-primary bg-primary/5 text-primary shadow-xl shadow-primary/10'
-                                 : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:bg-muted/30'
-                             )}
-                           >
-                             <div className={cn(
-                               "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
-                               method === m.id ? "bg-primary text-primary-foreground shadow-lg" : "bg-muted text-muted-foreground group-hover/btn:bg-primary/10"
-                             )}>
-                               <m.logo className="h-6 w-6" strokeWidth={2.5} />
-                             </div>
-                             <div className="flex flex-col">
-                                <span className="text-xs font-black uppercase tracking-widest">{m.id}</span>
-                                <span className="text-[11px] font-bold opacity-60">{m.name}</span>
-                             </div>
-                             {method === m.id && <div className="ml-auto"><Check className="h-5 w-5 bg-primary rounded-full p-1 text-white" strokeWidth={4} /></div>}
-                           </button>
-                         ))}
-                       </div>
-                    </div>
-   
-                    {/* Step 3: Receipt */}
-                    <div className="space-y-4">
-                       <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 mb-2">
-                          <ImageIcon className="h-3 w-3" /> 03. {t("payValidationMedia")}
-                       </Label>
-   
-                       {receiptPreview ? (
-                         <div className="relative group rounded-[2.5rem] overflow-hidden border-2 border-primary/20 shadow-2xl bg-muted/30 animate-fade-in aspect-video">
-                           <img src={receiptPreview} alt="Receipt preview" className="w-full h-full object-contain" />
-                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
-                             <Button
+                     {/* Step 1: Selection */}
+                     <div className="space-y-6">
+                        <div className="flex items-center justify-between mb-2">
+                           <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                              <Ticket className="h-3 w-3" /> 01. {t("paySelectionReservation")}
+                           </Label>
+                           {selectableTickets.length > 0 && (
+                             <button 
                                type="button"
-                               variant="destructive"
-                               className="rounded-2xl font-black text-[10px] uppercase tracking-widest px-6 h-11 shadow-xl"
-                               onClick={() => { setReceiptFile(null); setReceiptPreview(null); if (fileRef.current) fileRef.current.value = ""; }}
+                               onClick={handleSelectAll}
+                               className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
                              >
-                               <XCircle className="h-4 w-4 mr-2" /> {t("payReplaceImage")}
-                             </Button>
+                               {selectedTickets.length === selectableTickets.length ? (
+                                 <><XCircle className="h-3 w-3" /> {t("deselectAll") || "Deselect All"}</>
+                               ) : (
+                                 <><CheckCircle2 className="h-3 w-3" /> {t("selectAll") || "Select All"}</>
+                               )}
+                             </button>
+                           )}
+                        </div>
+
+                        {selectableTickets.length === 0 ? (
+                           <div className="p-10 text-center bg-muted/10 rounded-3xl border border-dashed border-border/60">
+                              <Ticket className="h-10 w-10 text-muted-foreground opacity-20 mx-auto mb-4" />
+                              <p className="text-sm font-black uppercase tracking-tight text-foreground mb-2">{t("payNoReservedFound")}</p>
+                              <p className="text-[10px] text-muted-foreground font-medium mb-6">{t("payPickConfirmNumbers")}</p>
+                              <Link to="/lottery" className="inline-block">
+                                <Button variant="outline" size="sm" className="rounded-full font-black uppercase tracking-widest text-[9px] px-6">
+                                  {t("payGoToBoard")}
+                                </Button>
+                              </Link>
                            </div>
-                         </div>
-                       ) : (
-                         <label className="flex flex-col items-center justify-center border-2 border-dashed border-border/60 rounded-[2.5rem] p-16 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group bg-muted/10 relative overflow-hidden">
-                           <div className="relative z-10 flex flex-col items-center text-center">
-                              <div className="w-20 h-20 rounded-3xl bg-background flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 group-hover:-rotate-3 transition-transform border border-border/40">
-                                <Upload className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={2.5} />
+                        ) : (
+                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {selectableTickets.map(ticket => {
+                                 const isSelected = selectedTickets.includes(ticket.id);
+                                 return (
+                                    <div 
+                                       key={ticket.id}
+                                       onClick={() => handleToggleTicket(ticket.id)}
+                                       className={cn(
+                                          "flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer group/ticket",
+                                          isSelected 
+                                             ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" 
+                                             : "border-border/60 hover:border-primary/30 hover:bg-muted/30"
+                                       )}
+                                    >
+                                       <div className={cn(
+                                          "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+                                          isSelected ? "bg-primary border-primary" : "border-border/60 bg-transparent"
+                                       )}>
+                                          {isSelected && <Check className="h-3 w-3 text-white" strokeWidth={4} />}
+                                       </div>
+                                       <div className="flex flex-col">
+                                          <span className="font-black text-foreground text-xs uppercase tracking-tight">#{ticket.number.toString().padStart(3, '0')}</span>
+                                          <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mt-0.5">{ticket.prize || t("activeSweepstake")}</span>
+                                       </div>
+                                       <div className="ml-auto text-xs font-black tabular-nums opacity-60">
+                                          {ticketPrice.toLocaleString()}
+                                       </div>
+                                    </div>
+                                 );
+                              })}
+                           </div>
+                        )}
+
+                        {selectedTickets.length > 0 && (
+                          <div className="flex items-center justify-between p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 animate-fade-in shadow-inner">
+                             <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                                   {selectedTickets.length} {t("ticketsSelected") || "Tickets Selected"}
+                                </span>
+                             </div>
+                             <div className="text-right">
+                                <span className="block text-[8px] font-black uppercase tracking-widest text-muted-foreground mb-1">{t("payAmountDue")}</span>
+                                <span className="text-xl font-black tabular-nums text-emerald-600 tracking-tighter">
+                                   {totalPrice.toLocaleString()} <span className="text-xs uppercase opacity-60 ml-1">{currency}</span>
+                                </span>
+                             </div>
+                          </div>
+                        )}
+                     </div>
+    
+                     {/* Step 2: Method */}
+                     <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 mb-2">
+                           <Landmark className="h-3 w-3" /> 02. {t("payGateway")}
+                        </Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {[
+                            { id: "CBE", name: "Commercial Bank", logo: Landmark, color: "primary" },
+                            { id: "Telebirr", name: "Telebirr Wallet", logo: Smartphone, color: "blue-600" }
+                          ].map(m => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              onClick={() => setMethod(m.id as any)}
+                              className={cn(
+                                "flex items-center gap-4 p-5 rounded-[1.5rem] border-2 transition-all group/btn text-left",
+                                method === m.id
+                                  ? 'border-primary bg-primary/5 text-primary shadow-xl shadow-primary/10'
+                                  : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:bg-muted/30'
+                              )}
+                            >
+                              <div className={cn(
+                                "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
+                                method === m.id ? "bg-primary text-primary-foreground shadow-lg" : "bg-muted text-muted-foreground group-hover/btn:bg-primary/10"
+                              )}>
+                                <m.logo className="h-6 w-6" strokeWidth={2.5} />
                               </div>
-                              <h4 className="text-lg font-black text-foreground uppercase tracking-tight mb-2">{t("payInstructions")}</h4>
-                              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted rounded-full px-4 py-1.5 border border-border/60">{t("fileFormatHint")}</span>
-                           </div>
-                           <input ref={fileRef} type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-                         </label>
-                       )}
-                    </div>
-   
-                    <Button
-                       type="submit"
-                       className="w-full rounded-[1.5rem] h-20 text-xl font-black shadow-2xl shadow-primary/30 bg-primary hover:scale-[1.02] active:scale-95 transition-all group/submit"
-                       disabled={isBusy}
-                    >
-                       {isBusy ? (
-                         <><Loader2 className="h-6 w-6 animate-spin mr-3" /> {uploading ? t("payStreamingData") : t("payValidatingSession")}</>
-                       ) : (
-                         <div className="flex items-center gap-3">
-                            {t("submitReceipt")}
-                            <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center group-hover/submit:translate-x-1 transition-transform">
-                               <ChevronRight className="h-6 w-6 text-white" strokeWidth={4} />
+                              <div className="flex flex-col">
+                                 <span className="text-xs font-black uppercase tracking-widest">{m.id}</span>
+                                 <span className="text-[11px] font-bold opacity-60">{m.name}</span>
+                              </div>
+                              {method === m.id && <div className="ml-auto"><Check className="h-5 w-5 bg-primary rounded-full p-1 text-white" strokeWidth={4} /></div>}
+                            </button>
+                          ))}
+                        </div>
+                     </div>
+    
+                     {/* Step 3: Receipt */}
+                     <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 mb-2">
+                           <ImageIcon className="h-3 w-3" /> 03. {t("payValidationMedia")}
+                        </Label>
+    
+                        {receiptPreview ? (
+                          <div className="relative group rounded-[2.5rem] overflow-hidden border-2 border-primary/20 shadow-2xl bg-muted/30 animate-fade-in aspect-video">
+                            <img src={receiptPreview} alt="Receipt preview" className="w-full h-full object-contain" />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                className="rounded-2xl font-black text-[10px] uppercase tracking-widest px-6 h-11 shadow-xl"
+                                onClick={() => { setReceiptFile(null); setReceiptPreview(null); if (fileRef.current) fileRef.current.value = ""; }}
+                              >
+                                <XCircle className="h-4 w-4 mr-2" /> {t("payReplaceImage")}
+                              </Button>
                             </div>
-                         </div>
-                       )}
-                    </Button>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center border-2 border-dashed border-border/60 rounded-[2.5rem] p-16 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group bg-muted/10 relative overflow-hidden">
+                            <div className="relative z-10 flex flex-col items-center text-center">
+                               <div className="w-20 h-20 rounded-3xl bg-background flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 group-hover:-rotate-3 transition-transform border border-border/40">
+                                 <Upload className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={2.5} />
+                               </div>
+                               <h4 className="text-lg font-black text-foreground uppercase tracking-tight mb-2">{t("payInstructions")}</h4>
+                               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted rounded-full px-4 py-1.5 border border-border/60">{t("fileFormatHint")}</span>
+                            </div>
+                            <input ref={fileRef} type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                          </label>
+                        )}
+                     </div>
+    
+                     <Button
+                        type="submit"
+                        className="w-full rounded-[1.5rem] h-20 text-xl font-black shadow-2xl shadow-primary/30 bg-primary hover:scale-[1.02] active:scale-95 transition-all group/submit"
+                        disabled={isBusy}
+                     >
+                        {isBusy ? (
+                          <><Loader2 className="h-6 w-6 animate-spin mr-3" /> {uploading ? t("payStreamingData") : t("payValidatingSession")}</>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                             {t("submitReceipt")}
+                             <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center group-hover/submit:translate-x-1 transition-transform">
+                                <ChevronRight className="h-6 w-6 text-white" strokeWidth={4} />
+                             </div>
+                          </div>
+                        )}
+                     </Button>
                   </form>
                )}
             </div>
@@ -385,7 +442,7 @@ export default function Payment() {
                   processedTickets.map((p: any) => {
                     // Logic to determine status display
                     let s = statusConfig.pending;
-                    let label = "Under Review";
+                    let label = t("payUnderReview") || "Under Review";
 
                     if (p.status === 'confirmed' || p.payment_status === 'approved') {
                       s = statusConfig.approved;
@@ -395,8 +452,8 @@ export default function Payment() {
                       label = t("payVerifyingReceipt");
                     } else if (p.status === 'pending' && !p.payment_status) {
                       if (p.lottery_status === 'closed') {
-                        s = { icon: XCircle, className: "bg-slate-500/10 text-slate-500 border-slate-500/20", label: "Lottery Closed" };
-                        label = "Lottery Closed";
+                        s = { icon: XCircle, className: "bg-slate-500/10 text-slate-500 border-slate-500/20", label: t("closedLottery") };
+                        label = t("closedLottery");
                       } else {
                         s = { icon: Clock, className: "bg-amber-500/10 text-amber-600 border-amber-500/20", label: t("payAwaitingPayment") };
                         label = t("payAwaitingPayment");
@@ -414,7 +471,7 @@ export default function Payment() {
                         key={p.id}
                         onClick={() => {
                           if (isAwaiting) {
-                            setSelectedTicket(p.id);
+                            handleToggleTicket(p.id);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }
                         }}
@@ -423,7 +480,8 @@ export default function Payment() {
                           isClosed
                             ? "bg-slate-100/60 border-slate-200 opacity-70"
                             : "bg-card border-border/60 hover:shadow-xl hover:-translate-y-1",
-                          isAwaiting && "cursor-pointer hover:border-amber-500/40"
+                          isAwaiting && "cursor-pointer hover:border-amber-500/40",
+                          selectedTickets.includes(p.id) && "border-primary bg-primary/5"
                         )}
                       >
                         {/* Closed lottery banner */}
@@ -455,8 +513,11 @@ export default function Payment() {
                                 {label}
                               </span>
                               {isAwaiting && (
-                                <span className="text-[8px] font-black uppercase tracking-widest text-amber-600 flex items-center gap-1">
-                                  {t("tapToPay")} <ChevronRight className="h-2.5 w-2.5" />
+                                <span className={cn(
+                                   "text-[8px] font-black uppercase tracking-widest flex items-center gap-1",
+                                   selectedTickets.includes(p.id) ? "text-primary" : "text-amber-600"
+                                )}>
+                                  {selectedTickets.includes(p.id) ? (t("selectedTick") || "Selected") : t("tapToPay")} <ChevronRight className="h-2.5 w-2.5" />
                                 </span>
                               )}
                               {p.rejection_reason && <p className="text-[8px] text-destructive font-bold italic text-right max-w-[120px] line-clamp-1">"{p.rejection_reason}"</p>}

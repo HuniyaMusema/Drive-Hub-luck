@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
  * ScrollToTop component ensures that the window is scrolled to the top
  * whenever the application's path changes.
  */
-const ScrollToTop = () => {
+export const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {

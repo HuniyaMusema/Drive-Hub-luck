@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Car, Eye, EyeOff, ShieldCheck, Sparkles, ArrowRight, Lock, Mail, MailCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/hooks/useSettings";
 import type { User } from "@/types/auth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,6 +24,8 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { settings } = useSettings();
+  const registrationEnabled = settings?.Security?.registrationEnabled !== false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +150,7 @@ export default function Login() {
                        <Input 
                           id="email" 
                           type="text" 
-                          placeholder="identifier@drivehub.com" 
+                          placeholder="identifier@gech.com" 
                           className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
                           value={email} 
                           onChange={(e) => setEmail(e.target.value)} 
@@ -225,12 +228,18 @@ export default function Login() {
               </form>
 
               <div className="mt-6 pt-4 border-t border-slate-200 text-center">
-                 <p className="text-sm font-medium text-slate-500">
-                    {t("noAccount")}{" "}
-                    <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#0d2e22' }}>
-                       {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
-                    </Link>
-                 </p>
+                 {registrationEnabled ? (
+                   <p className="text-sm font-medium text-slate-500">
+                      {t("noAccount")}{" "}
+                      <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2 text-[#4CBFBF]">
+                         {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
+                      </Link>
+                   </p>
+                 ) : (
+                   <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
+                      Registration is currently disabled
+                   </p>
+                 )}
               </div>
            </div>
         </div>

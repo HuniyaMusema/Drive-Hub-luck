@@ -11,16 +11,42 @@ const {
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { requireModule } = require('../middleware/systemGuards');
 
-// Receipt image upload (multer)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename:    (req, file, cb) => cb(null, `receipt-${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`),
-});
+const { supabaseAdmin } = require('../config/supabase');
+
+// Receipt image upload (multer memory storage)
+const storage = multer.memoryStorage();
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
 
-router.post('/upload-receipt', protect, upload.single('receipt'), (req, res) => {
+router.post('/upload-receipt', protect, upload.single('receipt'), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-  res.json({ url: `/uploads/${req.file.filename}` });
+
+  try {
+    const fileName = `receipt-${Date.now()}-${req.file.originalname.replace(/\s+/g, '-')}`;
+    
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not initialized');
+    }
+
+    const { data, error } = await supabaseAdmin.storage
+      .from('receipts')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (error) {
+      throw new Error(`Failed to upload to Supabase: ${error.message}`);
+    }
+
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('receipts')
+      .getPublicUrl(fileName);
+
+    res.json({ url: publicUrl });
+  } catch (error) {
+    console.error('[upload-receipt]', error.message);
+    res.status(500).json({ message: 'Upload failed.', details: error.message });
+  }
 });
 
 router.route('/').get(protect, authorize(['admin', 'lottery_staff'], 'lottery_mode'), getLotteryEntries);

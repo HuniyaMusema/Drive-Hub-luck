@@ -2,11 +2,12 @@ import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
-import { Car, Ticket, CreditCard, User, ArrowRight, Heart, Trophy, Clock, History, Settings } from "lucide-react";
+import { Ticket, CreditCard, User, ArrowRight, Heart, Trophy, Clock, History, Settings } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileHistory } from "@/hooks/useLottery";
+
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +37,6 @@ export default function Dashboard() {
   }, [history, t, savedCarsCount]);
 
   const quickLinks = [
-    { icon: Car,       label: t("browseCarsForSale"),              to: "/cars/sale",           desc: t("buyACarDesc").slice(0, 40) + "…", color: "bg-blue-500" },
     { icon: Ticket,    label: t("enterLotteryAction"),             to: "/lottery",             desc: t("carLotteryDesc").slice(0, 40) + "…", color: "bg-[#4CBFBF]" },
     { icon: CreditCard,label: t("payment"),                        to: "/payment",             desc: t("paymentPageDesc").slice(0, 40) + "…", color: "bg-amber-500" },
     { icon: User,      label: t("myProfile"),                      to: "/profile",             desc: t("profProfileConfiguration"),       color: "bg-slate-600" },
@@ -53,7 +53,7 @@ export default function Dashboard() {
             <div>
               <p className="text-xs text-slate-400 font-medium mb-1">{t("userAccountTier")}</p>
               <h1 className="text-2xl font-bold text-slate-800">
-                {t("welcomeBack")}, <span className="text-[#4CBFBF]">{user?.name?.split(' ')[0] || "User"}</span> 👋
+                {t("welcomeBack")}, <span className="text-[#4CBFBF]">{user?.name?.split(' ')[0] || t("userFallback")}</span> 👋
               </h1>
               <p className="text-sm text-slate-500 mt-1">{t("dashboardSubtitle")}</p>
             </div>

@@ -5,6 +5,7 @@ const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
 const { v4: uuidv4 } = require('uuid');
 const { sendPasswordResetEmail, sendVerificationEmail } = require('../services/emailService');
+const NotificationService = require('../services/NotificationService');
 
 // @desc    Generate JWT
 // @param   {string} id - User ID
@@ -31,6 +32,18 @@ const registerUser = async (req, res) => {
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: 'Please add all fields' });
+  }
+
+  // Enforce password policy from settings
+  const minLength = security.minPasswordLength || 8;
+  if (password.length < minLength) {
+    return res.status(400).json({ message: `Password must be at least ${minLength} characters.` });
+  }
+  if (security.requireUppercase !== false && !/[A-Z]/.test(password)) {
+    return res.status(400).json({ message: 'Password must contain at least one uppercase letter.' });
+  }
+  if (security.requireNumbers !== false && !/[0-9]/.test(password)) {
+    return res.status(400).json({ message: 'Password must contain at least one number.' });
   }
 
   try {
@@ -63,10 +76,26 @@ const registerUser = async (req, res) => {
 
     const user = rows[0];
 
+    await NotificationService.createNotification(
+      user.id,
+      'Welcome to Gech Car Lottery',
+      'Your account has been created successfully. Welcome to the Gech Car Lottery!',
+      'registration',
+      null,
+      user.id,  // reference_id = user.id — one welcome notification per user, ever
+      { entity_type: 'user', event_action: 'user_registered', user_id: user.id }
+    );
+
     // Build verification URL and send email
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
     const verifyUrl = `${frontendUrl}/auth/verify-email?token=${rawToken}`;
-    await sendVerificationEmail(user.email, user.name, verifyUrl);
+    
+    try {
+      await sendVerificationEmail(user.email, user.name, verifyUrl);
+    } catch (emailErr) {
+      console.error('[registerUser] Verification email failed to send:', emailErr.message);
+      // Proceed anyway so the account is created, user can request resend later
+    }
 
     res.status(201).json({
       message: 'Account created! Please check your email to verify your account before signing in.',
@@ -111,9 +140,17 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Force fresh session token for every login to ensure strict isolation
-    const sessionToken = uuidv4();
-    await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
+    // Respect multiLoginEnabled setting:
+    // If disabled (default), rotate session token to kick other sessions.
+    // If enabled, keep existing session token so multiple devices stay logged in.
+    const security = SettingsManager.getSetting('Security', {});
+    const multiLoginEnabled = security.multiLoginEnabled === true;
+
+    let sessionToken = user.session_token;
+    if (!multiLoginEnabled || !sessionToken) {
+      sessionToken = uuidv4();
+      await pool.query('UPDATE users SET session_token = $1 WHERE id = $2', [sessionToken, user.id]);
+    }
 
     res.json({
       id: user.id,
@@ -159,9 +196,11 @@ const getProfileHistory = async (req, res) => {
           p.status as payment_status, 
           p.created_at as payment_date, 
           ln.created_at as reservation_date,
-          ln.status as number_status
+          ln.status as number_status,
+          p.rejection_reason as rejection_reason
         FROM payments p
-        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
+        CROSS JOIN LATERAL unnest(COALESCE(p.ticket_ids, ARRAY[p.lottery_number_id])) AS t_id
+        JOIN lottery_numbers ln ON t_id = ln.id
         JOIN lottery_settings ls ON ln.lottery_id = ls.id
         LEFT JOIN cars c ON ls.prize_car_id = c.id
         WHERE p.user_id = $1
@@ -176,13 +215,18 @@ const getProfileHistory = async (req, res) => {
           NULL::payment_status as payment_status, 
           NULL::timestamptz as payment_date, 
           ln.created_at as reservation_date,
-          ln.status as number_status
+          ln.status as number_status,
+          NULL as rejection_reason
         FROM lottery_numbers ln
         JOIN lottery_settings ls ON ln.lottery_id = ls.id
         LEFT JOIN cars c ON ls.prize_car_id = c.id
         WHERE ln.user_id = $1
         AND ls.status = 'active'
-        AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.lottery_number_id = ln.id AND p.user_id = $1)
+        AND NOT EXISTS (
+          SELECT 1 FROM payments p 
+          WHERE (p.lottery_number_id = ln.id OR (p.ticket_ids IS NOT NULL AND ln.id = ANY(p.ticket_ids))) 
+          AND p.user_id = $1
+        )
       ) AS history
       ORDER BY COALESCE(payment_date, reservation_date) DESC
     `, [req.user.id]);
@@ -198,6 +242,7 @@ const getProfileHistory = async (req, res) => {
         date: l.payment_date || l.reservation_date, 
         status: l.number_status,
         payment_status: l.payment_status || null,
+        rejection_reason: l.rejection_reason,
         lottery_status: l.lottery_status,
         prize: l.prize_name || "Unknown Prize"
       }))

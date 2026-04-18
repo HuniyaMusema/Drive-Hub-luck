@@ -7,31 +7,35 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
+
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useSettings } from "@/hooks/useSettings";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 import Index from "./pages/Index";
-import ScrollToTop from "./components/ScrollToTop";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
-import CarsForSale from "./pages/cars/CarsForSale";
-import CarsForRent from "./pages/cars/CarsForRent";
-import CarDetail from "./pages/cars/CarDetail";
+
 import Lottery from "./pages/lottery/Lottery";
 import LotterySelect from "./pages/lottery/LotterySelect";
 import LotteryPayments from "./pages/lottery/LotteryPayments";
 import GenerateLotteryNumbers from "./pages/lottery/GenerateLotteryNumbers";
 import LotteryParticipants from "./pages/lottery/LotteryParticipants";
 import Payment from "./pages/Payment";
+import CarsForSale from "./pages/cars/CarsForSale";
+import CarsForRent from "./pages/cars/CarsForRent";
+import CarDetail from "./pages/cars/CarDetail";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLottery from "./pages/admin/AdminLottery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminCars from "./pages/admin/AdminCars";
+
 import Contact from "./pages/Contact";
 import SavedCars from "./pages/SavedCars";
 import Notifications from "./pages/Notifications";
@@ -49,13 +53,13 @@ const queryClient = new QueryClient({
 
 const PlatformTitle = memo(() => {
   const { settings } = useSettings();
-  const platformName = settings?.General?.platformName || "Drive Hub";
+  const platformName = settings?.General?.platformName || "Gech";
   
   const { t } = useLanguage();
   
   useEffect(() => {
-    document.title = `${platformName} | ${t("appSuffix")}`;
-  }, [platformName, t]);
+    document.title = platformName;
+  }, [platformName]);
   
   return null;
 });
@@ -79,13 +83,13 @@ const App = () => (
             <Route path="/auth/forgot-password" element={<ForgotPassword />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
-            <Route path="/cars/sale" element={<CarsForSale />} />
-            <Route path="/cars/rent" element={<CarsForRent />} />
-            <Route path="/cars/:id" element={<CarDetail />} />
             <Route path="/lottery" element={<Lottery />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/lottery/select" element={<LotterySelect />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/cars/sale" element={<CarsForSale />} />
+            <Route path="/cars/rent" element={<CarsForRent />} />
+            <Route path="/cars/:id" element={<CarDetail />} />
             <Route path="/saved-cars" element={<SavedCars />} />
 
             {/* User */}
@@ -98,6 +102,7 @@ const App = () => (
             <Route path="/admin/lottery" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLottery /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsers /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettings /></ProtectedRoute>} />
+            <Route path="/admin/cars" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCars /></ProtectedRoute>} />
 
             {/* Admin + Lottery Staff */}
             <Route path="/admin/lottery-payments" element={<ProtectedRoute allowedRoles={["admin", "lottery_staff"]}><LotteryPayments /></ProtectedRoute>} />
@@ -107,7 +112,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
       </SavedCarsProvider>
       </LanguageProvider>
       </AuthProvider>

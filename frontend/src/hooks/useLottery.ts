@@ -7,6 +7,7 @@ export interface Lottery {
   end_number: number;
   prize_text: string | null;
   prize_car_id: string | null;
+  prize_image_url?: string | null;
   ticket_price: number | string;
   status: 'active' | 'closed';
   created_at: string;
@@ -27,7 +28,8 @@ export interface LotteryPayment {
   receipt_url: string;
   method: 'CBE' | 'Telebirr';
   status: 'pending' | 'approved' | 'rejected';
-  ticket_number: number;
+  ticket_number?: number;
+  ticket_numbers?: number[] | null;
   rejection_reason?: string;
   created_at: string;
 }
@@ -46,6 +48,8 @@ export interface ProfileHistory {
     number: number;
     status: string;
     payment_status?: string | null;
+    rejection_reason?: string | null;
+    lottery_status?: string;
     date: string;
     prize: string;
   }>;
@@ -83,10 +87,17 @@ export const useCurrentLottery = () => {
   });
 };
 
-export const useLotteryNumbers = () => {
+export const useLotteryNumbers = (lotteryId?: string) => {
   return useQuery<any[]>({
-    queryKey: ['lottery', 'numbers'],
-    queryFn: () => apiFetch('/admin/lottery/numbers'),
+    queryKey: ['lottery', 'numbers', lotteryId],
+    queryFn: () => apiFetch(lotteryId ? `/admin/lottery/numbers?lottery_id=${lotteryId}` : '/admin/lottery/numbers'),
+  });
+};
+
+export const useLotteryHistory = () => {
+  return useQuery<any[]>({
+    queryKey: ['lottery', 'history'],
+    queryFn: () => apiFetch('/admin/lottery/history'),
   });
 };
 
@@ -115,7 +126,7 @@ export const useParticipateLottery = () => {
 export const useSubmitLotteryPayment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { lotteryNumberId: string; receiptUrl: string; method: string }) =>
+    mutationFn: (data: { lotteryNumberIds: string[]; receiptUrl: string; method: string }) =>
       apiFetch('/lottery/submit-payment', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -177,10 +188,11 @@ export const useRentCar = () => {
 export const useCreateLottery = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { start_number: number; end_number: number; prize_text: string; ticket_price: number }) =>
+    mutationFn: (data: FormData) =>
       apiFetch('/admin/lottery', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: data,
+        // When sending FormData, the browser automatically sets the correct Content-Type with boundary
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lottery', 'current'] });

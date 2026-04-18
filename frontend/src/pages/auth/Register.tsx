@@ -7,7 +7,8 @@ import { Header } from "@/components/Header";
 import { Eye, EyeOff, UserPlus, ShieldCheck, Mail, Lock, User, ArrowRight, Sparkles, CheckCircle, MailCheck, Car } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-
+import { useSettings } from "@/hooks/useSettings";
+import heroBg from "@/assets/hero-bg-lasers.png";
 import { cn } from "@/lib/utils";
 
 export default function Register() {
@@ -22,7 +23,13 @@ export default function Register() {
   
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { settings } = useSettings();
   const navigate = useNavigate();
+
+  const security = settings?.Security || {};
+  const minLength = security.minPasswordLength || 8;
+  const requireNumbers = security.requireNumbers !== false;
+  const requireUppercase = security.requireUppercase !== false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,9 +62,9 @@ export default function Register() {
   };
 
   const checks = [
-    { label: t("atLeast8"), ok: password.length >= 8 },
-    { label: t("containsNumber"), ok: /\d/.test(password) },
-    { label: t("containsUppercase"), ok: /[A-Z]/.test(password) },
+    { label: `At least ${minLength} characters`, ok: password.length >= minLength },
+    ...(requireNumbers ? [{ label: t("containsNumber"), ok: /\d/.test(password) }] : []),
+    ...(requireUppercase ? [{ label: t("containsUppercase"), ok: /[A-Z]/.test(password) }] : []),
   ];
 
   return (
@@ -169,7 +176,7 @@ export default function Register() {
                        <Input
                           id="email"
                           type="email"
-                          placeholder="identifier@drivehub.com"
+                          placeholder="identifier@gech.com"
                           className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}

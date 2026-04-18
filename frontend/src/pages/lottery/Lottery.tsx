@@ -24,21 +24,20 @@ export default function Lottery() {
     <PageShell>
       <div className="container mx-auto px-4 lg:px-8 pb-20">
         {/* Hero Section */}
-        <div className="relative text-center mb-12 sm:mb-24 py-12 sm:py-24 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl animate-fade-in-up border" style={{ background: 'linear-gradient(135deg, #071018 0%, #0a1929 50%, #071018 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
+        <div className="relative text-center mb-10 sm:mb-16 py-10 sm:py-16 rounded-[2.5rem] overflow-hidden shadow-sm animate-fade-in-up border border-border/60 bg-gradient-to-b from-white to-slate-50">
            <div className="absolute inset-0 z-0 pointer-events-none">
-             <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-48 -mt-48" style={{ background: 'radial-gradient(circle, rgba(76,191,191,0.18) 0%, transparent 70%)' }} />
-             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[130px] -ml-48 -mb-48" style={{ background: 'radial-gradient(circle, rgba(61,143,181,0.14) 0%, transparent 70%)' }} />
-             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(76,191,191,0.06) 0%, transparent 60%)' }} />
+             <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full blur-[100px] -mr-20 -mt-20 bg-primary/10" />
+             <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full blur-[100px] -ml-20 -mb-20 bg-emerald-500/10" />
            </div>
 
            <div className="relative z-10 flex flex-col items-center px-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-6 sm:mb-8 border" style={{ background: 'rgba(76,191,191,0.10)', borderColor: 'rgba(76,191,191,0.30)', color: '#4CBFBF' }}>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border bg-primary/5 text-primary border-primary/20">
                 <Sparkles className="h-3 w-3" /> {t("lotteryTagline")}
               </div>
-              <h1 className="text-3xl sm:text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.95] mb-6 sm:mb-8 uppercase max-w-4xl" style={{ textShadow: '0 4px 40px rgba(0,0,0,0.4)' }}>
+              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black text-slate-800 tracking-tighter leading-[0.95] mb-5 uppercase max-w-4xl shadow-sm" style={{ WebkitTextStroke: '1px rgba(0,0,0,0.05)' }}>
                 {t("lotteryTitle")}
               </h1>
-              <p className="max-w-xl mx-auto text-sm sm:text-lg font-medium leading-relaxed opacity-80" style={{ color: 'rgba(190,220,210,0.80)' }}>
+              <p className="max-w-xl mx-auto text-sm sm:text-base font-medium leading-relaxed text-slate-500">
                 {t("lotteryDesc")}
               </p>
            </div>
@@ -76,6 +75,17 @@ export default function Lottery() {
                <div className="lg:w-2/5 relative bg-slate-900 overflow-hidden min-h-[350px]">
                   <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900" />
                   
+                  {activeLottery.prize_image_url && (
+                    <div className="absolute inset-0">
+                      <img 
+                        src={activeLottery.prize_image_url} 
+                        className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[2000ms] ease-out" 
+                        alt="Prize" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                    </div>
+                  )}
+
                   {/* Neon Glow */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl opacity-50" />
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl opacity-50" />

@@ -49,6 +49,7 @@ CREATE TABLE cars (
     specs JSONB,
     location VARCHAR(255),
     contact_phone VARCHAR(50),
+    image_url TEXT,
     images JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
