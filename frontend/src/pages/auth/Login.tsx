@@ -93,7 +93,7 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1a2e 100%)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1a2e 100%)' }}>
       <Header />
       <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left Side: Cinematic Visuals */}
