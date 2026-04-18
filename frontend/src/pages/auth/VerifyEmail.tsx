@@ -95,11 +95,11 @@ export default function VerifyEmail() {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col" style={{ background: "linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)" }}>
+    <div className="h-screen overflow-hidden flex flex-col" style={{ background: "linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1a2e 100%)" }}>
       <Header />
       <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left cinematic panel */}
-        <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden" style={{ background: "linear-gradient(160deg, #0a1628 0%, #0d2e22 100%)" }}>
+        <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden" style={{ background: "linear-gradient(160deg, #0a1628 0%, #0d1b2e 100%)" }}>
           <img src={heroBg} alt="Background" className="absolute inset-0 w-full h-full object-cover opacity-55 scale-105" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.40) 50%, rgba(10,22,40,0.15) 100%)" }} />
           <div className="relative z-10 p-20 max-w-xl text-left">
