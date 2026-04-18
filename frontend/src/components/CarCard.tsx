@@ -125,63 +125,62 @@ export function CarCard({ car, view = "grid", isVisible = true, delay = 0 }: Car
   return (
     <Link
       to={`/cars/${car.id}`}
-      className={`group rounded-[2.5rem] overflow-hidden bg-card border border-border/60 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      className={`group rounded-2xl overflow-hidden bg-card border border-border/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
       style={{ transitionDelay: `${delay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
     >
-      <div className="relative aspect-[4/3] overflow-hidden group">
-        <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+      <div className="relative aspect-[16/10] overflow-hidden group">
+        <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
         
         {/* Overlay Gradients */}
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
            {!car.available ? (
-             <span className="bg-destructive/90 backdrop-blur-md text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg">
+             <span className="bg-destructive/90 backdrop-blur-md text-white text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-lg">
                 {car.type === "sale" ? t("sold") : t("rented")}
              </span>
            ) : (
-             <span className="bg-emerald-500/90 backdrop-blur-md text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-1.5">
-               <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+             <span className="bg-emerald-500/90 backdrop-blur-md text-white text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-1">
+               <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
                {t("available")}
              </span>
            )}
-           <span className="bg-white/20 backdrop-blur-md border border-white/10 text-white text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg w-fit">
+           <span className="bg-white/20 backdrop-blur-md border border-white/10 text-white text-[7px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.2em] shadow-lg w-fit">
               {t(car.type === "sale" ? "sale" : "rental")}
            </span>
         </div>
         <button
           type="button"
           onClick={handleToggleSave}
-          className={`absolute top-4 right-4 p-2.5 rounded-2xl backdrop-blur-md transition-all ${saved ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110" : "bg-black/20 text-white hover:bg-black/40 border border-white/10 hover:scale-105"}`}
+          className={`absolute top-3 right-3 p-2 rounded-xl backdrop-blur-md transition-all ${saved ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110" : "bg-black/20 text-white hover:bg-black/40 border border-white/10 hover:scale-105"}`}
         >
-          <FileText className={`h-4.5 w-4.5 ${saved ? "fill-current" : ""}`} strokeWidth={saved ? 0 : 2} />
+          <FileText className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} strokeWidth={saved ? 0 : 2} />
         </button>
       </div>
-      <div className="p-8">
+      <div className="p-5">
         <div className="flex items-start justify-between mb-2">
           <div>
-             <h3 className="font-black text-foreground text-xl tracking-tighter leading-none mb-1 group-hover:text-primary transition-colors">{car.name}</h3>
-             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Verified Year · {car.year}</p>
+             <h3 className="font-black text-foreground text-base tracking-tight leading-none mb-1 group-hover:text-primary transition-colors">{car.name}</h3>
+             <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">{car.year}</p>
           </div>
           <div className="text-right">
-             <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em] mb-1">Entry Price</p>
-             <p className="text-xl font-black text-foreground tabular-nums tracking-tighter leading-none">{car.priceLabel}</p>
+             <p className="text-base font-black text-foreground tabular-nums tracking-tight leading-none">{car.priceLabel}</p>
           </div>
         </div>
         
-        <div className="mt-6 flex items-center justify-between pt-6 border-t border-border/40">
-           <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground/60 uppercase">
-              <div className="flex items-center gap-1.5">
+        <div className="mt-4 flex items-center justify-between pt-4 border-t border-border/40">
+           <div className="flex items-center gap-3 text-[9px] font-bold text-muted-foreground/60 uppercase">
+              <div className="flex items-center gap-1">
                  <span className="w-1 h-1 rounded-full bg-primary" />
                  {car.mileage}
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                  <span className="w-1 h-1 rounded-full bg-primary" />
                  {car.transmission}
               </div>
            </div>
-           <div className="w-8 h-8 rounded-xl bg-primary/5 flex items-center justify-center text-primary border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all transform group-hover:rotate-12">
-              <ArrowRight className="h-4 w-4" strokeWidth={3} />
+           <div className="w-7 h-7 rounded-lg bg-primary/5 flex items-center justify-center text-primary border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all transform group-hover:rotate-12">
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={3} />
            </div>
         </div>
       </div>

@@ -28,8 +28,8 @@ function FlashcardStack() {
 
   return (
     <div
-      className="relative w-full max-w-[420px] mx-auto"
-      style={{ height: 460, perspective: 1200 }}
+      className="relative w-full max-w-[320px] mx-auto"
+      style={{ height: 380, perspective: 1200 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -69,8 +69,8 @@ function FlashcardStack() {
             {mockListings.map((car, i) => (
               <li key={i} className="px-6 py-3 flex items-center justify-between group/item hover:bg-white/[0.04] transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(76,191,191,0.12)" }}>
-                    <Car className="h-3.5 w-3.5 text-[#4CBFBF]" />
+                  <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(76,191,191,0.12)" }}>
+                    <Car className="h-3 w-3 text-[#4CBFBF]" />
                   </div>
                   <div>
                     <p className="text-[11px] font-bold text-white leading-none">{car.name}</p>
@@ -113,11 +113,11 @@ function FlashcardStack() {
             WebkitBackdropFilter: "blur(24px)",
             border: "1px solid rgba(255,255,255,0.18)",
             boxShadow: "none",
-            height: 310,
+            height: 250,
           }}
         >
           {/* Image area */}
-          <div className="relative h-[220px] overflow-hidden">
+          <div className="relative h-[170px] overflow-hidden">
             <img
               src={carGiftBow}
               alt="The Ultimate Gift – Luxury Car"
