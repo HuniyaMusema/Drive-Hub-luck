@@ -228,18 +228,18 @@ export default function Login() {
               </form>
 
               <div className="mt-6 pt-4 border-t border-slate-200 text-center">
-                 {registrationEnabled ? (
-                   <p className="text-sm font-medium text-slate-500">
-                      {t("noAccount")}{" "}
-                      <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2 text-[#4CBFBF]">
-                         {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
-                      </Link>
-                   </p>
-                 ) : (
-                   <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
-                      Registration is currently disabled
-                   </p>
-                 )}
+                 <p className="text-sm font-medium text-slate-500 mb-4">
+                    {t("noAccount")}
+                 </p>
+                 <Link to="/auth/register">
+                    <Button 
+                       type="button" 
+                       variant="outline"
+                       className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:bg-slate-50 border-slate-200 text-slate-700" 
+                    >
+                       {t("createOne")} <ArrowRight className="inline-block h-4 w-4 ml-2" strokeWidth={3} />
+                    </Button>
+                 </Link>
               </div>
            </div>
         </div>
