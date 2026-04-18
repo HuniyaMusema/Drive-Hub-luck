@@ -30,7 +30,7 @@ if (!fs.existsSync(uploadsDir)){
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: 'https://drivehub-theta.vercel.app',
   credentials: true,
 }));
 app.use(express.json());
@@ -62,6 +62,14 @@ app.use('/api/admin/logs', require('./routes/auditLogsRoutes'));
 // Basic route for testing
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Drive-Hub API' });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Drive-Hub backend is running',
+    time: new Date().toISOString()
+  });
 });
 
 const PORT = process.env.PORT || 5000;

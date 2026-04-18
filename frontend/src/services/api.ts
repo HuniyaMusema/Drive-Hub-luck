@@ -1,4 +1,4 @@
-export const API_BASE = '/api';
+export const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = sessionStorage.getItem('token');
