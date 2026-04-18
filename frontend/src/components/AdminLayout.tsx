@@ -62,7 +62,7 @@ function AdminSidebar() {
             to={item.url}
             className={cn(
               "flex items-center transition-all duration-200 group relative",
-              collapsed ? "justify-center p-0 h-11 w-11 rounded-xl mx-auto" : "gap-3 px-3 py-2.5 rounded-xl justify-start",
+              collapsed ? "justify-center p-2 h-10 w-10 rounded-xl mx-auto" : "gap-3 px-3 py-2.5 rounded-xl justify-start",
               isActive
                 ? "bg-[#4CBFBF]/15 text-white font-semibold"
                 : "text-white/55 hover:text-white hover:bg-white/8"
@@ -72,7 +72,8 @@ function AdminSidebar() {
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#4CBFBF]" />
             )}
             <item.icon className={cn(
-              "h-[18px] w-[18px] shrink-0 transition-colors",
+              "shrink-0 transition-colors",
+              collapsed ? "h-5 w-5" : "h-[18px] w-[18px]",
               isActive ? "text-[#4CBFBF]" : "text-white/40 group-hover:text-[#4CBFBF]"
             )} />
             {!collapsed && (
