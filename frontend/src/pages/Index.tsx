@@ -12,7 +12,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/services/api";
 import carGiftBow from "@/assets/car-gift-bow.png";
-import heroBg from "@/assets/hero-bg-lasers.png"; // New red laser background
+import heroBg from "@/assets/hero-night-car.jpg"; // Night car with dramatic lighting
 
 /* ─── Flashcard Stack – right panel ─── */
 const mockListings = [
@@ -166,16 +166,16 @@ function HeroSection() {
         <div className="absolute inset-0 flex">
           {/* Background image */}
           <div className="w-full h-full relative">
-            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" style={{ filter: "blur(1px) brightness(0.7)" }} />
+            <img src={heroBg} alt="Luxury Car at Night" className="w-full h-full object-cover object-center" style={{ filter: "brightness(0.6)" }} />
           </div>
         </div>
         {/* Directional overlay: dark on left (text), fades out toward right (cards) */}
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(to right, rgba(5,10,20,0.82) 0%, rgba(5,10,20,0.65) 40%, rgba(5,10,20,0.15) 70%, transparent 100%)"
+          background: "linear-gradient(to right, rgba(5,10,20,0.85) 0%, rgba(5,10,20,0.70) 40%, rgba(5,10,20,0.25) 70%, transparent 100%)"
         }} />
         {/* Bottom fade for polish */}
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(to top, rgba(5,10,20,0.4) 0%, transparent 30%)"
+          background: "linear-gradient(to top, rgba(5,10,20,0.5) 0%, transparent 30%)"
         }} />
       </div>
 
