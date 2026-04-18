@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { CheckCircle, AlertCircle, Loader2, MailCheck, ArrowRight, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import heroBg from "@/assets/hero-bg-lasers.png";
+
 
 type PageState = "verifying" | "success" | "expired" | "error";
 
@@ -100,7 +100,6 @@ export default function VerifyEmail() {
       <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left cinematic panel */}
         <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden" style={{ background: "linear-gradient(160deg, #0a1628 0%, #0d1b2e 100%)" }}>
-          <img src={heroBg} alt="Background" className="absolute inset-0 w-full h-full object-cover opacity-55 scale-105" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.40) 50%, rgba(10,22,40,0.15) 100%)" }} />
           <div className="relative z-10 p-20 max-w-xl text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border backdrop-blur-xl" style={{ background: "rgba(61,240,162,0.12)", borderColor: "rgba(61,240,162,0.25)", color: "#3df0a2" }}>

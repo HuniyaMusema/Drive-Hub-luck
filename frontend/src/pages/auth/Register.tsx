@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { Eye, EyeOff, UserPlus, ShieldCheck, Mail, Lock, User, ArrowRight, Sparkles, CheckCircle, MailCheck, Car } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import heroBg from "@/assets/hero-bg-lasers.png";
+
 import { cn } from "@/lib/utils";
 
 export default function Register() {
@@ -66,7 +66,6 @@ export default function Register() {
       <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left Side: Cinematic Onboarding */}
         <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden" style={{ background: 'linear-gradient(160deg, #0a1628 0%, #0d1b2e 100%)' }}>
-           <img src={heroBg} alt="Onboarding Visual" className="absolute inset-0 w-full h-full object-cover opacity-55 scale-105" />
            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.40) 50%, rgba(10,22,40,0.15) 100%)' }} />
            <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[130px] -mr-32 -mt-32" style={{ background: 'radial-gradient(circle, rgba(61,240,162,0.16) 0%, transparent 70%)' }} />
            
