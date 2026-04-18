@@ -4,22 +4,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Header } from "@/components/Header";
-import { Car, Eye, EyeOff, ShieldCheck, Sparkles, ArrowRight, Lock, Mail } from "lucide-react";
+import { Car, Eye, EyeOff, ShieldCheck, Sparkles, ArrowRight, Lock, Mail, MailCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/hooks/useSettings";
 import type { User } from "@/types/auth";
 import { useToast } from "@/hooks/use-toast";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/hero-bg-lasers.png";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
   const { setUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const [isLoading, setIsLoading] = useState(false);
+  const { settings } = useSettings();
+  const registrationEnabled = settings?.Security?.registrationEnabled !== false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +55,9 @@ export default function Login() {
         } else {
           navigate("/dashboard");
         }
+      } else if (response.status === 403 && data.requiresVerification) {
+        // Account exists but email is not verified yet
+        setUnverifiedEmail(data.email || email.toLowerCase().trim());
       } else {
         toast({ title: t("authAccessDenied"), description: data.message || t("authCredentialConflict"), variant: "destructive" });
       }
@@ -59,8 +68,32 @@ export default function Login() {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+    setResendLoading(true);
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: unverifiedEmail })
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        setResendSent(true);
+        toast({ title: "Email Sent", description: "A new verification link has been sent to your email." });
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to resend verification email.", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Network Error", description: "Failed to connect to the server.", variant: "destructive" });
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
-    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2820 100%)' }}>
       <Header />
       <div className="flex-1 flex flex-col lg:flex-row pt-16">
         {/* Left Side: Cinematic Visuals */}
@@ -118,7 +151,7 @@ export default function Login() {
                        <Input 
                           id="email" 
                           type="text" 
-                          placeholder="identifier@drivehub.com" 
+                          placeholder="identifier@gech.com" 
                           className="h-14 text-slate-900 rounded-2xl px-12 transition-all placeholder:text-slate-400 bg-slate-50 border-slate-200" 
                           value={email} 
                           onChange={(e) => setEmail(e.target.value)} 
@@ -131,7 +164,7 @@ export default function Login() {
                  <div className="space-y-2">
                     <div className="flex items-center justify-between ml-1">
                        <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-slate-600">{t("password")}</Label>
-                       <Link to="#" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: '#0d2e22' }}>{t("forgotPassword")}</Link>
+                       <Link to="/auth/forgot-password" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: '#0d2e22' }}>{t("forgotPassword")}</Link>
                     </div>
                     <div className="relative">
                        <Input 
@@ -154,6 +187,37 @@ export default function Login() {
                     </div>
                  </div>
 
+                  {/* Unverified Email Alert */}
+                  {unverifiedEmail && (
+                    <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50 animate-fade-in-up">
+                      <div className="flex items-start gap-3 text-left">
+                        <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-amber-200 text-amber-700">
+                          <MailCheck className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-black uppercase tracking-widest text-amber-800 mb-1">Unverified Account</p>
+                          <p className="text-xs text-amber-700 font-medium leading-relaxed mb-3">
+                            Please verify your link at <span className="font-bold underline">{unverifiedEmail}</span> to activate your access.
+                          </p>
+                          {!resendSent ? (
+                            <Button 
+                              type="button"
+                              onClick={handleResendVerification}
+                              disabled={resendLoading}
+                              className="h-8 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-600 hover:bg-amber-700 text-white border-0 shadow-sm"
+                            >
+                              {resendLoading ? "Sending..." : "Resend Verification Link"}
+                            </Button>
+                          ) : (
+                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-1">
+                              <Sparkles className="h-3 w-3" /> Resent Successfully
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                  <Button 
                     type="submit" 
                     className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 border-0 shadow-lg text-white" 
@@ -165,12 +229,18 @@ export default function Login() {
               </form>
 
               <div className="mt-6 pt-4 border-t border-slate-200 text-center">
-                 <p className="text-sm font-medium text-slate-500">
-                    {t("noAccount")}{" "}
-                    <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2" style={{ color: '#0d2e22' }}>
-                       {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
-                    </Link>
-                 </p>
+                 {registrationEnabled ? (
+                   <p className="text-sm font-medium text-slate-500">
+                      {t("noAccount")}{" "}
+                      <Link to="/auth/register" className="font-black uppercase tracking-widest text-xs hover:underline ml-2 text-[#4CBFBF]">
+                         {t("createOne")} <ArrowRight className="inline-block h-3 w-3 ml-1" strokeWidth={3} />
+                      </Link>
+                   </p>
+                 ) : (
+                   <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
+                      Registration is currently disabled
+                   </p>
+                 )}
               </div>
            </div>
         </div>

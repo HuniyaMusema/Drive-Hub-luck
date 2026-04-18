@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, X, Eye, ImageIcon, Loader2, CreditCard, Search, Clock, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { Check, X, Eye, ImageIcon, Loader2, CreditCard, Search, Clock, CheckCircle2, XCircle, RefreshCw, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -13,17 +13,17 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 type FilterType = "all" | "pending" | "approved" | "rejected";
 
-const statusConfig: Record<string, { icon: typeof Clock; label: string; className: string }> = {
-  pending:  { icon: Clock,        label: "Pending",  className: "bg-amber-400/10 text-[#f5b027] border-amber-400/20 shadow-sm" },
-  approved: { icon: CheckCircle2, label: "Approved", className: "bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20 shadow-sm" },
-  rejected: { icon: XCircle,      label: "Rejected", className: "bg-red-400/10 text-red-400 border-red-400/20 shadow-sm" },
+const statusConfig: Record<string, { icon: typeof Clock; labelKey: string; className: string }> = {
+  pending:  { icon: Clock,        labelKey: "lpPendingReview", className: "bg-amber-400/10 text-[#f5b027] border-amber-400/20 shadow-sm" },
+  approved: { icon: CheckCircle2, labelKey: "payApprove",       className: "bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20 shadow-sm" },
+  rejected: { icon: XCircle,      labelKey: "payReject",        className: "bg-red-400/10 text-red-400 border-red-400/20 shadow-sm" },
 };
 
-const filterTabs: { key: FilterType; label: string; color: string }[] = [
-  { key: "all",      label: "All",      color: "text-foreground" },
-  { key: "pending",  label: "Pending",  color: "text-amber-600" },
-  { key: "approved", label: "Approved", color: "text-green-600" },
-  { key: "rejected", label: "Rejected", color: "text-destructive" },
+const filterTabs: { key: FilterType; labelKey: string; color: string }[] = [
+  { key: "all",      labelKey: "payAll",            color: "text-foreground" },
+  { key: "pending",  labelKey: "lpPendingReview",   color: "text-amber-600" },
+  { key: "approved", labelKey: "payApprove",        color: "text-green-600" },
+  { key: "rejected", labelKey: "payReject",         color: "text-destructive" },
 ];
 
 export default function LotteryPayments() {
@@ -37,17 +37,21 @@ export default function LotteryPayments() {
   const [search, setSearch] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, formatDate } = useLanguage();
 
   const filtered = useMemo(() => {
     let list = filter === "all" ? payments : payments.filter(p => p.status === filter);
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter(p =>
-        p.user_name.toLowerCase().includes(q) ||
-        p.user_email.toLowerCase().includes(q) ||
-        p.ticket_number.toString().includes(q)
-      );
+      list = list.filter(p => {
+        const name = (p.user_name || "").toLowerCase();
+        const email = (p.user_email || "").toLowerCase();
+        const tickets = p.ticket_numbers || (p.ticket_number !== undefined ? [p.ticket_number] : []);
+        
+        return name.includes(q) || 
+               email.includes(q) || 
+               tickets.some((num: any) => num?.toString().includes(q));
+      });
     }
     return list;
   }, [payments, filter, search]);
@@ -75,11 +79,11 @@ export default function LotteryPayments() {
         reason: type === "reject" ? reason : undefined
       });
       toast({
-        title: type === "approve" ? "Payment Approved" : "Payment Rejected",
-        description: "The transaction has been processed successfully.",
+        title: type === "approve" ? t("paymentApprovedToast") : t("paymentRejectedToast"),
+        description: t("paymentProcessedToast"),
       });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     } finally {
       setActionDialog(null);
       setReason("");
@@ -139,7 +143,7 @@ export default function LotteryPayments() {
 
       {/* Filter Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {filterTabs.map(({ key }) => (
+        {filterTabs.map(({ key, labelKey }) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
@@ -148,7 +152,7 @@ export default function LotteryPayments() {
                 ? 'bg-[#4CBFBF] text-white border-[#4CBFBF] shadow-md'
                 : 'bg-white text-slate-500 border-slate-200 hover:border-[#4CBFBF]/40 hover:text-slate-900'}`}
           >
-            {key === 'all' ? t("payAll") : key === 'pending' ? t("lpPendingReview") : key === 'approved' ? t("payApprove") : t("payReject")}
+            {t(labelKey)}
             <span className={`px-1.5 py-0.5 rounded text-[9px] font-black tabular-nums ${filter === key ? 'bg-white/20' : 'bg-slate-100'}`}>
               {counts[key]}
             </span>
@@ -171,23 +175,27 @@ export default function LotteryPayments() {
             {/* Header row */}
             <div className="grid grid-cols-12 gap-3 px-6 py-4 bg-slate-50 text-xs font-black text-slate-400 uppercase tracking-widest">
               <div className="col-span-1">#</div>
-              <div className="col-span-4">{t("payUser")}</div>
-              <div className="col-span-2">{t("payMethod")}</div>
-              <div className="col-span-1">{t("payTicket")}</div>
+              <div className="col-span-2">{t("payUser")}</div>
+              <div className="col-span-1">{t("payMethod")}</div>
+              <div className="col-span-1">{t("payTickets")}</div>
+              <div className="col-span-2">{t("year")}</div>
               <div className="col-span-1">{t("payReceipt")}</div>
-              <div className="col-span-3">{t("payStatus")}</div>
+              <div className="col-span-4">{t("payStatus")}</div>
             </div>
 
             {filtered.map((p, i) => {
               const sc = statusConfig[p.status] || statusConfig.pending;
               const StatusIcon = sc.icon;
+              const ticketList = p.ticket_numbers || (p.ticket_number !== undefined ? [p.ticket_number] : []);
+              const ticketDisplay = ticketList.map((n: any) => n?.toString().padStart(3, '0') || '---').join(", ");
+
               return (
                 <div key={p.id} className="grid grid-cols-12 gap-3 px-6 py-5 items-center hover:bg-slate-50 transition-colors group">
                   {/* # */}
                   <div className="col-span-1 text-sm font-black text-slate-300 tabular-nums">{i + 1}</div>
 
                   {/* User */}
-                  <div className="col-span-4 flex items-center gap-3 min-w-0">
+                  <div className="col-span-2 flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-xl bg-[#4CBFBF]/10 flex items-center justify-center text-sm font-black text-[#4CBFBF] shrink-0 border border-[#4CBFBF]/20">
                       {p.user_name.charAt(0).toUpperCase()}
                     </div>
@@ -198,7 +206,7 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Method */}
-                  <div className="col-span-2">
+                  <div className="col-span-1">
                     <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase border whitespace-nowrap ${p.method === 'CBE' ? 'bg-blue-400/10 text-blue-400 border-blue-400/20' : 'bg-[#4CBFBF]/10 text-[#4CBFBF] border-[#4CBFBF]/20'}`}>
                       {p.method}
                     </span>
@@ -206,9 +214,16 @@ export default function LotteryPayments() {
 
                   {/* Ticket */}
                   <div className="col-span-1">
-                    <span className="font-black text-[#4CBFBF] tabular-nums text-xl tracking-tighter">
-                      {p.ticket_number.toString().padStart(3, '0')}
+                    <span className="font-black text-[#4CBFBF] tabular-nums text-sm truncate block" title={ticketDisplay}>
+                      {ticketList.length > 2 
+                        ? `${ticketList.slice(0, 2).map((n:any)=>n?.toString().padStart(3,'0') || '---').join(", ")} +${ticketList.length - 2}`
+                        : ticketDisplay || t("lpNoTickets")}
                     </span>
+                  </div>
+
+                  {/* Date */}
+                  <div className="col-span-2 text-[10px] font-black uppercase text-slate-500 tabular-nums">
+                    {(p as any).created_at ? formatDate((p as any).created_at) : '---'}
                   </div>
 
                   {/* Receipt */}
@@ -224,13 +239,13 @@ export default function LotteryPayments() {
                   </div>
 
                   {/* Status + Actions */}
-                  <div className="col-span-3 flex flex-col gap-2">
+                  <div className="col-span-4 flex flex-col gap-2">
                     <span className={`inline-flex items-center gap-1.5 w-fit text-xs font-black uppercase tracking-wide px-3 py-1.5 rounded-full border ${sc.className}`}>
                       <StatusIcon className="h-3.5 w-3.5" />
-                      {p.status === 'pending' ? t("lpPendingReview") : p.status === 'approved' ? t("payApprove") : t("payReject")}
+                      {t(sc.labelKey)}
                     </span>
                     {p.rejection_reason && (
-                      <p className="text-xs text-red-400 font-bold truncate max-w-full">"{p.rejection_reason}"</p>
+                      <p className="text-xs text-red-400 font-bold truncate max-w-full">"{t(p.rejection_reason)}"</p>
                     )}
                     {p.status === "pending" && (
                       <div className="flex gap-2">
@@ -261,9 +276,9 @@ export default function LotteryPayments() {
         )}
         {filtered.length > 0 && (
           <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 text-xs font-black uppercase tracking-widest text-slate-400 flex justify-between">
-            <span>Showing <span className="text-slate-900">{filtered.length}</span> of <span className="text-slate-900">{payments.length}</span> payments</span>
+            <span>{t("lpShowingPayments", { count: filtered.length, total: payments.length })}</span>
             {(search || filter !== "all") && (
-              <button onClick={() => { setSearch(""); setFilter("all"); }} className="text-[#4CBFBF] hover:text-[#3fb0b0] font-black">{t("lpClearFilters") || "Clear filters"}</button>
+              <button onClick={() => { setSearch(""); setFilter("all"); }} className="text-[#4CBFBF] hover:text-[#3fb0b0] font-black">{t("lpClearFilters")}</button>
             )}
           </div>
         )}
@@ -276,7 +291,7 @@ export default function LotteryPayments() {
             {previewUrl && <img src={previewUrl} alt="Receipt proof" className="w-full h-auto max-h-[70vh] object-contain rounded-2xl" />}
           </div>
           <div className="p-5 bg-white border-t border-slate-100 flex justify-center">
-            <Button className="rounded-2xl h-12 px-10 font-black uppercase text-[11px] tracking-widest bg-slate-50 border border-slate-200 text-slate-900 hover:bg-slate-100" onClick={() => setPreviewUrl(null)}>Close Viewer</Button>
+            <Button className="rounded-2xl h-12 px-10 font-black uppercase text-[11px] tracking-widest bg-slate-50 border border-slate-200 text-slate-900 hover:bg-slate-100" onClick={() => setPreviewUrl(null)}>{t("closeViewerBtn")}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -287,59 +302,59 @@ export default function LotteryPayments() {
           <DialogHeader className="pt-2">
             <DialogTitle className={`text-2xl font-black flex items-center gap-4 tracking-tighter uppercase ${actionDialog?.type === "reject" ? "text-red-500" : "text-[#4CBFBF]"}`}>
               {actionDialog?.type === "approve" ? <CheckCircle2 className="h-8 w-8" /> : <XCircle className="h-8 w-8" />}
-              {actionDialog?.type === "approve" ? "Confirm Approval" : "Reject Transaction"}
+              {actionDialog?.type === "approve" ? t("confirmApprovalTitle") : t("rejectTransactionTitle")}
             </DialogTitle>
           </DialogHeader>
           <div className="py-8">
             {actionDialog?.type === "reject" ? (
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Reason for Rejection</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">{t("reasonForRejection")}</Label>
                 {/* Quick-select preset reasons */}
                 <div className="flex flex-wrap gap-2">
                   {[
-                    "Screenshot is blurry or unreadable",
-                    "Transaction reference not found",
-                    "Wrong amount transferred",
-                    "Receipt appears to be edited",
-                    "Payment sent to wrong account",
-                    "Duplicate submission",
-                  ].map((preset) => (
+                    "reasonBlurry",
+                    "reasonNoRef",
+                    "reasonWrongAmount",
+                    "reasonEdited",
+                    "reasonWrongAccount",
+                    "reasonDuplicate",
+                  ].map((presetKey) => (
                     <button
-                      key={preset}
+                      key={presetKey}
                       type="button"
-                      onClick={() => setReason(preset)}
+                      onClick={() => setReason(presetKey)}
                       className={`text-[9px] font-black uppercase tracking-wide px-3 py-1.5 rounded-xl border transition-all ${
-                        reason === preset
+                        reason === presetKey
                           ? "bg-red-500 text-white border-red-500"
                           : "bg-slate-50 text-slate-500 border-slate-200 hover:border-red-300 hover:text-red-500"
                       }`}
                     >
-                      {preset}
+                      {t(presetKey)}
                     </button>
                   ))}
                 </div>
                 <Textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="Or type a custom reason..."
+                  placeholder={t("customReason")}
                   className="rounded-2xl border-slate-200 bg-slate-50 min-h-[80px] focus:ring-[#4CBFBF]/20 text-slate-900 font-black text-sm p-4 placeholder:text-slate-300"
                 />
               </div>
             ) : (
               <p className="text-slate-500 text-sm font-black uppercase tracking-widest leading-relaxed">
-                Approve this payment to confirm the lottery ticket. The number will be permanently locked to the user.
+                {t("approvePaymentDesc")}
               </p>
             )}
           </div>
           <DialogFooter className="flex flex-col gap-3">
-             <Button
+            <Button
               className={`w-full h-16 rounded-2xl shadow-xl font-black uppercase text-[11px] tracking-[0.2em] ${actionDialog?.type === "reject" ? "bg-red-500 hover:bg-red-600 text-white shadow-red-500/20" : "bg-[#4CBFBF] hover:bg-[#3fb0b0] text-white shadow-[#4CBFBF]/20"}`}
               onClick={handleAction}
               disabled={verifyMutation.isPending || (actionDialog?.type === "reject" && !reason.trim())}
             >
-              {verifyMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-3" />Processing…</> : (actionDialog?.type === "approve" ? "Verify Now" : "Confirm Rejection")}
+              {verifyMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-3" />{t("processing")}</> : (actionDialog?.type === "approve" ? t("verifyNowBtn") : t("confirmRejectionBtn"))}
             </Button>
-            <Button variant="ghost" className="w-full h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:bg-slate-50" onClick={() => { setActionDialog(null); setReason(""); }}>Cancel</Button>
+            <Button variant="ghost" className="w-full h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:bg-slate-50" onClick={() => { setActionDialog(null); setReason(""); }}>{t("cancelBtn")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

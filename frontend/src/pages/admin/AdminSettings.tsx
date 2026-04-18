@@ -40,22 +40,18 @@ interface SecuritySettings {
 
 interface LotterySettings {
   moduleEnabled: boolean;
-  ticketPrice: number;
   maxTicketsPerUser: number;
   drawFrequency: string;
   numberRangeMin: number;
   numberRangeMax: number;
   autoCloseMinutes: number;
   staffPaymentVerification: boolean;
-  staffNumberGeneration: boolean;
   adminOverride: boolean;
 }
 
 interface OperationalSettings {
   platformEnabled: boolean;
   lotteryModuleEnabled: boolean;
-  salesModuleEnabled: boolean;
-  rentalsModuleEnabled: boolean;
   maintenanceMessage: string;
 }
 
@@ -71,7 +67,7 @@ interface BackupSettings {
 }
 
 const defaultGeneral: GeneralSettings = {
-  platformName: "Drive Hub",
+  platformName: "Gech",
   defaultCurrency: "ETB",
   defaultLanguage: "en",
   timezone: "Africa/Addis_Ababa",
@@ -89,22 +85,18 @@ const defaultSecurity: SecuritySettings = {
 
 const defaultLottery: LotterySettings = {
   moduleEnabled: true,
-  ticketPrice: 200,
   maxTicketsPerUser: 5,
   drawFrequency: "manual",
   numberRangeMin: 1,
   numberRangeMax: 100,
   autoCloseMinutes: 30,
   staffPaymentVerification: true,
-  staffNumberGeneration: true,
   adminOverride: true,
 };
 
 const defaultOperational: OperationalSettings = {
   platformEnabled: true,
   lotteryModuleEnabled: true,
-  salesModuleEnabled: true,
-  rentalsModuleEnabled: true,
   maintenanceMessage: "",
 };
 
@@ -122,7 +114,7 @@ const defaultBackup: BackupSettings = {
 export default function AdminSettings() {
   const { toast } = useToast();
   const { settings, updateSetting, isLoading: settingsLoading } = useSettings();
-  const { t, setLanguage } = useLanguage();
+  const { t, setLanguage, formatDate } = useLanguage();
   const { data: auditLogs = [], isLoading: logsLoading } = useAuditLogs();
   const { data: backups = [], isLoading: backupsLoading } = useBackups();
   const createBackupMutation = useCreateBackup();
@@ -356,11 +348,9 @@ export default function AdminSettings() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[
                     { label: t("adminLotteryEngine"), desc: t("adminToggleTicketing"), key: "lotteryModuleEnabled" },
-                    { label: "Sales Engine", desc: "Toggle Vehicle Sales", key: "salesModuleEnabled" },
-                    { label: "Rental Engine", desc: "Toggle Vehicle Rentals", key: "rentalsModuleEnabled" }
                   ].map((item) => (
                     <div key={item.key} className="flex items-center justify-between p-8 rounded-[2rem] bg-slate-50 border border-slate-200 hover:border-[#4CBFBF]/40 transition-all group/toggle">
                        <div>
@@ -399,51 +389,66 @@ export default function AdminSettings() {
             <div className="bg-white rounded-[3rem] p-12 border border-slate-200 shadow-xl shadow-slate-100 relative overflow-hidden group">
               <SectionHeader icon={Lock} title={t("securityAccess")} desc={t("adminSecurityDesc")} color="text-[#f5b027]" />
               
-              <div className="space-y-10">
-                <div className="flex items-center justify-between p-10 rounded-[2.5rem] bg-slate-50 border border-slate-200 group/security hover:bg-slate-100 transition-all shadow-sm">
+              <div className="space-y-6">
+                {/* Registration toggle */}
+                <div className="flex items-center justify-between p-8 rounded-[2rem] bg-slate-50 border border-slate-200 group/security hover:bg-slate-100 transition-all shadow-sm">
                   <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-2xl bg-[#f5b027]/10 flex items-center justify-center text-[#f5b027] group-hover/security:scale-110 transition-transform border border-[#f5b027]/20 shadow-sm">
-                      <UserPlus className="h-8 w-8" />
+                    <div className="w-14 h-14 rounded-2xl bg-[#f5b027]/10 flex items-center justify-center text-[#f5b027] group-hover/security:scale-110 transition-transform border border-[#f5b027]/20 shadow-sm">
+                      <UserPlus className="h-7 w-7" />
                     </div>
                     <div>
-                      <p className="text-xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-1.5">{t("enableRegistration")}</p>
+                      <p className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none mb-1">{t("enableRegistration")}</p>
                       <p className="text-[10px] uppercase font-black tracking-widest text-slate-500">{t("registrationDesc")}</p>
                     </div>
                   </div>
                   <Switch checked={security.registrationEnabled} onCheckedChange={(v) => setSecurity({ ...security, registrationEnabled: v })} className="data-[state=checked]:bg-[#4CBFBF]" />
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-6">
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">{t("minPasswordLength")}</Label>
-                    <Input type="number" min={6} className="rounded-2xl h-14 bg-slate-50 border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-6 tabular-nums shadow-sm" value={security.minPasswordLength} onChange={(e) => setSecurity({ ...security, minPasswordLength: Number(e.target.value) })} />
+                </div>
+
+                {/* Password & session inputs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">{t("minPasswordLength")}</Label>
+                    <Input 
+                      type="text" 
+                      inputMode="numeric"
+                      className="rounded-xl h-12 bg-white border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-4 tabular-nums shadow-sm" 
+                      value={security.minPasswordLength} 
+                      onChange={(e) => setSecurity({ ...security, minPasswordLength: e.target.value.replace(/\D/g, "") as any })} 
+                    />
                   </div>
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">{t("sessionTimeout")} (min)</Label>
-                    <Input type="number" min={5} className="rounded-2xl h-14 bg-slate-50 border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-6 tabular-nums shadow-sm" value={security.sessionTimeout} onChange={(e) => setSecurity({ ...security, sessionTimeout: Number(e.target.value) })} />
+                  <div className="space-y-3 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">{t("sessionTimeout")} (min)</Label>
+                    <Input 
+                      type="text" 
+                      inputMode="numeric"
+                      className="rounded-xl h-12 bg-white border-slate-200 focus:ring-[#f5b027]/20 font-black text-slate-900 px-4 tabular-nums shadow-sm" 
+                      value={security.sessionTimeout} 
+                      onChange={(e) => setSecurity({ ...security, sessionTimeout: e.target.value.replace(/\D/g, "") as any })} 
+                    />
                   </div>
                 </div>
 
-                </div>
-
-                <div className="space-y-4 pt-8">
+                {/* Toggle switches */}
+                <div className="space-y-3">
                   {[
                     { label: t("requireUppercase"), desc: t("uppercaseDesc"), key: "requireUppercase" },
                     { label: t("requireNumbers"), desc: t("numbersDesc"), key: "requireNumbers" },
                     { label: t("allowMultiLogin"), desc: t("multiLoginDesc"), key: "multiLoginEnabled" }
                   ].map((item) => (
-                    <div key={item.key} className="flex items-center justify-between p-8 rounded-[2rem] border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all group/toggle">
-                       <div>
-                         <p className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none mb-1.5">{item.label}</p>
-                         <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest leading-relaxed">{item.desc}</p>
-                       </div>
-                       <Switch checked={(security as any)[item.key]} onCheckedChange={(v) => setSecurity({ ...security, [item.key]: v })} className="data-[state=checked]:bg-[#4CBFBF]" />
+                    <div key={item.key} className="flex items-center justify-between p-6 rounded-[2rem] border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all">
+                      <div>
+                        <p className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none mb-1">{item.label}</p>
+                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{item.desc}</p>
+                      </div>
+                      <Switch checked={(security as any)[item.key]} onCheckedChange={(v) => setSecurity({ ...security, [item.key]: v })} className="data-[state=checked]:bg-[#4CBFBF]" />
                     </div>
                   ))}
                 </div>
               </div>
 
-               <div className="mt-14 flex justify-end">
-                <Button onClick={() => save("Security", security, t("security"))} className="rounded-2xl h-16 px-12 font-black uppercase text-[11px] tracking-[0.25em] shadow-xl shadow-[#4CBFBF]/10 bg-[#4CBFBF] text-white hover:bg-[#3fb0b0] border-0 transition-all hover:scale-105 active:scale-95" disabled={updateSetting.isPending}>
-                  <Save className="h-5 w-5 mr-4" /> {t("saveGeneralSettings")}
+              <div className="mt-10 flex justify-end">
+                <Button onClick={() => save("Security", security, t("security"))} className="rounded-2xl h-14 px-10 font-black uppercase text-[11px] tracking-[0.25em] shadow-xl shadow-[#4CBFBF]/10 bg-[#4CBFBF] text-white hover:bg-[#3fb0b0] border-0 transition-all hover:scale-105 active:scale-95" disabled={updateSetting.isPending}>
+                  <Save className="h-5 w-5 mr-3" /> {t("saveGeneralSettings")}
                 </Button>
               </div>
             </div>
@@ -454,18 +459,16 @@ export default function AdminSettings() {
             <div className="bg-white rounded-[3rem] p-12 border border-slate-200 shadow-xl shadow-slate-100 relative overflow-hidden group">
               <SectionHeader icon={Ticket} title={t("lotteryConfiguration")} desc={t("adminLotteryDesc")} color="text-[#f5b027]" />
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="space-y-4 p-8 bg-[#f5b027]/10 rounded-[2.5rem] border border-[#f5b027]/20 shadow-sm">
-                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#f5b027] mb-1 block leading-none">{t("ticketPrice")}</Label>
-                  <div className="relative">
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 font-black text-[#f5b027] text-3xl">ETB</span>
-                    <Input type="number" className="pl-16 h-16 bg-transparent border-none text-4xl font-black tabular-nums focus-visible:ring-0 text-slate-900 shadow-none placeholder:text-[#f5b027]/20" value={lottery.ticketPrice} onChange={(e) => setLottery({ ...lottery, ticketPrice: Number(e.target.value) })} />
-                  </div>
-                </div>
-                
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4 p-8 bg-slate-50 rounded-[2.5rem] border border-slate-200 shadow-sm">
                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1 block leading-none">{t("adminMaxTicketsPerUser")}</Label>
-                   <Input type="number" className="h-14 bg-transparent border-none font-black tabular-nums text-4xl text-slate-900 px-0 w-full focus-visible:ring-0" value={lottery.maxTicketsPerUser} onChange={(e) => setLottery({ ...lottery, maxTicketsPerUser: Number(e.target.value) })} />
+                   <Input 
+                     type="text" 
+                     inputMode="numeric"
+                     className="h-14 bg-transparent border-none font-black tabular-nums text-4xl text-slate-900 px-0 w-full focus-visible:ring-0" 
+                     value={lottery.maxTicketsPerUser} 
+                     onChange={(e) => setLottery({ ...lottery, maxTicketsPerUser: e.target.value.replace(/\D/g, "") as any })} 
+                   />
                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest leading-none">{t("perDrawLimit")}</p>
                 </div>
 
@@ -482,25 +485,27 @@ export default function AdminSettings() {
                 </div>
               </div>
 
-              <div className="mt-14 space-y-6">
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] px-2">{t("staffPermissions")}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="mt-10 space-y-4">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em]">{t("staffPermissions")}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { label: t("staffCanVerify"), key: "staffPaymentVerification" },
-                    { label: t("staffCanGenerate"), key: "staffNumberGeneration" },
-                    { label: t("adminCanOverride"), key: "adminOverride" }
+                    { label: t("staffCanVerify"), desc: t("paymentVerificationPerm"), key: "staffPaymentVerification" },
+                    { label: t("adminCanOverride"), desc: t("adminOverridePerm"), key: "adminOverride" }
                   ].map((item) => (
-                    <div key={item.key} className="flex items-center justify-between p-8 rounded-[2rem] border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all group/perm">
-                      <p className="text-xs font-black text-slate-900 uppercase tracking-widest">{item.label}</p>
+                    <div key={item.key} className="flex items-center justify-between p-6 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all">
+                      <div>
+                        <p className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none mb-1">{item.label}</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.desc}</p>
+                      </div>
                       <Switch checked={(lottery as any)[item.key]} onCheckedChange={(v) => setLottery({ ...lottery, [item.key]: v })} className="data-[state=checked]:bg-[#4CBFBF]" />
                     </div>
                   ))}
                 </div>
               </div>
 
-               <div className="mt-14 flex justify-end">
-                <Button onClick={() => save("Lottery", lottery, t("lottery"))} className="rounded-2xl h-16 px-12 font-black uppercase text-[11px] tracking-[0.25em] shadow-xl shadow-[#4CBFBF]/10 bg-[#4CBFBF] text-white hover:bg-[#3fb0b0] border-0 transition-all hover:scale-105 active:scale-95" disabled={updateSetting.isPending}>
-                  <Save className="h-5 w-5 mr-4" /> {t("saveGeneralSettings")}
+              <div className="mt-10 flex justify-end">
+                <Button onClick={() => save("Lottery", lottery, t("lottery"))} className="rounded-2xl h-14 px-10 font-black uppercase text-[11px] tracking-[0.25em] shadow-xl shadow-[#4CBFBF]/10 bg-[#4CBFBF] text-white hover:bg-[#3fb0b0] border-0 transition-all hover:scale-105 active:scale-95" disabled={updateSetting.isPending}>
+                  <Save className="h-5 w-5 mr-3" /> {t("saveGeneralSettings")}
                 </Button>
               </div>
             </div>
@@ -648,7 +653,9 @@ export default function AdminSettings() {
                       <div className="p-8 rounded-[2.5rem] border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-all hover:shadow-xl hover:border-[#f5b027]/20 shadow-sm group-hover/log:-translate-y-1">
                         <div className="flex items-center justify-between mb-4">
                           <p className="text-lg font-black text-slate-900 uppercase tracking-tighter group-hover/log:text-[#f5b027] transition-colors leading-none">{log.action_type}</p>
-                          <span className="text-[10px] font-black text-slate-500 tabular-nums bg-white px-4 py-1.5 rounded-full uppercase tracking-widest border border-slate-200">{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span className="text-[10px] font-black text-slate-500 tabular-nums bg-white px-4 py-1.5 rounded-full uppercase tracking-widest border border-slate-200">
+                            {formatDate(log.timestamp, { hour: '2-digit', minute: '2-digit' })}
+                          </span>
                         </div>
                         <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-6">
                           <span className="text-slate-900">{log.user_name}</span> {t("performedActionFromIp")} <span className="text-[#f5b027]">{log.details?.ip || t("unknown")}</span>
@@ -659,7 +666,7 @@ export default function AdminSettings() {
                            </pre>
                         </div>
                         <p className="text-[9px] text-right mt-4 text-slate-600 font-black tracking-[0.3em] tabular-nums uppercase">
-                          {new Date(log.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {formatDate(log.timestamp)}
                         </p>
                       </div>
                     </div>

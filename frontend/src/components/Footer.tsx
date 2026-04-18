@@ -9,27 +9,22 @@ export function Footer() {
 
   const operational = settings?.Operational || {};
   const isLotteryEnabled = operational.lotteryModuleEnabled !== false;
-  const isSalesEnabled = operational.salesModuleEnabled !== false;
-  const isRentalsEnabled = operational.rentalsModuleEnabled !== false;
 
   const quickLinks = [
-    { label: t("carsForSale"), href: "/cars/sale", enabled: isSalesEnabled },
-    { label: t("carsForRent"), href: "/cars/rent", enabled: isRentalsEnabled },
+    { label: t("carsForSale"), href: "/cars/sale", enabled: true },
+    { label: t("carsForRent"), href: "/cars/rent", enabled: true },
     { label: t("lottery"), href: "/lottery", enabled: isLotteryEnabled },
     { label: t("contact"), href: "/contact", enabled: true },
   ].filter(l => l.enabled);
 
   return (
-    <footer className="border-t" style={{ background: 'linear-gradient(180deg, #1a2e45 0%, #142338 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
+    <footer className="border-t" style={{ background: 'linear-gradient(180deg, #334155 0%, #1e293b 100%)', borderColor: 'rgba(76,191,191,0.15)' }}>
       <div className="container mx-auto px-4 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center justify-start mb-6 hover:opacity-80 transition-opacity gap-2">
               <span className="text-[24px] font-display tracking-widest leading-[1.2] capitalize text-white">
-                Gech
-              </span>
-              <span className="text-[20px] font-display leading-[1.2]" style={{ color: '#4CBFBF' }}>
-                (ጌች)
+                {settings?.General?.platformName || "Gech"}
               </span>
             </Link>
             <p className="text-xs leading-relaxed max-w-sm tracking-wide text-white/55">
@@ -88,7 +83,7 @@ export function Footer() {
         </div>
 
         <div className="mt-16 pt-8 text-center text-[10px] font-bold uppercase tracking-widest text-white/35" style={{ borderTop: '1px solid rgba(76,191,191,0.12)' }}>
-          © {new Date().getFullYear()} Gech (ጌች). {t("allRightsReserved")}
+          © {new Date().getFullYear()} {settings?.General?.platformName || "Gech"}. {t("allRightsReserved")}
         </div>
       </div>
     </footer>

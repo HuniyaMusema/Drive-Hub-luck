@@ -2,11 +2,13 @@ import { useParams, Link } from "react-router-dom";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { useCars } from "@/hooks/useCars";
-import { ArrowLeft, Fuel, Gauge, Settings2, Users, Calendar, CheckCircle2, Heart } from "lucide-react";
+import { ArrowLeft, Fuel, Gauge, Settings2, Users, Calendar, CheckCircle2, Heart, MessageSquare, Phone, MapPin, Info } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useSettings } from "@/hooks/useSettings";
+import { cn } from "@/lib/utils";
 
 export default function CarDetail() {
   const { id } = useParams();
@@ -16,6 +18,11 @@ export default function CarDetail() {
   const { isSaved, toggleSave } = useSavedCars();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { settings } = useSettings();
+
+  const phone = settings?.General?.contactPhone || "+251911701849";
+  const address = settings?.General?.physicalAddress || "Jemo3 beside Taf gas station";
+
 
 
   const saved = car ? isSaved(car.id) : false;
@@ -102,7 +109,7 @@ export default function CarDetail() {
               {car.available ? (
                 <Link to="/contact" className="flex-1 min-w-[160px]">
                   <Button size="xl" className="w-full">
-                    <CheckCircle2 className="h-5 w-5 mr-1" /> {car.type === "sale" ? t("contactToBuy") : t("bookRental")}
+                    <CheckCircle2 className="h-5 w-5 mr-1" /> {car.type === "sale" ? t("contactToBuy") : t("contactForRental")}
                   </Button>
                 </Link>
               ) : (
@@ -119,10 +126,61 @@ export default function CarDetail() {
                 <Heart className={`h-5 w-5 ${saved ? "fill-current" : ""}`} />
               </Button>
             </div>
+
+            {/* Inquiry Portal Section */}
+            <div className="mt-10 p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-inner">
+               <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                     <Info className="h-4 w-4" />
+                  </div>
+                  <h3 className="font-bold text-slate-800 uppercase tracking-widest text-xs">{t("inquiryPortal")}</h3>
+               </div>
+               
+               <p className="text-xs text-slate-500 leading-relaxed mb-6 italic">
+                  "{t("catalogDisclaimer")}"
+               </p>
+
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a href={`tel:${phone}`} className="flex-1">
+                    <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl border-slate-200 hover:bg-white hover:border-primary transition-all">
+                       <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                          <Phone className="h-4 w-4" />
+                       </div>
+                       <div className="text-left">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">{t("callForDetails")}</p>
+                          <p className="text-xs font-bold text-slate-700 leading-none">{phone}</p>
+                       </div>
+                    </Button>
+                  </a>
+                  
+                  <a href={`https://wa.me/${phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1">
+                    <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl border-slate-200 hover:bg-white hover:border-primary transition-all">
+                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                          <MessageSquare className="h-4 w-4" />
+                       </div>
+                       <div className="text-left">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">{t("chatOnWhatsApp")}</p>
+                          <p className="text-xs font-bold text-slate-700 leading-none">WhatsApp</p>
+                       </div>
+                    </Button>
+                  </a>
+
+                  <div className="sm:col-span-2">
+                    <div className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200">
+                       <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600">
+                          <MapPin className="h-4 w-4" />
+                       </div>
+                       <div className="text-left">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">{t("visitOffice")}</p>
+                          <p className="text-xs font-bold text-slate-700 leading-none">{address}</p>
+                       </div>
+                    </div>
+                  </div>
+               </div>
+            </div>
           </div>
         </div>
-
-</div>
+      </div>
     </PageShell>
   );
 }

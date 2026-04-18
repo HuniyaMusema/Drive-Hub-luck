@@ -48,7 +48,7 @@ export default function AdminUsers() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
-  const { t } = useLanguage();
+  const { t, formatDate } = useLanguage();
   
   const filtered = useMemo(() => {
     return users.filter((u) => {
@@ -83,9 +83,9 @@ export default function AdminUsers() {
     } else {
         try {
           await updateStatusMutation.mutateAsync({ id: user.id, status: 'active' });
-          toast({ title: t("adminAccountActivated"), description: `${user.name}${t("adminAccountActivatedDesc")}` });
+          toast({ title: t("adminAccountActivated"), description: t("adminAccountActivatedDesc", { name: user.name }) });
         } catch (err: any) {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
+        toast({ title: t("toastError"), description: err.message, variant: "destructive" });
       }
     }
   };
@@ -101,7 +101,7 @@ export default function AdminUsers() {
         toast({ title: t("adminUserSuspended"), description: t("adminAccountRevoked") });
         setSuspensionDialog({ isOpen: false, userId: null, name: "" });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -110,7 +110,7 @@ export default function AdminUsers() {
       await deleteUserMutation.mutateAsync(userId);
       toast({ title: t("adminUserDeleted"), description: t("adminAccountRemoved") });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
   const handleAddStaff = async () => {
@@ -247,19 +247,17 @@ export default function AdminUsers() {
                         </div>
                       </div>
                     </td>
-                     <td className="px-8 py-6">
-                      <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full border shadow-sm transition-all ${
-                         u.role === 'admin' ? "bg-purple-400/10 text-purple-400 border-purple-400/20" :
-                        u.role === 'lottery_staff' ? "bg-[#f5b027]/10 text-[#f5b027] border-[#f5b027]/20" :
-                        "bg-slate-100 text-slate-500 border-slate-200"
+                    <td className="px-8 py-6">
+                      <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${
+                         u.role === 'admin' ? "text-purple-400" :
+                        u.role === 'lottery_staff' ? "text-[#f5b027]" :
+                        "text-slate-400"
                       }`}>
-                        <span className="flex items-center gap-2">
-                          <Shield className="h-2.5 w-2.5" />
-                          {u.role === 'admin' ? t("admin") :
-                           u.role === 'lottery_staff' ? t("lotteryStaff") :
-                           t("user")}
-                        </span>
-                      </span>
+                        <Shield className="h-3.5 w-3.5 opacity-70" />
+                        {u.role === 'admin' ? t("admin") :
+                         u.role === 'lottery_staff' ? t("lotteryStaff") :
+                         t("user")}
+                      </div>
                     </td>
                      <td className="px-8 py-6">
                       <div className="flex flex-col gap-1.5">
@@ -270,15 +268,15 @@ export default function AdminUsers() {
                         </span>
                         {u.status === 'suspended' && u.suspension_reason && (
                           <p className="text-[10px] text-red-400/70 italic truncate max-w-[150px] mt-1 uppercase tracking-tighter">
-                            "{u.suspension_reason}"
+                            "{t(u.suspension_reason)}"
                           </p>
                         )}
                       </div>
                     </td>
-                     <td className="px-8 py-6">
+                      <td className="px-8 py-6">
                        <div className="flex items-center gap-2 text-slate-500 text-xs font-black tabular-nums uppercase">
                          <Calendar className="h-3.5 w-3.5 opacity-40" />
-                         {new Date(u.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                         {formatDate(u.created_at)}
                        </div>
                     </td>
                      <td className="px-8 py-6 text-right">
@@ -356,11 +354,31 @@ export default function AdminUsers() {
 </DialogHeader>
 <div className="py-8 space-y-4">
 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-2">{t("suspensionReason")}</Label>
+<div className="flex flex-wrap gap-2 mb-2">
+  {[
+    "reasonSuspicious",
+    "reasonTermViolation",
+    "reasonDuplicate"
+  ].map((presetKey) => (
+    <button
+      key={presetKey}
+      type="button"
+      onClick={() => setSuspensionReason(presetKey)}
+      className={`text-[9px] font-black uppercase tracking-wide px-3 py-1.5 rounded-xl border transition-all ${
+        suspensionReason === presetKey
+          ? "bg-[#f5b027] text-white border-[#f5b027]"
+          : "bg-slate-50 text-slate-500 border-slate-200 hover:border-[#f5b027] hover:text-[#f5b027]"
+      }`}
+    >
+      {t(presetKey)}
+    </button>
+  ))}
+</div>
 <Textarea 
 placeholder={t("adminSuspensionReasonPlaceholder")} 
 value={suspensionReason}
 onChange={(e) => setSuspensionReason(e.target.value)}
-className="rounded-2xl border-slate-200 bg-slate-50 min-h-[120px] p-6 text-xs font-bold leading-relaxed focus:ring-[#f5b027]/20 text-slate-900 placeholder:text-slate-400"
+className="rounded-2xl border-slate-200 bg-slate-50 min-h-[100px] p-6 text-xs font-bold leading-relaxed focus:ring-[#f5b027]/20 text-slate-900 placeholder:text-slate-400"
 />
 </div>
 <DialogFooter className="flex-row gap-4 mt-2">
@@ -406,7 +424,7 @@ className="flex-1 rounded-2xl h-14 font-black uppercase text-[10px] tracking-wid
               <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 ml-2"><Mail className="h-3 w-3 "/> {t("adminWorkEmail")}</Label>
               <Input
                 type="email"
-                placeholder="staff@drivehub.com"
+                placeholder="staff@gech.com"
                 value={staffForm.email}
                 onChange={(e) => setStaffForm(prev => ({ ...prev, email: e.target.value }))}
                 className="rounded-2xl bg-slate-50 border-slate-200 text-slate-900 h-12 font-bold placeholder:text-slate-400 focus-visible:ring-[#4CBFBF]/20"

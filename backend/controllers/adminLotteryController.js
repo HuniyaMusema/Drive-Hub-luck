@@ -1,4 +1,5 @@
 const pool = require('../config/pgPool');
+const NotificationService = require('../services/NotificationService');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper: fetch the current active lottery (used by multiple handlers)
@@ -26,6 +27,8 @@ const createAuditLog = async (client, action_type, performed_by, target_id, deta
   );
 };
 
+const { supabase, supabaseAdmin } = require('../config/supabase');
+
 // ─────────────────────────────────────────────────────────────────────────────
 // @desc    Create a new lottery + bulk-generate lottery numbers
 // @route   POST /api/admin/lottery
@@ -33,6 +36,9 @@ const createAuditLog = async (client, action_type, performed_by, target_id, deta
 // ─────────────────────────────────────────────────────────────────────────────
 const createLottery = async (req, res) => {
   const { start_number, end_number, prize_text, prize_car_id, ticket_price } = req.body;
+  const imageFile = req.file;
+
+  console.log('[createLottery] Received request:', { start_number, end_number, hasImage: !!imageFile });
 
   // ── Validation ─────────────────────────────────────────────────────────────
   if (start_number === undefined || end_number === undefined) {
@@ -78,13 +84,44 @@ const createLottery = async (req, res) => {
       });
     }
 
+    // ── Handle Prize Image Upload ──────────────────────────────────────────
+    let prizeImageUrl = null;
+    if (imageFile) {
+      const fileName = `lottery/${Date.now()}_${imageFile.originalname.replace(/\s+/g, '_')}`;
+      
+      const storageClient = supabaseAdmin || supabase; // Fallback to public if admin is somehow null
+      
+      if (!storageClient) {
+        throw new Error('Supabase client not initialized');
+      }
+
+      const { data, error } = await storageClient.storage
+        .from('lottery_cars')
+        .upload(fileName, imageFile.buffer, {
+          contentType: imageFile.mimetype,
+          upsert: false
+        });
+
+      if (error) {
+        console.error('[createLottery] Storage Error:', error);
+        throw new Error(`Failed to upload prize image: ${error.message}`);
+      }
+
+      const { data: { publicUrl } } = storageClient.storage
+        .from('lottery_cars')
+        .getPublicUrl(fileName);
+        
+      prizeImageUrl = publicUrl;
+      console.log('[createLottery] Image uploaded successfully:', prizeImageUrl);
+    }
+
     // ── Insert lottery_settings row ────────────────────────────────────────
     const lotteryResult = await client.query(
       `INSERT INTO lottery_settings
-         (start_number, end_number, prize_text, prize_car_id, ticket_price, status)
-       VALUES ($1, $2, $3, $4, $5, 'active')
+         (start_number, end_number, prize_text, prize_car_id, ticket_price, status, prize_image_url)
+       VALUES ($1, $2, $3, $4, $5, 'active', $6)
        RETURNING *`,
-      [start, end, prize_text || null, prize_car_id || null, parseFloat(ticket_price) || 0]
+      [start, end, prize_text || null, prize_car_id || null, parseFloat(ticket_price) || 0, prizeImageUrl]
     );
     const lottery = lotteryResult.rows[0];
 
@@ -118,11 +155,14 @@ const createLottery = async (req, res) => {
       numbers_generated: end - start + 1,
     });
   } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('[createLottery]', error.message);
-    return res.status(500).json({ message: error.message });
+    if (client) await client.query('ROLLBACK');
+    console.error('[createLottery] Unexpected Error:', error);
+    return res.status(500).json({ 
+        message: 'Internal server error while creating lottery.',
+        details: error.message 
+    });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };
 
@@ -259,7 +299,7 @@ const stopLottery = async (req, res) => {
 
     const { rows: updated } = await pool.query(
       `UPDATE lottery_settings
-       SET    status = 'closed', updated_at = NOW()
+       SET    status = 'closed', updated_at = NOW(), closed_at = NOW()
        WHERE  id = $1
        RETURNING *`,
       [id]
@@ -310,23 +350,29 @@ const getLotteryPayments = async (req, res) => {
     if (lotteryId) {
       query = `
         SELECT p.*, u.name as user_name, u.email as user_email,
-               ln.number as ticket_number, ln.lottery_id
+               (SELECT array_agg(number) FROM lottery_numbers WHERE id = ANY(COALESCE(p.ticket_ids, ARRAY[p.lottery_number_id]))) as ticket_numbers
         FROM payments p
         JOIN users u ON p.user_id = u.id
-        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
-        WHERE ln.lottery_id = $1
+        WHERE EXISTS (
+          SELECT 1 FROM lottery_numbers ln 
+          WHERE ln.id = ANY(COALESCE(p.ticket_ids, ARRAY[p.lottery_number_id])) 
+          AND ln.lottery_id = $1
+        )
         ORDER BY p.created_at DESC`;
       params = [lotteryId];
     } else {
       // Default: only show payments for the current active lottery
       query = `
         SELECT p.*, u.name as user_name, u.email as user_email,
-               ln.number as ticket_number, ln.lottery_id
+               (SELECT array_agg(number) FROM lottery_numbers WHERE id = ANY(COALESCE(p.ticket_ids, ARRAY[p.lottery_number_id]))) as ticket_numbers
         FROM payments p
         JOIN users u ON p.user_id = u.id
-        JOIN lottery_numbers ln ON p.lottery_number_id = ln.id
-        JOIN lottery_settings ls ON ln.lottery_id = ls.id
-        WHERE ls.status = 'active'
+        JOIN lottery_settings ls ON ls.status = 'active'
+        WHERE EXISTS (
+          SELECT 1 FROM lottery_numbers ln 
+          WHERE ln.id = ANY(COALESCE(p.ticket_ids, ARRAY[p.lottery_number_id])) 
+          AND ln.lottery_id = ls.id
+        )
         ORDER BY p.created_at DESC`;
       params = [];
     }
@@ -363,6 +409,7 @@ const verifyPayment = async (req, res) => {
     }
 
     const payment = rows[0];
+    const targetTicketIds = payment.ticket_ids || [payment.lottery_number_id];
 
     // 1. Approve the payment
     const { rows: updated } = await client.query(
@@ -373,30 +420,37 @@ const verifyPayment = async (req, res) => {
       [req.user.id, id]
     );
 
-    // 2. CRITICAL: Lock the lottery number to this user (confirmed)
+    // 2. CRITICAL: Lock ALL lottery numbers in this batch to this user (confirmed)
     await client.query(
       `UPDATE lottery_numbers
        SET status = 'confirmed', user_id = $1, updated_at = NOW()
-       WHERE id = $2`,
-      [payment.user_id, payment.lottery_number_id]
+       WHERE id = ANY($2::uuid[])`,
+      [payment.user_id, targetTicketIds]
     );
 
-    // 3. Notify the user
-    const { rows: ticketInfo } = await client.query(
-      'SELECT number FROM lottery_numbers WHERE id = $1',
-      [payment.lottery_number_id]
-    );
-    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
-    const notificationService = require('../services/notificationService');
-    await notificationService.createNotification(
-      payment.user_id,
-      'Payment Approved!',
-      `Your payment for ticket #${ticketNumber} has been approved. Your lottery number is now confirmed!`,
-      'success',
-      client
-    );
+    // 3. Notify the user for EACH ticket in the batch
+    for (const ticketId of targetTicketIds) {
+      await NotificationService.createNotification(
+        payment.user_id,
+        'payment_approved_title',
+        'payment_approved_msg',
+        'payment_approved',
+        client,
+        payment.id,
+        { entity_type: 'payment', event_action: 'payment_approved', payment_id: payment.id, lottery_number_id: ticketId }
+      );
+      await NotificationService.createNotification(
+        payment.user_id,
+        'ticket_assigned_title',
+        'ticket_assigned_msg',
+        'ticket_assigned',
+        client,
+        ticketId,
+        { entity_type: 'ticket', event_action: 'ticket_assigned', lottery_number_id: ticketId, payment_id: payment.id }
+      );
+    }
 
-    await createAuditLog(client, 'PAYMENT_VERIFIED', req.user.id, id, { status: 'approved', lottery_number_id: payment.lottery_number_id });
+    await createAuditLog(client, 'PAYMENT_VERIFIED', req.user.id, id, { status: 'approved', ticket_ids: targetTicketIds });
 
     await client.query('COMMIT');
     return res.status(200).json(updated[0]);
@@ -434,6 +488,7 @@ const rejectPayment = async (req, res) => {
     }
 
     const payment = rows[0];
+    const targetTicketIds = payment.ticket_ids || [payment.lottery_number_id];
 
     // 1. Reject the payment
     const { rows: updated } = await client.query(
@@ -444,47 +499,45 @@ const rejectPayment = async (req, res) => {
       [req.user.id, rejection_reason, id]
     );
 
-    // 2. CRITICAL: Release the lottery number back to available ONLY if lottery is still active
-    const { rows: lotteryCheck } = await client.query(
-      `SELECT ls.status FROM lottery_numbers ln
-       JOIN lottery_settings ls ON ln.lottery_id = ls.id
-       WHERE ln.id = $1`,
-      [payment.lottery_number_id]
-    );
+    // 2. CRITICAL: Release ALL lottery numbers back to available ONLY if lottery is still active
+    for (const ticketId of targetTicketIds) {
+      const { rows: lotteryCheck } = await client.query(
+        `SELECT ls.status FROM lottery_numbers ln
+         JOIN lottery_settings ls ON ln.lottery_id = ls.id
+         WHERE ln.id = $1`,
+        [ticketId]
+      );
 
-    if (lotteryCheck.length > 0 && lotteryCheck[0].status === 'active') {
-      await client.query(
-        `UPDATE lottery_numbers
-         SET status = 'available', user_id = NULL, updated_at = NOW()
-         WHERE id = $1`,
-        [payment.lottery_number_id]
-      );
-    } else {
-      // Lottery is closed — just clear the user_id but keep status as-is (do not reopen slot)
-      await client.query(
-        `UPDATE lottery_numbers
-         SET user_id = NULL, updated_at = NOW()
-         WHERE id = $1`,
-        [payment.lottery_number_id]
-      );
+      if (lotteryCheck.length > 0 && lotteryCheck[0].status === 'active') {
+        await client.query(
+          `UPDATE lottery_numbers
+           SET status = 'available', user_id = NULL, updated_at = NOW()
+           WHERE id = $1`,
+          [ticketId]
+        );
+      } else {
+        // Lottery is closed — just clear the user_id but keep status as-is (do not reopen slot)
+        await client.query(
+          `UPDATE lottery_numbers
+           SET user_id = NULL, updated_at = NOW()
+           WHERE id = $1`,
+          [ticketId]
+        );
+      }
     }
 
-    // 3. Notify the user
-    const { rows: ticketInfo } = await client.query(
-      'SELECT number FROM lottery_numbers WHERE id = $1',
-      [payment.lottery_number_id]
-    );
-    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
-    const notificationService = require('../services/notificationService');
-    await notificationService.createNotification(
+    // 3. Notify the user — reference_id = payment.id prevents duplicate on retry
+    await NotificationService.createNotification(
       payment.user_id,
-      'Payment Rejected',
-      `Your payment for ticket #${ticketNumber} was rejected. Reason: ${rejection_reason}. Please try again.`,
-      'error',
-      client
+      'payment_rejected_title',
+      'payment_rejected_msg',
+      'payment_rejected',
+      client,
+      payment.id,
+      { entity_type: 'payment', event_action: 'payment_rejected', payment_id: payment.id, rejection_reason: rejection_reason, ticket_ids: targetTicketIds }
     );
 
-    await createAuditLog(client, 'PAYMENT_REJECTED', req.user.id, id, { reason: rejection_reason, lottery_number_id: payment.lottery_number_id });
+    await createAuditLog(client, 'PAYMENT_REJECTED', req.user.id, id, { reason: rejection_reason, ticket_ids: targetTicketIds });
 
     await client.query('COMMIT');
     return res.status(200).json(updated[0]);
@@ -575,10 +628,40 @@ const pickWinner = async (req, res) => {
     // If they don't yet, run: ALTER TABLE lottery_settings ADD COLUMN IF NOT EXISTS winner_id UUID REFERENCES users(id) ON DELETE SET NULL, ADD COLUMN IF NOT EXISTS winning_number INTEGER;
     await client.query(
       `UPDATE lottery_settings
-       SET status = 'closed', winner_id = $1, winning_number = $2, updated_at = NOW()
+       SET status = 'closed', winner_id = $1, winning_number = $2, updated_at = NOW(), closed_at = NOW()
        WHERE id = $3`,
       [winner.user_id, winner.number, lotteryId]
     );
+
+    // 4. Notify everyone
+    // The winner gets a special "Congratulations" message
+    await NotificationService.createNotification(
+      winner.user_id,
+      'lottery_winner_title',
+      'lottery_winner_msg',
+      'lottery_result',
+      client,
+      lotteryId,
+      { entity_type: 'lottery', event_action: 'draw_completed', lottery_id: lotteryId, winning_number: winner.number }
+    );
+
+    // All OTHER participants get a general "Draw Completed" message
+    const { rows: participants } = await client.query(
+      `SELECT DISTINCT user_id FROM lottery_numbers WHERE lottery_id = $1 AND status = 'confirmed' AND user_id != $2`,
+      [lotteryId, winner.user_id]
+    );
+
+    for (const participant of participants) {
+      await NotificationService.createNotification(
+        participant.user_id,
+        'lottery_draw_title',
+        'lottery_draw_msg',
+        'lottery_result',
+        client,
+        lotteryId,
+        { entity_type: 'lottery', event_action: 'draw_completed', lottery_id: lotteryId, winning_number: winner.number }
+      );
+    }
 
     await client.query('COMMIT');
 
@@ -599,6 +682,31 @@ const pickWinner = async (req, res) => {
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// @desc    Get all closed lotteries (history)
+// @route   GET /api/admin/lottery/history
+// @access  Private / Admin
+// ─────────────────────────────────────────────────────────────────────────────
+const getLotteryHistory = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT ls.id, ls.prize_text, ls.prize_image_url, ls.winning_number, ls.winner_id AS winner_user_id, ls.closed_at, ls.created_at, ls.ticket_price,
+              u.name AS winner_name, c.name AS prize_car_name,
+              (SELECT COUNT(DISTINCT user_id) FROM lottery_numbers ln WHERE ln.lottery_id = ls.id AND ln.status = 'confirmed') as total_participants
+       FROM   lottery_settings ls
+       LEFT JOIN users u ON u.id = ls.winner_id
+       LEFT JOIN cars c ON c.id = ls.prize_car_id
+       WHERE  ls.status = 'closed'
+       ORDER  BY ls.closed_at DESC NULLS LAST, ls.created_at DESC`
+    );
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.error('[getLotteryHistory]', error.message);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createLottery,
   getCurrentLottery,
@@ -610,4 +718,5 @@ module.exports = {
   rejectPayment,
   getLotteryNumbers,
   pickWinner,
+  getLotteryHistory,
 };

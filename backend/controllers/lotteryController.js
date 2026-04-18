@@ -1,5 +1,6 @@
 const pool = require('../config/pgPool');
 const SettingsManager = require('../services/SettingsManager');
+const NotificationService = require('../services/NotificationService');
 
 // @desc    Participate in the lottery (Assign specific chosen numbers)
 // @route   POST /api/lottery/participate
@@ -14,7 +15,7 @@ const participateLottery = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const lotteryModuleEnabled = SettingsManager.getSetting('lotteryModuleEnabled', true);
+    const lotteryModuleEnabled = SettingsManager.getSetting('Operational', {})?.lotteryModuleEnabled !== false;
     if (!lotteryModuleEnabled) {
       return res.status(403).json({ message: 'Lottery module is currently disabled' });
     }
@@ -31,6 +32,22 @@ const participateLottery = async (req, res) => {
       return res.status(404).json({ message: 'No active lottery currently running.' });
     }
     const lotteryId = lotteryRows[0].id;
+
+    // 1b. Enforce maxTicketsPerUser from settings
+    const lotterySettings = SettingsManager.getSetting('Lottery', {});
+    const maxTickets = lotterySettings.maxTicketsPerUser || 5;
+    const { rows: existingTickets } = await client.query(
+      `SELECT COUNT(*) FROM lottery_numbers
+       WHERE lottery_id = $1 AND user_id = $2 AND status != 'available'`,
+      [lotteryId, req.user.id]
+    );
+    const currentCount = parseInt(existingTickets[0].count, 10);
+    if (currentCount + numbers.length > maxTickets) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        message: `You can only hold up to ${maxTickets} ticket(s) per lottery. You currently have ${currentCount}.`
+      });
+    }
 
     // 2. Check availability of EVERY chosen number
     const { rows: matched } = await client.query(
@@ -75,63 +92,62 @@ const participateLottery = async (req, res) => {
 
 
 const submitLotteryPayment = async (req, res) => {
-  const { lotteryNumberId, receiptUrl, method } = req.body;
+  const { lotteryNumberIds, receiptUrl, method } = req.body;
 
-  if (!lotteryNumberId || !receiptUrl || !method) {
-    return res.status(400).json({ message: 'Missing required payment details.' });
+  if (!lotteryNumberIds || !Array.isArray(lotteryNumberIds) || lotteryNumberIds.length === 0 || !receiptUrl || !method) {
+    return res.status(400).json({ message: 'Missing or invalid payment details. Expected an array of ticket IDs.' });
   }
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    // 1. Verify the number belongs to the user, is pending, AND its lottery is still active
-    const { rows: numbers } = await client.query(
-      `SELECT ln.id FROM lottery_numbers ln
+    // 1. Verify all numbers belong to the user, are pending, AND their lottery is still active
+    const { rows: validTickets } = await client.query(
+      `SELECT ln.id, ln.number FROM lottery_numbers ln
        JOIN lottery_settings ls ON ln.lottery_id = ls.id
-       WHERE ln.id = $1 AND ln.user_id = $2 AND ln.status = 'pending' AND ls.status = 'active'`,
-      [lotteryNumberId, req.user.id]
+       WHERE ln.id = ANY($1::uuid[]) AND ln.user_id = $2 AND ln.status = 'pending' AND ls.status = 'active'`,
+      [lotteryNumberIds, req.user.id]
     );
 
-    if (numbers.length === 0) {
+    if (validTickets.length !== lotteryNumberIds.length) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'Invalid ticket, ticket not in pending state, or lottery is no longer active.' });
+      return res.status(400).json({ message: 'One or more tickets are invalid, not in pending state, or belong to an inactive lottery.' });
     }
 
-    // 2. Create the payment record
-    await client.query(
-      `INSERT INTO payments (user_id, lottery_number_id, receipt_url, method, status)
-       VALUES ($1, $2, $3, $4, 'pending')`,
-      [req.user.id, lotteryNumberId, receiptUrl, method]
+    // 2. Create the payment record with ticket_ids array
+    const { rows: paymentRows } = await client.query(
+      `INSERT INTO payments (user_id, ticket_ids, receipt_url, method, status)
+       VALUES ($1, $2, $3, $4, 'pending')
+       RETURNING id`,
+      [req.user.id, lotteryNumberIds, receiptUrl, method]
     );
+    const paymentId = paymentRows[0].id;
 
-    // 3. Notify Admin/Staff
-    const { rows: ticketInfo } = await client.query(
-      'SELECT number FROM lottery_numbers WHERE id = $1',
-      [lotteryNumberId]
-    );
-    const ticketNumber = ticketInfo[0]?.number || 'Unknown';
-    const notificationService = require('../services/notificationService');
-    
-    // Notify Admin/Staff
-    await notificationService.notifyAdminsAndStaff(
-      'New Payment Pending',
-      `User ${req.user.name} uploaded a receipt for ticket #${ticketNumber}.`,
-      'info',
+    // 3. Notify Admin/Staff & User for each ticket
+    const ticketNumbersList = validTickets.map(t => `#${t.number}`).join(', ');
+
+    // Admin/Staff Notification
+    await NotificationService.notifyAdminsAndStaff(
+      'New Batch Payment Pending',
+      `User ${req.user.name} uploaded a receipt for tickets: ${ticketNumbersList}.`,
+      'payment_pending',
       client
     );
 
-    // Notify User
-    await notificationService.createNotification(
+    // User Notification
+    await NotificationService.createNotification(
       req.user.id,
       'Payment Under Review',
-      `Your payment for ticket #${ticketNumber} has been received and is under review.`,
-      'info',
-      client
+      `Your payment for tickets ${ticketNumbersList} is under review.`,
+      'payment_pending',
+      client,
+      paymentId,
+      { entity_type: 'payment', event_action: 'payment_submitted', payment_id: paymentId, ticket_numbers: ticketNumbersList }
     );
 
     await client.query('COMMIT');
-    res.status(201).json({ message: 'Payment receipt submitted successfully. Waiting for admin approval.' });
+    res.status(201).json({ message: 'Payment receipt submitted successfully for all selected tickets. Waiting for admin approval.' });
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('[submitLotteryPayment]', error.message);

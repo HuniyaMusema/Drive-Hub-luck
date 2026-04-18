@@ -3,10 +3,12 @@ export const API_BASE = '/api';
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = sessionStorage.getItem('token');
   
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  } as Record<string, string>;
+  const headers: Record<string, string> = { ...options.headers } as Record<string, string>;
+  
+  // Only set application/json if not sending FormData
+  if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;

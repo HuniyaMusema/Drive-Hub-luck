@@ -57,7 +57,7 @@ export default function LotterySelect() {
           }, 50);
         }
       } else {
-        toast({ title: "Limit Reached", description: "You can select up to 5 numbers per transaction." });
+        toast({ title: t("lsLimitReached"), description: t("lsLimitDesc") });
       }
       return next;
     });
@@ -73,7 +73,7 @@ export default function LotterySelect() {
       setConfirmed(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("toastError"), description: err.message, variant: "destructive" });
     }
   };
 
@@ -172,16 +172,17 @@ export default function LotterySelect() {
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-2">
                    <div className="relative w-full sm:w-64">
                       <Input 
-                        type="number" 
-                        placeholder={t("l_searchNumberPlaceholder") || "Search number..."}
+                        type="text" 
+                        inputMode="numeric"
+                        placeholder={t("lsSearchNumber")}
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => setSearchTerm(e.target.value.replace(/\D/g, ""))}
                         className="h-12 pl-10 rounded-2xl bg-muted/20 border-border/40 focus:ring-primary/20 font-bold"
                       />
                       <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                    </div>
                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 bg-muted/30 px-4 py-2 rounded-full border border-border/40 shrink-0">
-                      {t("l_loadMoreNumbers") || t("loadMoreNumbers")}
+                      {t("loadMoreNumbers")}
                    </div>
                 </div>
 
@@ -283,7 +284,7 @@ export default function LotterySelect() {
                   </div>
                   <div>
                     <h2 className="text-lg font-black text-foreground tracking-tighter leading-none">{t("yourSelection")}</h2>
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mt-0.5">Checkout Summary</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mt-0.5">{t("checkoutSummary")}</p>
                   </div>
                 </div>
 
@@ -309,11 +310,11 @@ export default function LotterySelect() {
                     {/* Totals */}
                     <div className="space-y-2 pt-3 border-t border-border/60">
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                        <span>Items</span>
+                        <span>{t("itemsLabel")}</span>
                         <span className="text-foreground">{selected.size} × {t("ticket")}</span>
                       </div>
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                        <span>Price / unit</span>
+                        <span>{t("pricePerUnit")}</span>
                         <span className="text-foreground tabular-nums">{ticketPrice.toLocaleString()} {currency}</span>
                       </div>
                       <div className="flex justify-between items-end pt-3 border-t border-border/60">
@@ -335,7 +336,7 @@ export default function LotterySelect() {
                   onClick={handleConfirm}
                 >
                   {participateMutation.isPending ? (
-                    <><Loader2 className="h-5 w-5 animate-spin mr-2" /> PROCESSING...</>
+                    <><Loader2 className="h-5 w-5 animate-spin mr-2" /> {t("lsProcessing")}</>
                   ) : isAdminOrStaff ? (
                     <><LockIcon className="h-4 w-4 mr-2" /> {t("restrictedRoleButton")}</>
                   ) : (

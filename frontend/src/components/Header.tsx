@@ -4,6 +4,7 @@ import { Bookmark, Car, Globe, Menu, X, Bell, Ticket, Search, Key, Plus, FileTex
 import { Button } from "@/components/ui/button";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/hooks/useSettings";
 import NotificationBell from "@/components/NotificationBell";
@@ -16,9 +17,9 @@ import {
 
 const navLinks = [
   { key: "home", href: "/" },
-  { key: "cars", href: "/cars/sale" },
-  { key: "rentals", href: "/cars/rent" },
   { key: "lottery", href: "/lottery" },
+  { key: "navSale", href: "/cars/sale" },
+  { key: "navRent", href: "/cars/rent" },
   { key: "contact", href: "/contact" },
 ];
 
@@ -54,8 +55,8 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
-  const scrolledBg = 'rgba(18, 35, 58, 0.96)';
-  const mobileBg = 'rgba(18, 35, 58, 0.99)';
+  const scrolledBg = 'rgba(51, 65, 85, 0.97)';
+  const mobileBg = 'rgba(51, 65, 85, 0.99)';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300" style={{
@@ -68,10 +69,7 @@ export function Header() {
         {/* Left side: Logo */}
         <Link to="/" className="flex items-center justify-center text-white min-w-max hover:opacity-80 transition-opacity gap-2">
           <span className="text-[20px] font-display tracking-widest leading-[1.2] capitalize text-white">
-            Gech
-          </span>
-          <span className="text-[16px] font-display leading-[1.2]" style={{ color: '#4CBFBF' }}>
-            (ጌች)
+            {settings?.General?.platformName || "Gech"}
           </span>
         </Link>
 
@@ -104,7 +102,7 @@ export function Header() {
                 {currentLang?.code.toUpperCase()}
               </span>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32 bg-[#0d1e2e] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
+            <DropdownMenuContent align="end" className="w-32 bg-slate-800 border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
               {languages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
@@ -130,7 +128,7 @@ export function Header() {
                   <ChevronDown className="h-3 w-3 text-white/40 group-hover:text-[#4CBFBF] transition-colors" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 mt-2 bg-[#0d1e2e] border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
+              <DropdownMenuContent align="end" className="w-48 mt-2 bg-slate-800 border border-[#4CBFBF]/20 text-white shadow-xl rounded-xl p-1">
                 <DropdownMenuItem asChild className="text-xs cursor-pointer rounded-lg px-3 py-2 transition-colors focus:bg-[#4CBFBF]/10 focus:text-white font-medium">
                   <Link to={user.role === 'admin' || user.role === 'lottery_staff' ? "/admin" : "/dashboard"} className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" />
@@ -165,6 +163,9 @@ export function Header() {
             </Link>
           )}
 
+          {/* Notification Bell */}
+          {user && <NotificationBell />}
+          
           {/* Saved Cars */}
           <Link to="/saved-cars" className="relative text-white/60 hover:text-white transition-colors">
             <FileText className="h-5 w-5" strokeWidth={1.5} />
@@ -174,6 +175,8 @@ export function Header() {
               </span>
             )}
           </Link>
+
+
 
           {/* Hamburger for mobile */}
           <button
@@ -223,6 +226,8 @@ export function Header() {
                 )}
               </Link>
             )}
+            
+
 
             {user && (
               <Link

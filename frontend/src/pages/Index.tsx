@@ -12,19 +12,33 @@ import { useSettings } from "@/hooks/useSettings";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/services/api";
 import carGiftBow from "@/assets/car-gift-bow.png";
-import heroBg from "@/assets/hero-bg.jpg"; // Using existing background for left side
+import heroBg from "@/assets/hero-bg-lasers.png"; // New red laser background
 
 /* ─── Flashcard Stack – right panel ─── */
-const mockListings = [
-  { name: "Mercedes-AMG GT 63", year: 2024, price: "4,200,000 Birr", tag: "Available", color: "#22c55e" },
-  { name: "BMW M8 Competition",  year: 2023, price: "3,750,000 Birr", tag: "Available", color: "#22c55e" },
-  { name: "Porsche 911 Turbo S", year: 2024, price: "5,100,000 Birr", tag: "New In",    color: "#f5b027" },
-  { name: "Lamborghini Urus SE", year: 2024, price: "8,900,000 Birr", tag: "Available", color: "#22c55e" },
-];
-
 function FlashcardStack() {
   const [hovered, setHovered] = useState(false);
   const { t } = useLanguage();
+  const { data: carsData = [] } = useCars();
+
+  const listings = useMemo(() => {
+    if (carsData.length === 0) {
+      return [
+        { name: "Mercedes-AMG GT 63", year: 2024, price: `4,200,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
+        { name: "BMW M8 Competition",  year: 2023, price: `3,750,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
+        { name: "Porsche 911 Turbo S", year: 2024, price: `5,100,000 ${t("birr")}`, tag: t("newIn"),    color: "#f5b027" },
+        { name: "Lamborghini Urus SE", year: 2024, price: `8,900,000 ${t("birr")}`, tag: t("available"), color: "#22c55e" },
+      ];
+    }
+    
+    // Take real cars and map them to the same display format
+    return carsData.slice(0, 4).map(car => ({
+      name: car.name,
+      year: car.year,
+      price: `${car.price.toLocaleString()} ${t("birr")}`,
+      tag: car.available ? t("available") : t("sold"),
+      color: car.available ? "#22c55e" : "#ef4444"
+    }));
+  }, [carsData, t]);
 
   return (
     <div
@@ -57,16 +71,15 @@ function FlashcardStack() {
           {/* Card header */}
           <div className="px-6 pt-5 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/45">Drive Hub Fleet</p>
-              <p className="text-sm font-bold text-white mt-0.5">Cars For Sale</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/45">{t("driveHubFleet")}</p>
+              <p className="text-sm font-bold text-white mt-0.5">{t("carsForSale")}</p>
             </div>
             <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full" style={{ background: "rgba(245,176,39,0.18)", color: "#f5b027", border: "1px solid rgba(245,176,39,0.3)" }}>
-              {mockListings.length} Listed
+              {listings.length} {t("listedLabel")}
             </span>
           </div>
-          {/* Listing rows */}
-          <ul className="divide-y divide-white/[0.06]">
-            {mockListings.map((car, i) => (
+                     <ul className="divide-y divide-white/[0.06]">
+            {listings.map((car, i) => (
               <li key={i} className="px-6 py-3 flex items-center justify-between group/item hover:bg-white/[0.04] transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(76,191,191,0.12)" }}>
@@ -88,7 +101,7 @@ function FlashcardStack() {
           </ul>
           <div className="px-6 py-4">
             <Link to="/cars/sale" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/70 hover:text-white transition-colors" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-              View All Listings <ChevronRight className="h-3 w-3" />
+              {t("viewAllListings")} <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
         </div>
@@ -166,17 +179,11 @@ function HeroSection() {
         <div className="absolute inset-0 flex">
           {/* Background image */}
           <div className="w-full h-full relative">
-            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" style={{ filter: "blur(1px) brightness(0.7)" }} />
+            <img src={heroBg} alt="Garage" className="w-full h-full object-cover object-left" />
           </div>
         </div>
-        {/* Directional overlay: dark on left (text), fades out toward right (cards) */}
-        <div className="absolute inset-0" style={{
-          background: "linear-gradient(to right, rgba(5,10,20,0.82) 0%, rgba(5,10,20,0.65) 40%, rgba(5,10,20,0.15) 70%, transparent 100%)"
-        }} />
-        {/* Bottom fade for polish */}
-        <div className="absolute inset-0" style={{
-          background: "linear-gradient(to top, rgba(5,10,20,0.4) 0%, transparent 30%)"
-        }} />
+        {/* Directional overlay removed to clear shadow */}
+        {/* Bottom fade removed to clear shadow */}
       </div>
 
       {/* Right edge fade into footer color */}
@@ -260,7 +267,7 @@ function HeroSection() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60" style={{ animation: "fadeInUp 0.8s 1.2s both" }}>
-        <span className="text-[9px] text-white/70 tracking-[0.2em] uppercase font-bold">Scroll</span>
+        <span className="text-[9px] text-white/70 tracking-[0.2em] uppercase font-bold">{t("scrollLabel")}</span>
         <ChevronDown className="h-5 w-5 text-white/60 animate-bounce mt-1" strokeWidth={1} />
       </div>
     </section>
@@ -355,43 +362,43 @@ function LotterySection() {
   ];
 
   return (
-    <section ref={ref} className="py-24 lg:py-32 overflow-hidden relative" style={{ background: 'linear-gradient(180deg, #162840 0%, #112033 100%)' }}>
+    <section ref={ref} className="py-8 lg:py-12 overflow-hidden relative" style={{ background: 'linear-gradient(180deg, #334155 0%, #1e293b 100%)' }}>
       {/* Ambient light effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[160px]" style={{ background: 'radial-gradient(ellipse, rgba(76,191,191,0.09) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'radial-gradient(circle, rgba(61,143,181,0.07) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'radial-gradient(circle, rgba(245,176,39,0.07) 0%, transparent 70%)' }} />
       </div>
       
       <div className="relative container mx-auto px-4 lg:px-8 z-10">
-        <div className={`text-center mb-20 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+        <div className={`text-center mb-8 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
           style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border" style={{ background: 'rgba(76,191,191,0.08)', borderColor: 'rgba(76,191,191,0.28)', color: '#4CBFBF' }}>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border" style={{ background: 'rgba(76,191,191,0.08)', borderColor: 'rgba(76,191,191,0.28)', color: '#4CBFBF' }}>
             <Zap className="h-3 w-3" /> {t("howItWorks")}
           </div>
-          <h2 className="text-4xl lg:text-5xl font-display text-white tracking-widest uppercase mb-6 leading-tight">{t("winYourNextRide")}</h2>
-          <p className="mt-4 text-sm tracking-wide font-medium max-w-xl mx-auto text-white/60">{t("lotteryLandingDesc")}</p>
+          <h2 className="text-3xl lg:text-4xl font-black text-white tracking-widest uppercase mb-3 leading-tight shadow-sm" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>{t("winYourNextRide")}</h2>
+          <p className="mt-2 text-sm tracking-wide font-medium max-w-lg mx-auto text-slate-300">{t("lotteryLandingDesc")}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-6">
           {lotterySteps.map((step, i) => (
             <div
               key={step.title}
-              className={`group relative rounded-xl p-10 border transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className={`group relative rounded-[2rem] p-8 border shadow-xl hover:shadow-2xl transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{
                 transitionDelay: `${(i + 1) * 120}ms`,
                 transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-                background: 'rgba(76,191,191,0.04)',
-                borderColor: 'rgba(76,191,191,0.12)',
+                background: 'rgba(255,255,255,0.03)',
+                borderColor: 'rgba(255,255,255,0.1)',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.35)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.07)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(76,191,191,0.12)'; (e.currentTarget as HTMLElement).style.background = 'rgba(76,191,191,0.04)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
             >
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform" style={{ background: 'rgba(245,176,39,0.12)' }}>
-                <step.icon className="h-7 w-7" strokeWidth={1.5} style={{ color: '#f5b027' }} />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner border border-amber-500/20" style={{ background: 'rgba(245,176,39,0.15) ' }}>
+                <step.icon className="h-6 w-6 text-amber-400" strokeWidth={2} />
               </div>
-              <div className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#f5b027' }}>{t("step")} {i + 1}</div>
-              <h3 className="text-xl font-display tracking-[0.1em] mb-4 uppercase text-white">{step.title}</h3>
-              <p className="text-xs leading-relaxed tracking-wide font-medium text-white/55">{step.desc}</p>
+              <div className="text-[10px] font-black uppercase tracking-widest mb-2 text-amber-500">{t("step")} {i + 1}</div>
+              <h3 className="text-xl font-bold tracking-tight mb-3 uppercase text-white">{step.title}</h3>
+              <p className="text-sm font-medium leading-relaxed text-slate-300">{step.desc}</p>
               <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(245,176,39,0.10)' }} />
             </div>
           ))}
@@ -466,7 +473,7 @@ export default function Index() {
             {t("retry")}
           </Button>
           <Link to="/auth/login">
-            <Button variant="ghost">Admin Login</Button>
+            <Button variant="ghost">{t("adminLogin")}</Button>
           </Link>
         </div>
       </div>
