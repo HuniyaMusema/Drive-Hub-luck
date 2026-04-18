@@ -231,15 +231,16 @@ export default function Login() {
                  <p className="text-sm font-medium text-slate-500 mb-4">
                     {t("noAccount")}
                  </p>
-                 <Link to="/auth/register">
-                    <Button 
-                       type="button" 
-                       variant="outline"
-                       className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:bg-slate-50 border-slate-200 text-slate-700" 
-                    >
+                 <Button 
+                    asChild
+                    type="button" 
+                    variant="outline"
+                    className="w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:bg-slate-50 border-slate-200 text-slate-700" 
+                 >
+                    <Link to="/auth/register">
                        {t("createOne")} <ArrowRight className="inline-block h-4 w-4 ml-2" strokeWidth={3} />
-                    </Button>
-                 </Link>
+                    </Link>
+                 </Button>
               </div>
            </div>
         </div>
