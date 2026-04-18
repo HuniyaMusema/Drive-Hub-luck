@@ -62,7 +62,7 @@ function AdminSidebar() {
             to={item.url}
             className={cn(
               "flex items-center transition-all duration-200 group relative",
-              collapsed ? "justify-center p-2 h-10 w-10 rounded-xl mx-auto" : "gap-3 px-3 py-2.5 rounded-xl justify-start",
+              collapsed ? "justify-center p-2 h-10 w-10 rounded-xl mx-auto" : "gap-3 px-4 py-3 rounded-xl justify-start min-h-[44px]",
               isActive
                 ? "bg-[#4CBFBF]/15 text-white font-semibold"
                 : "text-white/55 hover:text-white hover:bg-white/8"
@@ -77,7 +77,7 @@ function AdminSidebar() {
               isActive ? "text-[#4CBFBF]" : "text-white/40 group-hover:text-[#4CBFBF]"
             )} />
             {!collapsed && (
-              <span className="text-[13px] leading-none">{t(item.labelKey)}</span>
+              <span className="text-[14px] leading-tight whitespace-nowrap">{t(item.labelKey)}</span>
             )}
           </Link>
         </SidebarMenuButton>
