@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/services/api';
+import { apiFetch, API_BASE } from '@/services/api';
 
 export interface Lottery {
   id: string;
@@ -59,7 +59,7 @@ export const useCurrentLottery = () => {
   return useQuery<{ lottery: Lottery; number_stats: LotteryStats } | null>({
     queryKey: ['lottery', 'current'],
     queryFn: async () => {
-      const url = '/api/lottery/current';
+      const url = `${API_BASE}/lottery/current`;
       
       const res = await fetch(url, {
         headers: {
