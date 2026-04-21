@@ -92,4 +92,13 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
+
+  // Log which services are available so we can debug connectivity issues
+  const { supabase, supabaseAdmin } = require('./config/supabase');
+  const pool = require('./config/pgPool');
+
+  console.log('[startup] Service availability:');
+  console.log(`  Supabase public client : ${supabase      ? '✓ available' : '✗ unavailable (check SUPABASE_URL / SUPABASE_ANON_KEY)'}`);
+  console.log(`  Supabase admin client  : ${supabaseAdmin ? '✓ available' : '✗ unavailable (SUPABASE_SERVICE_ROLE_KEY not set)'}`);
+  console.log(`  PostgreSQL pool        : ${pool          ? '✓ available' : '✗ unavailable (DATABASE_URL not set)'}`);
 });
