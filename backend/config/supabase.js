@@ -5,14 +5,19 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 /**
- * Validate environment variables safely (do NOT crash app on load)
+ * Validate environment variables safely (do NOT crash app on load).
+ * SUPABASE_SERVICE_ROLE_KEY is optional — the public client is sufficient
+ * for basic operations. Missing it logs a warning, not an error.
  */
-if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
-  console.error('[Supabase] Missing environment variables:', {
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('[Supabase] Missing required environment variables:', {
     SUPABASE_URL: !!supabaseUrl,
     SUPABASE_ANON_KEY: !!supabaseAnonKey,
-    SUPABASE_SERVICE_ROLE_KEY: !!supabaseServiceKey
   });
+}
+
+if (!supabaseServiceKey) {
+  console.warn('[Supabase] SUPABASE_SERVICE_ROLE_KEY is not set — admin client will be unavailable. Admin-only routes will not function.');
 }
 
 /**
