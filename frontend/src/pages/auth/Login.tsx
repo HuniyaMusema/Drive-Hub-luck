@@ -10,6 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/hooks/useSettings";
 import type { User } from "@/types/auth";
 import { useToast } from "@/hooks/use-toast";
+import { apiFetch } from "@/services/api";
 
 
 export default function Login() {
@@ -32,37 +33,31 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/auth/login', {
+      const data = await apiFetch('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.toLowerCase().trim(), password })
       });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        sessionStorage.setItem('token', data.token);
-        const loggedInUser: User = {
-          id: data.id,
-          name: data.name,
-          email: data.email,
-          role: data.role as any,
-        };
-        setUser(loggedInUser);
-        toast({ title: `${t("authWelcomeBackMsg")}, ${data.name}!`, description: t("authSecureSession") });
-        if (loggedInUser.role === "admin" || loggedInUser.role === "lottery_staff") {
-          navigate("/admin");
-        } else {
-          navigate("/dashboard");
-        }
-      } else if (response.status === 403 && data.requiresVerification) {
-        // Account exists but email is not verified yet
-        setUnverifiedEmail(data.email || email.toLowerCase().trim());
+
+      sessionStorage.setItem('token', data.token);
+      const loggedInUser: User = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role as any,
+      };
+      setUser(loggedInUser);
+      toast({ title: `${t("authWelcomeBackMsg")}, ${data.name}!`, description: t("authSecureSession") });
+      if (loggedInUser.role === "admin" || loggedInUser.role === "lottery_staff") {
+        navigate("/admin");
       } else {
-        toast({ title: t("authAccessDenied"), description: data.message || t("authCredentialConflict"), variant: "destructive" });
+        navigate("/dashboard");
       }
-    } catch (error) {
-      toast({ title: t("authNetworkError"), description: t("authConnectionFailed"), variant: "destructive" });
+    } catch (error: any) {
+      if (error?.requiresVerification) {
+        setUnverifiedEmail(error.email || email.toLowerCase().trim());
+      } else {
+        toast({ title: t("authAccessDenied"), description: error?.message || t("authCredentialConflict"), variant: "destructive" });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -72,21 +67,14 @@ export default function Login() {
     if (!unverifiedEmail) return;
     setResendLoading(true);
     try {
-      const response = await fetch('/api/auth/resend-verification', {
+      await apiFetch('/auth/resend-verification', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: unverifiedEmail })
       });
-      
-      const data = await response.json();
-      if (response.ok) {
-        setResendSent(true);
-        toast({ title: "Email Sent", description: "A new verification link has been sent to your email." });
-      } else {
-        toast({ title: "Error", description: data.message || "Failed to resend verification email.", variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: "Network Error", description: "Failed to connect to the server.", variant: "destructive" });
+      setResendSent(true);
+      toast({ title: "Email Sent", description: "A new verification link has been sent to your email." });
+    } catch (error: any) {
+      toast({ title: "Error", description: error?.message || "Failed to resend verification email.", variant: "destructive" });
     } finally {
       setResendLoading(false);
     }

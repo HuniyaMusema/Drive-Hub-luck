@@ -8,6 +8,7 @@ import { Eye, EyeOff, UserPlus, ShieldCheck, Mail, Lock, User, ArrowRight, Spark
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
+import { apiFetch } from "@/services/api";
 import heroBg from "@/assets/hero-bg-lasers.png";
 import { cn } from "@/lib/utils";
 
@@ -37,25 +38,18 @@ export default function Register() {
     
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
+      await apiFetch('/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: `${firstName} ${lastName}`.trim(),
           email: email.toLowerCase().trim(),
           password
         })
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        setRegisteredEmail(email.toLowerCase().trim());
-        setRegistered(true);
-      } else {
-        toast({ title: t("authRegistrationBlocked"), description: data.message || t("authCredentialConflict"), variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: t("authConnectionError"), description: t("authSecureNodeRegistration"), variant: "destructive" });
+      setRegisteredEmail(email.toLowerCase().trim());
+      setRegistered(true);
+    } catch (error: any) {
+      toast({ title: t("authRegistrationBlocked"), description: error?.message || t("authCredentialConflict"), variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
